@@ -9,31 +9,22 @@
 
 class Observer : public Entity
 {
-	WorldLine* worldLine;
+	WorldLine* worldLine = NULL;
 
 public:
 
-	Observer(WorldLine* _worldLine, std::string _name, std::string _desc = "")
+	Observer(WorldLine* _worldLine, std::string _name = "", std::string _desc = "")
 		: Entity(_name, _desc), worldLine(_worldLine) {
 	}
 
 	~Observer() {
+		delete worldLine;
 	}
 
-	Camera* getCameraAtAbsoluteTime(float t) {
-		vec4 location = worldLine->getLocationAtAbsoluteTime(t);
-		vec4 fVelocity = worldLine->getVelocityAtAbsoluteTime(t);
+	vec4 getLocationAtAbsoluteTime(float t);
 
-		//Todo
-		return new Camera();
-	}
+	vec4 getVelocityAtAbsoluteTime(float t);
 
-	Camera* getCameraAtProperTime(float tau) {
-		vec4 location = worldLine->getLocationAtProperTime(tau);
-		vec4 fVelocity = worldLine->getVelocityAtProperTime(tau);
 
-		//Todo
-		return new Camera();
-	}
 };
 
