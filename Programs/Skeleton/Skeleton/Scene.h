@@ -8,10 +8,10 @@
 #include <iostream>
 
 class Scene {
-	float timeScale = 1; // Time scale of the simulation.
+	float timeScale = 10; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float absoluteTimeSpent = 0.0f;
 
-	Camera* camera;
+	Camera* camera = NULL;
 
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
@@ -42,6 +42,10 @@ public:
 
 	void Animate(float dt) {
 		dt *= timeScale;
+		for each (Object* obj in objects)
+		{
+			obj->Animate(dt, absoluteTimeSpent);
+		}
 	}
 
 	void Draw(GPUProgram& gpuProgram) {

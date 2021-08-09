@@ -16,6 +16,7 @@ class Object : public Entity
 	WorldLine* worldLine = NULL;
 	Geometry* geometry;
 	Material* material = NULL;
+	vec4 locationFV, velocityFV;
 
 public:
 
@@ -60,11 +61,13 @@ public:
 	}
 
 	void Animate(float dt, float absoluteTimeSpent) {
-		vec4 trs4 = worldLine->getLocationAtAbsoluteTime(absoluteTimeSpent);
-		translation = vec3(trs4.x, trs4.y, trs4.z);
+		locationFV = worldLine->getLocationAtAbsoluteTime(absoluteTimeSpent);
+		velocityFV = worldLine->getVelocityAtAbsoluteTime(absoluteTimeSpent);
+		translation = vec3(locationFV.x, locationFV.y, locationFV.z);
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
+		material->calculateDopplerShift(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), locationFV);
 		material->loadOnGPU(gpuProgram);
 		gpuProgram.setUniform(M() * camera.V() * camera.P(), "MVP");
 		gpuProgram.setUniform(M(), "M");

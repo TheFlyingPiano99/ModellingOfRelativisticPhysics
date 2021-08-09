@@ -62,4 +62,12 @@ public:
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(eye, "wEye");
 	}
+
+	vec4 getLocationFV() {
+		return locationFV;
+	}
+
+	vec4 getVelocityFV() {
+		return velocityFV;
+	}
 };
