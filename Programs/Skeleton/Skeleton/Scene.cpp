@@ -14,7 +14,7 @@ void Scene::Create()
 	vec3 color = vec3(0.1, 0.2, 0.9);
 	ParamSurface* pSurface = new SphereSurface(0.5f);
 	pSurface->GenSurface(100, 100);
-	wrdln = new GeodeticLine(vec3(1.0f, 0.0f, 0.0f), vec3(0.4f, 0.0f, 0.0f), "Obj1's world line");
+	wrdln = new GeodeticLine(vec3(5.0f, 0.0f, 0.0f), vec3(0.62f, 0.0f, 0.0f), "Obj1's world line");
 	Object* obj = new Object(
 		vec3(1.0f, 1.0f, 1.0f),
 		0.0f,

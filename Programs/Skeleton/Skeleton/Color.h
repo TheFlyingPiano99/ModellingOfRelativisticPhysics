@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include "framework.h"
+#include <iostream>
 
 static double Gamma = 0.80;
 static double IntensityMax = 255;
@@ -71,6 +72,7 @@ static vec3 waveLengthToRGB(double Wavelength) {
     rgb.x = Red == 0.0 ? 0 : (int)round(IntensityMax * pow(Red * factor, Gamma));
     rgb.y = Green == 0.0 ? 0 : (int)round(IntensityMax * pow(Green * factor, Gamma));
     rgb.z = Blue == 0.0 ? 0 : (int)round(IntensityMax * pow(Blue * factor, Gamma));
-
+    rgb = rgb / 256.0f;
+    std::cout << rgb.x <<", " << rgb.y << ", " << rgb.z << ", " << std::endl;
     return rgb;
 }
