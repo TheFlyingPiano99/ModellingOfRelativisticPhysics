@@ -110,5 +110,8 @@
     <ClInclude Include="LightCone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Intersectable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

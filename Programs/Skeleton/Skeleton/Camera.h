@@ -1,5 +1,6 @@
 #pragma once
 #include "framework.h"
+#include "Hyperplane.h"
 
 /*
 * Viewing camera.
@@ -12,6 +13,15 @@ class Camera {
 
 
 public:
+
+	Hyperplane getHyperplane() {
+		return Hyperplane::simultaneousHyperplane(
+			locationFV,
+			velocityFV
+		);
+		//return Hyperplane(locationFV, velocityFV);
+	}
+
 	void initBasic(const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp) {
 		this->lookat = lookat;
 		this->prefUp = prefUp;
@@ -63,6 +73,7 @@ public:
 	}
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
+		;
 		//gpuProgram.setUniform(eye, "wEye");
 	}
 

@@ -74,7 +74,7 @@ public:
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		geometry->updateBeforeDraw(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), locationFV);
+		geometry->updateBeforeDraw(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), camera.getHyperplane(), *worldLine);
 		material->loadOnGPU(gpuProgram);
 		if (texture != nullptr) {
 			texture->loadOnGPU(gpuProgram);

@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include "Hyperplane.h"
+#include "LightCone.h"
 #include "RelPhysics.h"
 #include "Exceptions.h"
 
@@ -68,6 +69,21 @@ public:
 	*/
 	virtual Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t) = 0;
 
+	/*
+	* Returns intersection event in space-time between this world line and the intersectable hyperplane.
+	*/
+	virtual vec4 intersectHyperplane(Hyperplane& plane) = 0;
+
+	/*
+	* Returns intersection event in space-time between this world line and the intersectable light cone.
+	*/
+	virtual vec4 intersectLightCone(LightCone& cone) = 0;
+
+	/*
+	* Used, when a vertex is offseted from the center of an object.
+	* Returned object must be deleted by caller!
+	*/
+	virtual WorldLine* getWorldLineWithOffset(vec3 offset) = 0;
 };
 
 class GeodeticLine : public WorldLine
@@ -97,5 +113,9 @@ public:
 	vec4 getLocationAtAbsoluteTime(float t);
 	vec4 getVelocityAtAbsoluteTime(float t);
 	Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t);
+	virtual vec4 intersectHyperplane(Hyperplane& plane);
+	virtual vec4 intersectLightCone(LightCone& cone);
+	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
+
 
 };

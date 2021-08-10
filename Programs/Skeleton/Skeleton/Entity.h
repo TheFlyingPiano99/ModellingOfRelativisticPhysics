@@ -9,6 +9,7 @@
 */
 class Entity
 {
+protected:
 	int ID;
 	static int nextID;
 	std::string name;

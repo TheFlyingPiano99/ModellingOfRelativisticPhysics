@@ -98,6 +98,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Intersectable.h" />
     <ClInclude Include="LightCone.h" />
     <ClInclude Include="Hyperplane.h" />
     <ClInclude Include="Material.h" />

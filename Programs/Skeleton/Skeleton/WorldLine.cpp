@@ -67,4 +67,24 @@ Hyperplane GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
     );
 }
 
+vec4 GeodeticLine::intersectHyperplane(Hyperplane& plane)
+{
+    float t = (dot(plane.getLocation() - locationAtZeroT, plane.getNormal())) / dot(fourVelocity, plane.getNormal());
+    return getLocationAtAbsoluteTime(t);
+}
+
+vec4 GeodeticLine::intersectLightCone(LightCone& cone)
+{
+    return vec4();
+}
+
+WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
+{
+    return new GeodeticLine(
+        locationAtZeroT + vec4(offset.x, offset.y, offset.z, 0),
+        fourVelocity,
+        name,
+        description);
+}
+
 //------------------------------------------------------------------------

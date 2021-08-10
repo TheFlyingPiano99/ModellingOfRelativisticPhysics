@@ -28,8 +28,13 @@ public:
 
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		geometry->updateBeforeDraw(camera.getVelocityFV(), vec4(0,0,0,1),
-			camera.getLocationFV(), vec4(0,0,0,0));
+		WorldLine* line = new GeodeticLine(camera.getLocationFV(), vec4(0, 0, 0, 1),
+			"Background world line", "");
+		geometry->updateBeforeDraw(
+			camera.getVelocityFV(), vec4(0,0,0,1),
+			camera.getLocationFV(),
+			camera.getHyperplane(), *line);
+		delete line;
 		material->loadOnGPU(gpuProgram);
 
 		gpuProgram.setUniform(*texture, "textureUnit");

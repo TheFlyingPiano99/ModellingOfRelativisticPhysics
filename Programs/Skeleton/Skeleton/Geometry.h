@@ -2,6 +2,8 @@
 
 #include "framework.h"
 #include "Color.h"
+#include "Hyperplane.h"
+#include "WorldLine.h"
 
 class Geometry {
 protected:
@@ -22,8 +24,13 @@ public:
 
 	virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) = 0;
 
-	virtual void updateBeforeDraw(vec4 observersVelocity, vec4 subjectsVelocity,
-		vec4 observersLocation, vec4 subjectsLocation) = 0;
+	virtual void updateBeforeDraw(
+		vec4 observersVelocity,
+		vec4 subjectsVelocity,
+		vec4 observersLocation,
+		Hyperplane& observersPlane,
+		WorldLine& subjectsLine
+		) = 0;
 
 };
 
@@ -44,18 +51,31 @@ protected:
 
 public:
 
-	virtual void updateBeforeDraw(vec4 observersVelocity, vec4 subjectsVelocity, vec4 observersLocation, vec4 subjectsLocation) {
-		//Temporary:	(The same Doppler shift for all the vertices is not correct!)
-		float dopplerShift = calculateDopplerShift(observersVelocity, subjectsVelocity, observersLocation, subjectsLocation);
-		//std::cout << "Doppler = " << dopplerShift << std::endl;
-		for (int i = 0; i < vds.size(); i++)
+	virtual void updateBeforeDraw(
+		vec4 observersVelocity,
+		vec4 subjectsVelocity,
+		vec4 observersLocation,
+		Hyperplane& observersPlane,
+		WorldLine& subjectsLine) {
+
+		std::vector<VertexData> transformedVds(vds.size());
+		for (int i = 0; i < transformedVds.size(); i++)
 		{
-			vds[i].doppler = dopplerShift;
+			vec4 offset = vec4(vds[i].pos.x, vds[i].pos.y, vds[i].pos.z, 0);
+			WorldLine* offsettedLine = subjectsLine.getWorldLineWithOffset(vds[i].pos);
+			vec4 vertexLocation = offsettedLine->intersectHyperplane(observersPlane);
+			delete offsettedLine;
+			float vertexDopplerShift = calculateDopplerShift(observersVelocity, subjectsVelocity,
+				observersLocation, vertexLocation);
+			transformedVds[i].doppler = vertexDopplerShift;
+			transformedVds[i].norm = vds[i].norm;
+			transformedVds[i].pos = vec3(vertexLocation.x, vertexLocation.y, vertexLocation.z);
+			transformedVds[i].uv = vds[i].uv;
 		}
 		
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vds.size() * sizeof(VertexData), &vds[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, transformedVds.size() * sizeof(VertexData), &transformedVds[0], GL_DYNAMIC_DRAW);
 
 	}
 
