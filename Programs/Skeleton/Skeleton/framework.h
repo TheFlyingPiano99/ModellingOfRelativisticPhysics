@@ -145,6 +145,14 @@ inline mat4 operator*(const mat4& left, const mat4& right) {
 	return result;
 }
 
+inline mat4 UnitMatrix() {
+	return mat4(vec4(1, 0, 0, 0),
+		vec4(0, 1, 0, 0),
+		vec4(0, 0, 1, 0),
+		vec4(0, 0, 0, 1));
+}
+
+
 inline mat4 TranslateMatrix(vec3 t) {
 	return mat4(vec4(1,   0,   0,   0),
 			    vec4(0,   1,   0,   0),

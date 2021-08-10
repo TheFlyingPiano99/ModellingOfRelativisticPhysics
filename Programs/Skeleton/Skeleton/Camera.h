@@ -35,6 +35,9 @@ public:
 
 	void setLookat(const vec3 lat) {
 		lookat = lat;
+		vec3 w = eye - lookat;
+		vRight = normalize(cross(prefUp, w));
+		vUp = normalize(cross(w, vRight));
 	}
 
 	mat4 V() {
@@ -60,7 +63,7 @@ public:
 	}
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
-		gpuProgram.setUniform(eye, "wEye");
+		//gpuProgram.setUniform(eye, "wEye");
 	}
 
 	vec4 getLocationFV() {
@@ -69,5 +72,14 @@ public:
 
 	vec4 getVelocityFV() {
 		return velocityFV;
+	}
+
+	void rotate(float verticalAxisAngle, float horizontalAxisAngle) {
+		mat4 vRotationM = RotationMatrix(verticalAxisAngle, prefUp);
+		mat4 hRotationM = RotationMatrix(horizontalAxisAngle, vRight);
+
+		vec3 centered = lookat - eye;
+		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
+		setLookat(vec3(rotated.x, rotated.y, rotated.z) + eye);
 	}
 };

@@ -41,12 +41,33 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 void onKeyboardUp(unsigned char key, int pX, int pY) {
 }
 
+static bool down = false;
+static bool prevDown = false;
+static float prevCX, prevCY;
+
 // Move mouse with key pressed
 void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the cursor in the coordinate system of the operation system
 	// Convert to normalized device space
 	float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
 	float cY = 1.0f - 2.0f * pY / windowHeight;
-	printf("Mouse moved to (%3.2f, %3.2f)\n", cX, cY);
+
+
+	if (!prevDown && down) {
+		prevCX = cX;
+		prevCY = cY;
+	}
+
+	float deltaX = cX - prevCX;
+	float deltaY = cY - prevCY;
+
+	if (down) {
+		prevDown = true;
+		scene->moveCamera(deltaX, deltaY);
+		glutPostRedisplay();
+	}
+
+	prevCX = cX;
+	prevCY = cY;
 }
 
 // Mouse click event
@@ -56,16 +77,20 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 	float cY = 1.0f - 2.0f * pY / windowHeight;
 
 	char * buttonStat;
-	switch (state) {
-	case GLUT_DOWN: buttonStat = "pressed"; break;
-	case GLUT_UP:   buttonStat = "released"; break;
-	}
 
 	switch (button) {
-	case GLUT_LEFT_BUTTON:   printf("Left button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);   break;
-	case GLUT_MIDDLE_BUTTON: printf("Middle button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY); break;
-	case GLUT_RIGHT_BUTTON:  printf("Right button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);  break;
+	case GLUT_LEFT_BUTTON: break;
+	case GLUT_MIDDLE_BUTTON: break;
+	case GLUT_RIGHT_BUTTON:
+		if (state == GLUT_DOWN) {	//Start dragging camera
+			down = true;
+		}
+		else if (state == GLUT_UP) {	//Stop dragging camera
+			down = false; prevDown = false;
+		}
+			break;
 	}
+
 }
 
 

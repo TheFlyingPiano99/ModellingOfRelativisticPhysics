@@ -7,38 +7,44 @@
 #include "Material.h"
 #include "Geometry.h"
 #include "Camera.h"
+#include "AdvancedTexture.h"
 
 
 class Object : public Entity
 {
-	float rotationAngle;
+	float rotationAngle, rotationSpeed;
 	vec3 scale, rotationAxis, translation;
 	WorldLine* worldLine = NULL;
 	Geometry* geometry;
 	Material* material = NULL;
-	vec4 locationFV, velocityFV;
+	AdvancedTexture* texture = NULL;
+	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
 
 public:
 
 	Object(
 		vec3 _scale,
 		float _rotaionAngle,
+		float _rotationSpeed,
 		vec3 _translation,
 		vec3 _rotationAxis,
 		WorldLine* _worldLine,
 		Geometry* _geometry,
 		Material* _material,
+		AdvancedTexture* _texture,
 		std::string _name = "",
 		std::string _desc = ""
 	)
 		: Entity(_name, _desc),
 		scale(_scale),
 		rotationAngle(_rotaionAngle),
+		rotationSpeed(_rotationSpeed),
 		rotationAxis(_rotationAxis),
 		translation(_translation),
 		worldLine(_worldLine),
 		geometry(_geometry),
-		material(_material)
+		material(_material),
+		texture(_texture)
 	{
 	}
 
@@ -64,13 +70,18 @@ public:
 		locationFV = worldLine->getLocationAtAbsoluteTime(absoluteTimeSpent);
 		velocityFV = worldLine->getVelocityAtAbsoluteTime(absoluteTimeSpent);
 		translation = vec3(locationFV.x, locationFV.y, locationFV.z);
+		rotationAngle = absoluteTimeSpent * rotationSpeed;
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		material->calculateDopplerShift(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), locationFV);
+		geometry->updateBeforeDraw(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), locationFV);
 		material->loadOnGPU(gpuProgram);
+		if (texture != nullptr) {
+			texture->loadOnGPU(gpuProgram);
+		}
 		gpuProgram.setUniform(M() * camera.V() * camera.P(), "MVP");
-		gpuProgram.setUniform(M(), "M");
+		//gpuProgram.setUniform(M(), "M");
+		gpuProgram.setUniform(invM(), "invM");
 
 		geometry->Draw(gpuProgram, M(), camera.V(), camera.P());
 	}

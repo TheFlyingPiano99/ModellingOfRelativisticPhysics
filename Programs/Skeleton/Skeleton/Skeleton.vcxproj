@@ -80,6 +80,7 @@
     <ClCompile Include="framework.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
+    <ClCompile Include="LightCone.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
@@ -88,6 +89,8 @@
     <ClCompile Include="WorldLine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdvancedTexture.h" />
+    <ClInclude Include="Background.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Entity.h" />
@@ -95,6 +98,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="LightCone.h" />
     <ClInclude Include="Hyperplane.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Object.h" />

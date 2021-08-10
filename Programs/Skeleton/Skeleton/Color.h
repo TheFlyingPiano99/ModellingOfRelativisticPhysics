@@ -1,7 +1,29 @@
 #pragma once
-#include <math.h>
+
 #include "framework.h"
+#include "RelPhysics.h"
+
 #include <iostream>
+#include <math.h>
+
+/*
+* Calculates coeficient for Doppler shift of perceived color.
+*/
+static float calculateDopplerShift(vec4 observersVelocity, vec4 subjectsVelocity, vec4 observersLocation, vec4 subjectsLocation) {
+    vec4 toSubject4 = subjectsLocation - observersLocation;
+    vec3 toSubject3 = vec3(toSubject4.x, toSubject4.y, toSubject4.z);
+    vec4 relVelocityVector4 = subjectsVelocity - observersVelocity;
+    vec3 relVelocityVector3 = vec3(relVelocityVector4.x, relVelocityVector4.y, relVelocityVector4.z);
+    float v = RelPhysics::relativeVelocity(observersVelocity, subjectsVelocity);
+    float dopplerShift;
+    if (dot(toSubject3, relVelocityVector3) < 0.0f) {	// Ha közeledik
+        dopplerShift = sqrtf((RelPhysics::speedOfLight - v) / (RelPhysics::speedOfLight + v));
+    }
+    else { // Ha távolodik
+        dopplerShift = sqrtf((RelPhysics::speedOfLight + v) / (RelPhysics::speedOfLight - v));
+    }
+    return dopplerShift;
+}
 
 static double Gamma = 0.80;
 static double IntensityMax = 255;
@@ -73,6 +95,6 @@ static vec3 waveLengthToRGB(double Wavelength) {
     rgb.y = Green == 0.0 ? 0 : (int)round(IntensityMax * pow(Green * factor, Gamma));
     rgb.z = Blue == 0.0 ? 0 : (int)round(IntensityMax * pow(Blue * factor, Gamma));
     rgb = rgb / 256.0f;
-    std::cout << rgb.x <<", " << rgb.y << ", " << rgb.z << ", " << std::endl;
+    std::cout << "Color Shifted: " << rgb.x <<", " << rgb.y << ", " << rgb.z << ", " << std::endl;
     return rgb;
 }

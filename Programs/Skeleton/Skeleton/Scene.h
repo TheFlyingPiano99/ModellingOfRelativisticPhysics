@@ -1,11 +1,12 @@
 #pragma once
 
+#include <vector>
+#include <iostream>
+
 #include "Camera.h"
 #include "Observer.h"
 #include "Object.h"
-
-#include <vector>
-#include <iostream>
+#include "Background.h"
 
 class Scene {
 	float timeScale = 10; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
@@ -16,6 +17,8 @@ class Scene {
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
+
+	Background* background;
 
 public:
 
@@ -31,6 +34,8 @@ public:
 		{
 			delete obj;
 		}
+
+		delete background;
 	}
 
 	void Create();
@@ -50,17 +55,21 @@ public:
 
 	void Draw(GPUProgram& gpuProgram) {
 		if (currentObserver != nullptr) {
+			//Prefase:
 			camera->update(
 				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
 				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
 			);
 			camera->loadOnGPU(gpuProgram);
+
+			//Actual draw:
+			background->Draw(gpuProgram, *camera);
 			for each (Object * obj in objects)
 			{
 				obj->Draw(gpuProgram, *camera);
 			}
 		}
-		std::cout << absoluteTimeSpent << std::endl;
+		//std::cout << absoluteTimeSpent << std::endl;
 	}
 
 	void toggleCurrentObserver() {
@@ -73,5 +82,9 @@ public:
 		}
 	}
 
+	void moveCamera(float cx, float cy) {
+		static float camSpeed = 0.01f;
+		camera->rotate(cx, -cy);
+	}
 
 };
