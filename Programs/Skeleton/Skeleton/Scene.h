@@ -47,6 +47,10 @@ public:
 
 	void Animate(float dt) {
 		dt *= timeScale;
+		camera->update(
+			currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
+			currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
+		);
 		for each (Object* obj in objects)
 		{
 			obj->Animate(dt, absoluteTimeSpent);
@@ -56,20 +60,15 @@ public:
 	void Draw(GPUProgram& gpuProgram) {
 		if (currentObserver != nullptr) {
 			//Prefase:
-			camera->update(
-				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
-			);
 			camera->loadOnGPU(gpuProgram);
 
-			//Actual draw:
-			background->Draw(gpuProgram, *camera);
-			for each (Object * obj in objects)
+			//Actual drawing:
+			background->Draw(gpuProgram, *camera);		// Background
+			for each (Object * obj in objects)			// Objects
 			{
 				obj->Draw(gpuProgram, *camera);
 			}
 		}
-		//std::cout << absoluteTimeSpent << std::endl;
 	}
 
 	void toggleCurrentObserver() {

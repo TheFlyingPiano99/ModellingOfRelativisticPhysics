@@ -127,35 +127,45 @@ public:
 	}
 };
 
-
-#pragma once
-
-#include "framework.h"
-#include "Camera.h"
-#include "Color.h"
-
 class Stars : public ParamSurface {
-
+	Dnum<vec2> R;
 public:
+
 	Stars() : ParamSurface() {
-		srand(0);
+		//srand(0);
+		R = Dnum<vec2>(1000, vec2(0, 0));
 	}
 
-	// Inherited via ParamSurface
+	void Eval(float u, float v, vec3& pos, vec3& norm) {
+		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
+		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
+		Dnum<vec2> X = R * Cos(U) * Sin(V);
+		Dnum<vec2> Y = R * Sin(U) * Sin(V);
+		Dnum<vec2> Z = R * Cos(V);
+
+		pos = vec3(X.f, Y.f, Z.f);
+		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
+	}
+
+
+	/*
+		// Inherited via ParamSurface
 	void Eval(float u, float v, vec3& pos, vec3& norm)
 	{
 		pos = normalize(vec3(rand() % 1000 - 500, rand() % 1000 - 500, rand() % 1000 - 500));
 		norm = -pos;
 		pos = pos * 1000.0f;
 	}
+	*/
 
-	virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) {
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		//gpuProgram.setUniform(depthShading, "depthShading");
-		glLineWidth(5);
-		glPointSize(10);
-		glDrawArrays(GL_POINTS, 0, vds.size());
-		glLineWidth(1);
-	}
+
+	//virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) {
+	//	glBindVertexArray(vao);
+	//	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//	//gpuProgram.setUniform(depthShading, "depthShading");
+	//	glLineWidth(5);
+	//	glPointSize(10);
+	//	glDrawArrays(GL_TRI, 0, vds.size());
+	//	glLineWidth(1);
+	//}
 };

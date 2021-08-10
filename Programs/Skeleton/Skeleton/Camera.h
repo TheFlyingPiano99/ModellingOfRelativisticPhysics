@@ -74,6 +74,10 @@ public:
 		return velocityFV;
 	}
 
+	vec3 getEye() {
+		return eye;
+	}
+
 	void rotate(float verticalAxisAngle, float horizontalAxisAngle) {
 		mat4 vRotationM = RotationMatrix(verticalAxisAngle, prefUp);
 		mat4 hRotationM = RotationMatrix(horizontalAxisAngle, vRight);
