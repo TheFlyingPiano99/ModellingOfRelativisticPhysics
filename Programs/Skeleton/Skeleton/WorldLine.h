@@ -72,12 +72,12 @@ public:
 	/*
 	* Returns intersection event in space-time between this world line and the intersectable hyperplane.
 	*/
-	virtual vec4 intersectHyperplane(Hyperplane& plane) = 0;
+	virtual float intersectHyperplane(Hyperplane& plane) = 0;
 
 	/*
 	* Returns intersection event in space-time between this world line and the intersectable light cone.
 	*/
-	virtual vec4 intersectLightCone(LightCone& cone) = 0;
+	virtual float intersectLightCone(LightCone& cone) = 0;
 
 	/*
 	* Used, when a vertex is offseted from the center of an object.
@@ -113,8 +113,8 @@ public:
 	vec4 getLocationAtAbsoluteTime(float t);
 	vec4 getVelocityAtAbsoluteTime(float t);
 	Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t);
-	virtual vec4 intersectHyperplane(Hyperplane& plane);
-	virtual vec4 intersectLightCone(LightCone& cone);
+	virtual float intersectHyperplane(Hyperplane& plane);
+	virtual float intersectLightCone(LightCone& cone);
 	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
 
 

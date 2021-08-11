@@ -26,7 +26,6 @@ public:
 
 	virtual void updateBeforeDraw(
 		vec4 observersVelocity,
-		vec4 subjectsVelocity,
 		vec4 observersLocation,
 		Hyperplane& observersPlane,
 		WorldLine& subjectsLine
@@ -53,7 +52,6 @@ public:
 
 	virtual void updateBeforeDraw(
 		vec4 observersVelocity,
-		vec4 subjectsVelocity,
 		vec4 observersLocation,
 		Hyperplane& observersPlane,
 		WorldLine& subjectsLine) {
@@ -63,14 +61,21 @@ public:
 		{
 			vec4 offset = vec4(vds[i].pos.x, vds[i].pos.y, vds[i].pos.z, 0);
 			WorldLine* offsettedLine = subjectsLine.getWorldLineWithOffset(vds[i].pos);
-			vec4 vertexLocation = offsettedLine->intersectHyperplane(observersPlane);
-			delete offsettedLine;
-			float vertexDopplerShift = calculateDopplerShift(observersVelocity, subjectsVelocity,
-				observersLocation, vertexLocation);
+			float t = offsettedLine->intersectHyperplane(observersPlane);
+			
+			vec4 vertexLocation = offsettedLine->getLocationAtAbsoluteTime(t);
+			vec4 vertexVelocity = offsettedLine->getVelocityAtAbsoluteTime(t);
+			
+			float vertexDopplerShift = calculateDopplerShift(
+				observersVelocity,
+				vertexVelocity,
+				observersLocation,
+				vertexLocation);
 			transformedVds[i].doppler = vertexDopplerShift;
 			transformedVds[i].norm = vds[i].norm;
 			transformedVds[i].pos = vec3(vertexLocation.x, vertexLocation.y, vertexLocation.z);
 			transformedVds[i].uv = vds[i].uv;
+			delete offsettedLine;
 		}
 		
 		glBindVertexArray(vao);

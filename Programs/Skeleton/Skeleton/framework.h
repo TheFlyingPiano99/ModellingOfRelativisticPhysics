@@ -137,7 +137,7 @@ inline vec4 operator*(const vec4& v, const mat4& mat) {
 
 inline float length(const vec4& v) { return sqrtf(dot(v, v)); }
 
-inline vec4 normalize(const vec4& v) { return v * (1 / length(v)); }
+inline vec4 normalize(const vec4& v) { return v * (1.0f / length(v)); }
 
 inline mat4 operator*(const mat4& left, const mat4& right) {
 	mat4 result;

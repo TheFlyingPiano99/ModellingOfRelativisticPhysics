@@ -74,16 +74,16 @@ public:
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		geometry->updateBeforeDraw(camera.getVelocityFV(), velocityFV, camera.getLocationFV(), camera.getHyperplane(), *worldLine);
+		geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), camera.getHyperplane(), *worldLine);
 		material->loadOnGPU(gpuProgram);
 		if (texture != nullptr) {
 			texture->loadOnGPU(gpuProgram);
 		}
-		gpuProgram.setUniform(M() * camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
 		//gpuProgram.setUniform(M(), "M");
-		gpuProgram.setUniform(invM(), "invM");
+		gpuProgram.setUniform(UnitMatrix(), "invM");
 
-		geometry->Draw(gpuProgram, M(), camera.V(), camera.P());
+		geometry->Draw(gpuProgram, UnitMatrix(), camera.V(), camera.P());
 	}
 
 };
