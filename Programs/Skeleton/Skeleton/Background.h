@@ -32,10 +32,11 @@ public:
 			vec4(camera.getLocationFV().x, camera.getLocationFV().y, camera.getLocationFV().z, 0),
 			vec4(0, 0, 0, 1),
 			"Background world line", "");
-		geometry->updateBeforeDraw(
+/*		geometry->updateBeforeDraw(
 			camera.getVelocityFV(),
 			camera.getLocationFV(),
-			camera.getHyperplane(), *line);
+			*line);*/
+		line->loadOnGPU(gpuProgram);
 		delete line;
 		material->loadOnGPU(gpuProgram);
 
@@ -45,7 +46,7 @@ public:
 		//gpuProgram.setUniform(M(), "M");
 
 		glDisable(GL_CULL_FACE);
-		geometry->Draw(gpuProgram, UnitMatrix(), camera.V(), camera.P());
+		geometry->Draw(gpuProgram);
 		glEnable(GL_CULL_FACE);
 	}
 

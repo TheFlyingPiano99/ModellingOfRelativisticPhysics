@@ -7,23 +7,85 @@ const char* const vertexSource = R"(
 	layout(location = 0) in vec3 vp;
 	layout(location = 1) in vec3 vn;
 	layout(location = 2) in vec2 uv;
-	layout(location = 3) in float ds;
+	
+	uniform float speedOfLight;
 
 	uniform mat4 MVP;
 	uniform mat4 M;
 	uniform mat4 invM;
 
+	uniform vec4 observersVelocity;
+	uniform vec4 observersLocation;
+	
+	//WorldLine:
+	uniform int worldLineType;
+
 	out vec3 wPos;
-	out vec3 norm;	
+	out vec3 norm;
 	out vec2 texCoord;
 	out float dopplerShift;
 
-	void main() {		
-		wPos = (vec4(vp, 1) * M).xyz;
-		norm = (invM * vec4(vn, 0)).xyz;
+	//if Geodetic:-----------------------------------------------------------
+	uniform vec4 subjectsStartPos;
+	uniform vec4 subjectsVelocity;
+
+	float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 planeLocation, vec4 planeNormal) {
+		return dot(planeLocation - offsetedStartPos, planeNormal)
+				/ dot(subjectsVelocity, planeNormal);
+	}
+
+	vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, float t) {
+		return offsetedStartPos + subjectsVelocity * t;
+	}
+
+	vec4 GeodeticVelocityAtAbsoluteTime(vec4 offsetedStartPos, float t) {
+		return subjectsVelocity;
+	}
+	//-----------------------------------------------------------------------
+
+	/*
+	* Calculates coeficient for Doppler shift of perceived color.
+	*/
+	float calculateDopplerShift(vec4 vertexVelocity, vec4 vertexLocation) {
+
+		vec4 toSubject4 = vertexLocation - observersLocation;
+		vec3 toSubject = normalize(vec3(toSubject4.xyz));
+
+		vec4 relVelocity4 = vertexVelocity - observersVelocity;
+		vec3 relVelocity = vec3(relVelocity4.xyz);
+
+		float v = dot(toSubject, relVelocity);  //Approach speed
+		return sqrt((speedOfLight + v) / (speedOfLight - v));
+	}
+
+	/*
+		Calculates the intersection of a hyperplane and world line of this vertex
+		Also calculates the Doppler shift for this vertex.
+	*/
+	void simultaneity() {
+
+        vec4 offsetedStartPos = subjectsStartPos + vec4(vp, 0);		// Start position of the world line of this vertex.
+		
+		//Simultaneous hyperplane of the observer:
+		vec4 planeLocation = observersLocation;
+		vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
+		
+		//Intersect:
+		float t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);
+		vec4 vertexLocation = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t);
+		vec4 vertexVelocity = GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t);
+		
+		dopplerShift = calculateDopplerShift(vertexVelocity, vertexLocation);
+		wPos = vertexLocation.xyz;
+	}
+
+
+
+	void main() {
+		simultaneity();
 		texCoord = vec2(uv.x, 1 - uv.y);
-		dopplerShift = ds;
-		gl_Position = vec4(vp, 1) * MVP;
+		norm = (invM * vec4(vn, 0)).xyz;
+		gl_Position = vec4(wPos, 1) * MVP;
 	}
 )";
 

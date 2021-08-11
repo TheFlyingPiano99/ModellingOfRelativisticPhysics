@@ -90,4 +90,11 @@ WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
         description);
 }
 
+void GeodeticLine::loadOnGPU(GPUProgram& gpuProgram)
+{
+    //gpuProgram.setUniform(type, "worldLineType");
+    gpuProgram.setUniform(locationAtZeroT, "subjectsStartPos");
+    gpuProgram.setUniform(fourVelocity, "subjectsVelocity");
+}
+
 //------------------------------------------------------------------------

@@ -10,8 +10,10 @@ unsigned int vao;	   // virtual world on the GPU
 
 Scene* scene = NULL;
 
+
 // Initialization, create an OpenGL context
 void onInitialization() {
+
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -34,7 +36,15 @@ void onDisplay() {
 
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
-	if (key == 'd') glutPostRedisplay();         // if d, invalidate display, i.e. redraw
+	if (key == 'c') {
+		scene->toggleCurrentObserver();
+		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
+	}
+	if (key == ' ') {
+		scene->togglePause();
+		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
+	}
+
 }
 
 // Key of ASCII code released

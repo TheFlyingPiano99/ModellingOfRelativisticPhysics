@@ -25,6 +25,5 @@ public:
 
 	vec4 getVelocityAtAbsoluteTime(float t);
 
-
 };
 

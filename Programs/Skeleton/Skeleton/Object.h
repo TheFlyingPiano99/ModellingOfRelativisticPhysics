@@ -74,7 +74,9 @@ public:
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), camera.getHyperplane(), *worldLine);
+		//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
+
+		worldLine->loadOnGPU(gpuProgram);
 		material->loadOnGPU(gpuProgram);
 		if (texture != nullptr) {
 			texture->loadOnGPU(gpuProgram);
@@ -83,7 +85,7 @@ public:
 		//gpuProgram.setUniform(M(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 
-		geometry->Draw(gpuProgram, UnitMatrix(), camera.V(), camera.P());
+		geometry->Draw(gpuProgram);
 	}
 
 };

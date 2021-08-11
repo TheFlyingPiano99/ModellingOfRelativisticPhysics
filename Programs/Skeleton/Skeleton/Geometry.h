@@ -7,7 +7,7 @@
 
 class Geometry {
 protected:
-	unsigned int vao, vbo, dopplerVao, dopplerVbo;
+	unsigned int vao, vbo;
 
 public:
 	Geometry() {
@@ -22,12 +22,11 @@ public:
 		glDeleteVertexArrays(1, &vao);
 	}
 
-	virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) = 0;
+	virtual void Draw(GPUProgram& gpuProgram) = 0;
 
 	virtual void updateBeforeDraw(
 		vec4 observersVelocity,
 		vec4 observersLocation,
-		Hyperplane& observersPlane,
 		WorldLine& subjectsLine
 		) = 0;
 
@@ -38,7 +37,6 @@ protected:
 	struct VertexData {
 		vec3 pos, norm;
 		vec2 uv;
-		float doppler;
 	};
 
 	std::vector<VertexData> vds;
@@ -53,14 +51,13 @@ public:
 	virtual void updateBeforeDraw(
 		vec4 observersVelocity,
 		vec4 observersLocation,
-		Hyperplane& observersPlane,
 		WorldLine& subjectsLine) {
 
 		std::vector<VertexData> transformedVds(vds.size());
 		for (int i = 0; i < transformedVds.size(); i++)
 		{
-			vec4 offset = vec4(vds[i].pos.x, vds[i].pos.y, vds[i].pos.z, 0);
 			WorldLine* offsettedLine = subjectsLine.getWorldLineWithOffset(vds[i].pos);
+			Hyperplane observersPlane = Hyperplane::simultaneousHyperplane(observersLocation, observersVelocity);
 			float t = offsettedLine->intersectHyperplane(observersPlane);
 			
 			vec4 vertexLocation = offsettedLine->getLocationAtAbsoluteTime(t);
@@ -71,7 +68,6 @@ public:
 				vertexVelocity,
 				observersLocation,
 				vertexLocation);
-			transformedVds[i].doppler = vertexDopplerShift;
 			transformedVds[i].norm = vds[i].norm;
 			transformedVds[i].pos = vec3(vertexLocation.x, vertexLocation.y, vertexLocation.z);
 			transformedVds[i].uv = vds[i].uv;
@@ -113,15 +109,10 @@ public:
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, pos));
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, norm));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));
-		
-		//Doppler:
-		//glBindBuffer(GL_ARRAY_BUFFER, dopplerVbo);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, doppler));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));		
 	}
 
-	virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) {
+	virtual void Draw(GPUProgram& gpuProgram) {
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		//gpuProgram.setUniform(depthShading, "depthShading");
@@ -184,7 +175,7 @@ public:
 	*/
 
 
-	//virtual void Draw(GPUProgram& gpuProgram, mat4 M, mat4 V, mat4 P) {
+	//virtual void Draw(GPUProgram& gpuProgram) {
 	//	glBindVertexArray(vao);
 	//	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//	//gpuProgram.setUniform(depthShading, "depthShading");

@@ -7,6 +7,8 @@
 #include "Observer.h"
 #include "Object.h"
 #include "Background.h"
+#include "TextOperations.h"
+#include "MenuSystem.h"
 
 class Scene {
 	float timeScale = 10; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
@@ -17,8 +19,13 @@ class Scene {
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
+	std::vector<Caption*> captions;
 
 	Background* background;
+
+	MenuSystem menu;
+	bool running = true;
+	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
 public:
 
@@ -34,6 +41,10 @@ public:
 		{
 			delete obj;
 		}
+		for each (Caption * cap in captions)
+		{
+			delete cap;
+		}
 
 		delete background;
 	}
@@ -41,25 +52,36 @@ public:
 	void Create();
 
 	void Control(float dt) {
-		dt *= timeScale;
-		absoluteTimeSpent += dt;
+		if (running) {
+			dt *= timeScale;
+			absoluteTimeSpent += dt;
+			//Todo
+		}
 	}
 
 	void Animate(float dt) {
-		dt *= timeScale;
-		camera->update(
-			currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-			currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
-		);
-		for each (Object* obj in objects)
-		{
-			obj->Animate(dt, absoluteTimeSpent);
+		if (running) {
+			dt *= timeScale;
+			camera->update(
+				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
+				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
+			);
+			for each (Object * obj in objects)
+			{
+				obj->Animate(dt, absoluteTimeSpent);
+			}
+			for each (Caption * cap in captions)
+			{
+				cap->Animate();
+			}
+
 		}
 	}
 
 	void Draw(GPUProgram& gpuProgram) {
 		if (currentObserver != nullptr) {
 			//Prefase:
+			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 			camera->loadOnGPU(gpuProgram);
 
 			//Actual drawing:
@@ -68,6 +90,10 @@ public:
 			{
 				obj->Draw(gpuProgram, *camera);
 			}
+		}
+		for each (Caption* cap in captions)
+		{
+			cap->Draw();
 		}
 	}
 
@@ -84,6 +110,11 @@ public:
 	void moveCamera(float cx, float cy) {
 		static float camSpeed = 0.01f;
 		camera->rotate(cx, -cy);
+	}
+
+	void togglePause() {
+		running = !running;
+		captions.push_back(new Caption(vec2(200.0f, 200.0f), defaultFont, vec3(0.0f, 1.0f, 0.5f), "Paused"));
 	}
 
 };

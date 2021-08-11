@@ -81,11 +81,13 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
     <ClCompile Include="LightCone.cpp" />
+    <ClCompile Include="MenuSystem.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="TextOperations.cpp" />
     <ClCompile Include="WorldLine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +100,8 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="MenuSystem.h" />
+    <ClInclude Include="TextOperations.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="LightCone.h" />
     <ClInclude Include="Hyperplane.h" />

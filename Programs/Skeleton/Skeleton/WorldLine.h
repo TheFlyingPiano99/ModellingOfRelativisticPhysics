@@ -12,10 +12,14 @@
 * World-line of an object / observer in space-time continuum.
 * Abstract base class!
 */
-
 class WorldLine : public Entity
 {
 protected:
+	enum WorldLineType {
+		geodetic,
+		other
+	} type;
+
 	WorldLine(std::string _name = "", std::string _desc = ""): Entity(_name, _desc) {
 	}
 
@@ -84,6 +88,9 @@ public:
 	* Returned object must be deleted by caller!
 	*/
 	virtual WorldLine* getWorldLineWithOffset(vec3 offset) = 0;
+
+	virtual void loadOnGPU(GPUProgram& gpuProgram) = 0;
+
 };
 
 class GeodeticLine : public WorldLine
@@ -98,6 +105,7 @@ public:
 	*/
 	GeodeticLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name = "", std::string _desc = "")
 		: WorldLine(_name, _desc) {
+		type = WorldLineType::geodetic;
 		locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
 		fourVelocity = RelPhysics::ToFourVelocity(_velocity);
 	}
@@ -116,6 +124,7 @@ public:
 	virtual float intersectHyperplane(Hyperplane& plane);
 	virtual float intersectLightCone(LightCone& cone);
 	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
+	virtual void loadOnGPU(GPUProgram& gpuProgram);
 
 
 };

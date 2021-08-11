@@ -73,7 +73,8 @@ public:
 	}
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
-		;
+		gpuProgram.setUniform(velocityFV, "observersVelocity");
+		gpuProgram.setUniform(locationFV, "observersLocation");
 		//gpuProgram.setUniform(eye, "wEye");
 	}
 
