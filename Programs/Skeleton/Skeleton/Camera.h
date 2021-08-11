@@ -9,7 +9,7 @@ class Camera {
 	vec3 eye, lookat, vUp, vRight, prefUp;
 	float fov, asp, fp, bp;
 	//4-vectors:
-	vec4 locationFV, velocityFV;
+	vec4 locationFV, velocityFV, startPosFV;
 
 
 public:
@@ -31,9 +31,10 @@ public:
 		this->bp = bp;
 	}
 
-	void update(const vec4 _location, const vec4 _velocity) {
+	void update(const vec4 _location, const vec4 _velocity, const vec4 _startPos) {
 		locationFV = _location;
 		velocityFV = _velocity;
+		startPosFV = _startPos;
 		vec3 updatedEye = vec3(locationFV.x, locationFV.y, locationFV.z);
 		vec3 delta = updatedEye - eye;
 		eye = updatedEye;
@@ -52,7 +53,8 @@ public:
 
 	mat4 V() {
 		vec3 w = normalize(eye - lookat);
-		return TranslateMatrix(-eye) * mat4(vRight.x, vUp.x, w.x, 0,
+
+		return /*TranslateMatrix(-eye)*/  mat4(vRight.x, vUp.x, w.x, 0,
 			vRight.y, vUp.y, w.y, 0,
 			vRight.z, vUp.z, w.z, 0,
 			0, 0, 0, 1);
@@ -75,7 +77,8 @@ public:
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(velocityFV, "observersVelocity");
 		gpuProgram.setUniform(locationFV, "observersLocation");
-		//gpuProgram.setUniform(eye, "wEye");
+		gpuProgram.setUniform(startPosFV, "observersStartPos");
+		gpuProgram.setUniform(eye, "wEye");
 	}
 
 	vec4 getLocationFV() {
@@ -91,8 +94,8 @@ public:
 	}
 
 	void rotate(float verticalAxisAngle, float horizontalAxisAngle) {
-		mat4 vRotationM = RotationMatrix(verticalAxisAngle, prefUp);
-		mat4 hRotationM = RotationMatrix(horizontalAxisAngle, vRight);
+		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
+		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
 
 		vec3 centered = lookat - eye;
 		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
@@ -101,6 +104,10 @@ public:
 
 	void zoom(float delta) {
 		fov *= delta;
+		if (fov > M_PI)
+			fov = M_PI;
+		else if (fov < M_PI / 4.0f)
+			fov = M_PI / 4.0f;
 	}
 
 };

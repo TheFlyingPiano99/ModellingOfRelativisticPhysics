@@ -21,10 +21,10 @@ public:
 	}
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
-		//gpuProgram.setUniform(ka, "ka");
-		//gpuProgram.setUniform(kd, "kd");
+		gpuProgram.setUniform(ka, "ka");
+		gpuProgram.setUniform(kd, "kd");
+		gpuProgram.setUniform(ks, "ks");
+		gpuProgram.setUniform(shininess, "shininess");
 		gpuProgram.setUniform(glow, "glow");
-		//gpuProgram.setUniform(ks, "ks");
-		//gpuProgram.setUniform(shininess, "shininess");
 	}
 };

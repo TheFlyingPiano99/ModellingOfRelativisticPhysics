@@ -44,6 +44,22 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 		scene->togglePause();
 		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
 	}
+	if (key == '=') {
+		scene->zoomCamera(1.5f);
+	}
+	if (key == '-') {
+		scene->zoomCamera(0.75f);
+	}
+	if (key == 'd') {
+		scene->toggleDoppler();
+	}
+	if (key == 'r') {
+		scene->windTime(-10);
+	}
+	if (key == 'f') {
+		scene->windTime(10);
+	}
+
 
 }
 

@@ -9,13 +9,14 @@ const char* const vertexSource = R"(
 	layout(location = 2) in vec2 uv;
 	
 	uniform float speedOfLight;
-
+	uniform bool symulateDoppler;
 	uniform mat4 MVP;
 	uniform mat4 M;
 	uniform mat4 invM;
 
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
+	uniform vec4 observersStartPos;
 
 	uniform int intersectionType;	// 0 = lightCone, 1 = hyperplane
 
@@ -26,6 +27,13 @@ const char* const vertexSource = R"(
 	out vec3 norm;
 	out vec2 texCoord;
 	out float dopplerShift;
+
+	mat4 TranslateMatrix(vec3 t) {
+		return mat4(vec4(1,   0,   0,   0),
+					vec4(0,   1,   0,   0),
+					vec4(0,   0,   1,   0),
+					vec4(t.x, t.y, t.z, 1));
+	}
 
 
 	vec2 solveQuadraticFunction(float a, float b, float c, out int noOfRealSolutions) {
@@ -88,17 +96,52 @@ const char* const vertexSource = R"(
 	//-----------------------------------------------------------------------
 
 	/*
+	* Converts four-velocity [magnitude = c] to 3D velocity [m/m];
+	*/
+	vec3 To3DVelocity(const vec4 fv) {
+		vec4 scaled = fv / fv.w;
+		return vec3(scaled.xyz);
+	}
+
+	float lorentzFactor(float relVelocity) {
+		return 1.0f / (1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
+	}
+
+	vec4 lorentzTransformation(vec4 toTransform, vec3 relVelocity) {
+		if (length(relVelocity) >= speedOfLight || length(relVelocity) == 0.0f) {
+			return toTransform;
+		}
+		vec3 v = relVelocity;
+		float vLength = length(v);
+		float gamma = lorentzFactor(vLength);
+
+		vec3 r = vec3(toTransform.xyz);
+		float t = toTransform.w;
+		vec3 n = normalize(v);
+		float tTrans = gamma * (t - dot(vLength * n, r) / speedOfLight / speedOfLight);
+		vec3 rTrans = r + (gamma - 1) * dot(r, n) * n - gamma * t * vLength * n;
+		return vec4(rTrans, tTrans);
+	}
+
+	vec3 lorentzTransformationOfVelocity(vec3 toTransform, vec3 relVelocity) {
+		if (length(relVelocity) >= speedOfLight || length(relVelocity) == 0.0f) {
+			return toTransform;
+		}
+		float gammaV = 1 / sqrt(1 - dot(relVelocity, relVelocity) / speedOfLight / speedOfLight);
+		return (1 / (1 - dot(relVelocity, toTransform) / speedOfLight / speedOfLight))
+			* (toTransform / gammaV - relVelocity
+			+ (1 / speedOfLight / speedOfLight) * (gammaV / (gammaV + 1))
+			* dot(toTransform, relVelocity) * relVelocity);
+	}
+
+	/*
 	* Calculates coeficient for Doppler shift of perceived color.
 	*/
-	float calculateDopplerShift(vec4 vertexVelocity, vec4 vertexLocation) {
+	float calculateDopplerShift(vec3 vertexVelocity, vec3 vertexLocation, vec3 observerLocationProperFrame) {
 
-		vec4 toSubject4 = vertexLocation - observersLocation;
-		vec3 toSubject = normalize(vec3(toSubject4.xyz));
+		vec3 toSubject = normalize(vertexLocation - observerLocationProperFrame);
 
-		vec4 relVelocity4 = vertexVelocity - observersVelocity;
-		vec3 relVelocity = vec3(relVelocity4.xyz);
-
-		float v = dot(toSubject, relVelocity);  //Approach speed
+		float v = dot(toSubject, vertexVelocity);  //Approach speed
 		return sqrt((speedOfLight + v) / (speedOfLight - v));
 	}
 
@@ -108,11 +151,10 @@ const char* const vertexSource = R"(
 	*/
 	void geodetic() {
 
-        vec4 offsetedStartPos = subjectsStartPos + vec4(vp, 0);		// Start position of the world line of this vertex.
-		
+        vec4 offsetedStartPos = subjectsStartPos + vec4(vp, 0);		// Start position of the world line of this vertex in absolute frame.
 		
 		//Intersect:
-		float t = 0;
+		float t = 0;	// absolute time parametre
 		if (intersectionType == 0) {
 			//Light cone:
 			vec4 coneLocation = observersLocation;
@@ -125,20 +167,36 @@ const char* const vertexSource = R"(
 			t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);			
 		}
 
-		vec4 vertexLocation = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t);
-		vec4 vertexVelocity = GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t);
+		// From here forward everything is in observers frame:
 		
-		dopplerShift = calculateDopplerShift(vertexVelocity, vertexLocation);
-		wPos = vertexLocation.xyz;
+		vec4 toOrigo = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;
+		vec3 vertexLocationProperFrame = lorentzTransformation(toOrigo, To3DVelocity(observersVelocity)).xyz;
+		vec3 vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)), To3DVelocity(observersVelocity));
+		
+		toOrigo = observersLocation - observersStartPos;
+		vec3 observersLocationProperFrame = lorentzTransformation(toOrigo, To3DVelocity(observersVelocity)).xyz;
+		
+		if (symulateDoppler) {
+			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
+		}
+		else {
+			dopplerShift = 1.0f;		
+		}
+	/*
+		vec3 vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;	// This value shouldnt be in observers Frame
+		vec3 vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t));
+		vec3 observersLocationProperFrame = observersLocation.xyz;
+		dopplerShift = 1.0f;		
+	*/
+
+		wPos = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
+		texCoord = vec2(uv.x, 1 - uv.y);
+		norm = (invM * vec4(vn, 0)).xyz;
+		gl_Position = vec4(vertexLocationProperFrame, 1) * MVP;
 	}
-
-
 
 	void main() {
 		geodetic();
-		texCoord = vec2(uv.x, 1 - uv.y);
-		norm = (invM * vec4(vn, 0)).xyz;
-		gl_Position = vec4(wPos, 1) * MVP;
 	}
 )";
 
@@ -151,7 +209,6 @@ const char* const fragmentSource = R"(
 	in vec3 norm;
 	in vec2 texCoord;
 	in float dopplerShift;
-	//uniform float dopplerShift;
 
 	uniform mat4 M;
 	uniform mat4 invM;
@@ -172,9 +229,9 @@ const char* const fragmentSource = R"(
 	uniform vec3 lightL1;
 
 //Material:	
-	//uniform vec3 ka;
+	uniform vec3 ka;
 	uniform vec3 kd;
-	//uniform vec3 ks;
+	uniform vec3 ks;
 	uniform float shininess;
 	uniform bool depthShading;
 
@@ -250,71 +307,68 @@ const char* const fragmentSource = R"(
 		return rgb;
 	}
 
+	vec3 DirectLight(vec3 rawColor) {
+		vec3 eyeDir = normalize(wEye - wPos);
+
+		vec3 outRadiance = ka * La;
+
+		//Light0:	(Point light)
+
+		vec3 lightDir = normalize(lightPos0 - wPos);
+		float dist = length(lightPos0 - wPos);
+		vec3 radiance = lightL0 / dist / dist;
+		float cosTheta = dot(norm, lightDir);
+		vec3 halfway;
+		float cosDelta;
+		if (cosTheta > 0) {
+			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
+			halfway = normalize(eyeDir + lightDir);
+			cosDelta = dot(norm, halfway);
+			if (cosDelta > 0) {
+				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
+			}
+		}
+
+		//Light1:
+		lightDir = normalize(lightPos1 - wPos);
+		dist = length(lightPos1 - wPos);
+		radiance = lightL1 / dist / dist;
+		cosTheta = dot(norm, lightDir);
+		if (cosTheta > 0) {
+			outRadiance = outRadiance + radiance * kd * cosTheta;
+			halfway = normalize(eyeDir + lightDir);
+			cosDelta = dot(norm, halfway);
+			if (cosDelta > 0) {
+				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
+			}
+		}
+		if (depthShading) {
+			int depth = int(-wPos.z * 3.0f);
+			if (depth > 0) {
+				outRadiance /= float(depth);
+			}
+		}
+		return outRadiance;
+	}
+
 	void main() {
 		vec4 rawColor = texture(textureUnit, texCoord);		
 		
-		float attitude = 1.0;
-		if (!glow) {
-			attitude = dot(vec3(-1,1,1), norm);
+		vec3 shaded;
+		if (glow) {
+			shaded = rawColor.xyz;
 		}
-		vec4 shaded = rawColor * ((attitude > 0.1)? attitude : 0.1);
-	
+		else {
+			shaded = DirectLight(rawColor.xyz);	
+		}
 
 		vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
 		vec3 greenShifted = waveLengthToRGB(525.0 * dopplerShift);	// Green
 		vec3 blueShifted = waveLengthToRGB(460.0 * dopplerShift);	// Blue
 		vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);
-
-
+		
 		outColor = vec4(sumShifted, rawColor.w);
 	}
 )";
 
-
-//GLSL lighting function:
-
-	/*
-vec3 DirectLight() {
-	vec3 eyeDir = normalize(wEye - wPos);
-
-	vec3 outRadiance = ka * La;
-
-	//Light0:
-	vec3 lightDir = normalize(lightPos0 - wPos);
-	float dist = length(lightPos0 - wPos);
-	vec3 radiance = lightL0 / dist / dist;
-	float cosTheta = dot(norm, lightDir);
-	vec3 halfway;
-	float cosDelta;
-	if (cosTheta > 0) {
-		outRadiance = outRadiance + radiance * kd * cosTheta;
-		halfway = normalize(eyeDir + lightDir);
-		cosDelta = dot(norm, halfway);
-		if (cosDelta > 0) {
-			outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
-		}
-	}
-
-	//Light1:
-	lightDir = normalize(lightPos1 - wPos);
-	dist = length(lightPos1 - wPos);
-	radiance = lightL1 / dist / dist;
-	cosTheta = dot(norm, lightDir);
-	if (cosTheta > 0) {
-		outRadiance = outRadiance + radiance * kd * cosTheta;
-		halfway = normalize(eyeDir + lightDir);
-		cosDelta = dot(norm, halfway);
-		if (cosDelta > 0) {
-			outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
-		}
-	}
-	if (depthShading) {
-		int depth = int(-wPos.z * 3.0f);
-		if (depth > 0) {
-			outRadiance /= float(depth);
-		}
-	}
-	return outRadiance;
-}
-*/
 

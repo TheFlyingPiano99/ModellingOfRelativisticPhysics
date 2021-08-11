@@ -32,19 +32,13 @@ public:
 
 };
 
-class ParamSurface : public Geometry {
+class MeshSurface : public Geometry {
 protected:
 	struct VertexData {
 		vec3 pos, norm;
 		vec2 uv;
 	};
-
 	std::vector<VertexData> vds;
-	unsigned int nVtxStrip, nStrip;
-	unsigned int vdSize = 0;
-
-
-	bool depthShading = false;
 
 public:
 
@@ -59,10 +53,10 @@ public:
 			WorldLine* offsettedLine = subjectsLine.getWorldLineWithOffset(vds[i].pos);
 			Hyperplane observersPlane = Hyperplane::simultaneousHyperplane(observersLocation, observersVelocity);
 			float t = offsettedLine->intersectHyperplane(observersPlane);
-			
+
 			vec4 vertexLocation = offsettedLine->getLocationAtAbsoluteTime(t);
 			vec4 vertexVelocity = offsettedLine->getVelocityAtAbsoluteTime(t);
-			
+
 			float vertexDopplerShift = calculateDopplerShift(
 				observersVelocity,
 				vertexVelocity,
@@ -73,13 +67,20 @@ public:
 			transformedVds[i].uv = vds[i].uv;
 			delete offsettedLine;
 		}
-		
+
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, transformedVds.size() * sizeof(VertexData), &transformedVds[0], GL_DYNAMIC_DRAW);
-
 	}
 
+
+};
+
+class ParamSurface : public MeshSurface {
+	unsigned int nVtxStrip, nStrip;
+	bool depthShading = false;
+
+public:
 
 	virtual void Eval(float u, float v, vec3& pos, vec3& norm) = 0;
 

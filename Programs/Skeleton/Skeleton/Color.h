@@ -14,8 +14,9 @@ static float calculateDopplerShift(vec4 observersVelocity, vec4 subjectsVelocity
     vec4 toSubject4 = subjectsLocation - observersLocation;
     vec3 toSubject = normalize(vec3(toSubject4.x, toSubject4.y, toSubject4.z));
 
-    vec4 relVelocity4 = subjectsVelocity - observersVelocity;
-    vec3 relVelocity = vec3(relVelocity4.x, relVelocity4.y, relVelocity4.z);
+    vec3 relVelocity = RelPhysics::lorentzTransformationOfVelocity(
+        RelPhysics::To3DVelocity(subjectsVelocity),
+        RelPhysics::To3DVelocity(observersVelocity));
 
     float v = dot(toSubject, relVelocity);  //Approach speed
     float dopplerShift = sqrtf((RelPhysics::speedOfLight + v) / (RelPhysics::speedOfLight - v));

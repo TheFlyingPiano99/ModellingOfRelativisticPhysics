@@ -9,6 +9,7 @@
 #include "Background.h"
 #include "TextOperations.h"
 #include "MenuSystem.h"
+#include "LightSource.h"
 
 enum IntersectionType {
 	lightCone,
@@ -16,7 +17,7 @@ enum IntersectionType {
 };
 
 class Scene {
-	float timeScale = 10; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
+	float timeScale = 2; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float absoluteTimeSpent = 0.0f;
 
 	Camera* camera = NULL;
@@ -25,12 +26,14 @@ class Scene {
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
+	std::vector<LightSource*> lights;
 	std::vector<Caption*> captions;
 
 	Background* background;
 
 	MenuSystem menu;
 	bool running = true;
+	bool symulateDoppler = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
 
@@ -52,6 +55,10 @@ public:
 		{
 			delete cap;
 		}
+		for each (LightSource * lt in lights)
+		{
+			delete lt;
+		}
 
 		delete background;
 	}
@@ -71,7 +78,8 @@ public:
 			dt *= timeScale;
 			camera->update(
 				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent)
+				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
+				currentObserver->getLocationAtAbsoluteTime(0.0f)
 			);
 			for each (Object * obj in objects)
 			{
@@ -90,7 +98,16 @@ public:
 			//Prefase:
 			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 			gpuProgram.setUniform(intersectionType, "intersectionType");
+			gpuProgram.setUniform(symulateDoppler, "symulateDoppler");
+			
+
+			gpuProgram.setUniform(vec3(0.01, 0.01, 0.01), "La");
+			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 			camera->loadOnGPU(gpuProgram);
+			for each (LightSource * lt in lights)
+			{
+				lt->loadOnGPU(gpuProgram);
+			}
 
 			//Actual drawing:
 			background->Draw(gpuProgram, *camera);		// Background
@@ -111,7 +128,8 @@ public:
 			currentIdx = (observers.size() > currentIdx + 1)? currentIdx + 1 : 0;
 			currentObserver = observers.at(currentIdx);
 			camera->update(currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent));
+				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
+				currentObserver->getLocationAtAbsoluteTime(0.0f));
 		}
 	}
 
@@ -124,9 +142,27 @@ public:
 		camera->zoom(delta);
 	}
 
+	void toggleDoppler() {
+		symulateDoppler = !symulateDoppler;
+	}
+
+	//Time manipulation:
+
 	void togglePause() {
 		running = !running;
 		captions.push_back(new Caption(vec2(200.0f, 200.0f), defaultFont, vec3(0.0f, 1.0f, 0.5f), "Paused"));
+	}
+
+	void setTime(float t) {
+		absoluteTimeSpent = t;
+	}
+
+	void reset() {
+		setTime(0.0f);
+	}
+
+	void windTime(float deltaT) {
+		absoluteTimeSpent += deltaT;
 	}
 
 };

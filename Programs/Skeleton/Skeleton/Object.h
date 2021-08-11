@@ -54,6 +54,32 @@ public:
 		}
 	}
 
+	/*
+	* Factory for Earth-like object.
+	*/
+	static Object* createEarth(WorldLine* wrdln) {
+		AdvancedTexture* texture = new AdvancedTexture("../../../Resources/lowres/earth_daymap.bmp", "../../../Resources/lowres/earth_normal_map.bmp", "");
+		if (texture->getTextureId() == 0) {
+			texture = NULL;
+		}
+		ParamSurface* pSurface = new SphereSurface(0.5f);
+		pSurface->GenSurface(100, 100);
+		Object* obj = new Object(
+			vec3(1.0f, 1.0f, 1.0f),
+			0.0f,
+			0.01f,
+			vec3(2.5f, 0.0f, 0.0f),
+			vec3(0.0f, 0.0f, 1.0f),
+			wrdln,
+			pSurface,
+			new Material(vec3(3,1.5,1), vec3(10,10,20), vec3(5,6,20), 50),
+			texture,
+			"Earth",
+			"Inhabited planet"
+		);
+		return obj;
+	}
+
 	mat4 M() {
 		return ScaleMatrix(scale) * RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);
 	}

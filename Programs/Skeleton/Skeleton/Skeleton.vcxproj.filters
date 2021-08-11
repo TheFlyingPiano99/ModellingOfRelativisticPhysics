@@ -125,5 +125,8 @@
     <ClInclude Include="MenuSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

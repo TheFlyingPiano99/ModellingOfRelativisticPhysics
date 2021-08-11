@@ -100,6 +100,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="TextOperations.h" />
     <ClInclude Include="Intersectable.h" />

@@ -6,47 +6,31 @@ void Scene::Create()
 {
 	//Camera:
 	camera = new Camera();
-	camera->initBasic(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 2.0f);
+	camera->initBasic(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+
+	//LightSources:----------------------------------------------
+	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(1000, 1000, 1000), 0));
+	lights.push_back(new LightSource(vec3(0, 50, 50), vec3(1000, 1000, 1000), 0));
 
 	//Observers:-------------------------------------------------
 	//1.:
-	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obs1's world line");
 	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
 	//2.:
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.5f, 0.0f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
 	//3.:
-	wrdln = new GeodeticLine(vec3(0.0f, -20.0f, 0.0f), vec3(0.5f, 0.4f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.5f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
-	AdvancedTexture* texture = new AdvancedTexture("../../../Resources/lowres/earth_daymap.bmp", "../../../Resources/lowres/earth_normal_map.bmp", "");
-	if (texture->getTextureId() == 0) {
-		texture = NULL;
-	}
-	vec3 color = vec3(1, 1, 1);
-	ParamSurface* pSurface = new SphereSurface(0.5f);
-	pSurface->GenSurface(25, 25);
-	wrdln = new GeodeticLine(vec3(3.0f, -20.0f, 0.0f), vec3(0.5f, 0.4f, 0.0f), "Obj1's world line");
-	Object* obj = new Object(
-		vec3(1.0f, 1.0f, 1.0f),
-		0.0f,
-		0.01f,
-		vec3(2.5f, 0.0f, 0.0f),
-		vec3(0.0f, 0.0f, 1.0f),
-		wrdln,
-		pSurface,
-		new Material(color, color, color, 50),
-		texture,
-		"Obj1",
-		"Test object"
-	);
-	objects.push_back(obj);
+	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obj1's world line");
+	objects.push_back(Object::createEarth(wrdln));
 
 	//Background:------------------------------------------------------
 	background = new Background();
@@ -56,6 +40,12 @@ void Scene::Create()
 
 
 	//Test:----------------------------------
+
+	vec3 u = vec3(0.0f, 0.2f, 0.0f);
+	vec3 r = vec3(0, 0, 0.0f);
+	vec4 transformed = RelPhysics::lorentzTransformation(vec4(r.x, r.y, r.z, 0), u);
+	std::cout << "transformed u = " << transformed.x << ", " << transformed.y << ", " << transformed.z << std::endl;
+
 	/*
 	LightCone cone(vec4(0,0,1,3));
 	GeodeticLine line(vec3(4.6,5,835), vec3(0,0,0), "Test line", "");
