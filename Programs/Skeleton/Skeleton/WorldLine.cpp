@@ -77,8 +77,34 @@ float GeodeticLine::intersectHyperplane(Hyperplane& plane)
 
 float GeodeticLine::intersectLightCone(LightCone& cone)
 {
-    //Todo
-    return 0.0f;
+    float a, b, c, t;
+    a = LorentzianProduct(fourVelocity, fourVelocity);
+    b = 2 * (
+        (locationAtZeroT.x * fourVelocity.x
+            - fourVelocity.x * cone.getObserver().x)
+        + (locationAtZeroT.y * fourVelocity.y
+            - fourVelocity.y * cone.getObserver().y)
+        + (locationAtZeroT.z * fourVelocity.z
+            - fourVelocity.z * cone.getObserver().z)
+        - (locationAtZeroT.w * fourVelocity.w
+            - fourVelocity.w * cone.getObserver().w)
+        );
+
+    c = powf(cone.getObserver().x - locationAtZeroT.x, 2)
+        + powf(cone.getObserver().y - locationAtZeroT.y, 2)
+        + powf(cone.getObserver().z - locationAtZeroT.z, 2)
+        - powf(cone.getObserver().w - locationAtZeroT.w, 2);
+
+    int noOfSolutions;
+    vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+    std::cout << "Number of solutions = " << noOfSolutions << std::endl;
+    if (noOfSolutions > 0) {
+        t = solutions.x;
+    }
+    else {
+        throw DoesNotIntersectException();
+    }
+    return t;
 }
 
 WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)

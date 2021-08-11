@@ -89,16 +89,21 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 	char * buttonStat;
 
 	switch (button) {
-	case GLUT_LEFT_BUTTON: break;
-	case GLUT_MIDDLE_BUTTON: break;
-	case GLUT_RIGHT_BUTTON:
-		if (state == GLUT_DOWN) {	//Start dragging camera
-			down = true;
-		}
-		else if (state == GLUT_UP) {	//Stop dragging camera
-			down = false; prevDown = false;
-		}
+		case GLUT_LEFT_BUTTON: break;
+		case GLUT_MIDDLE_BUTTON: break;
+		case GLUT_RIGHT_BUTTON:
+			if (state == GLUT_DOWN) {	//Start dragging camera
+				down = true;
+			}
+			else if (state == GLUT_UP) {	//Stop dragging camera
+				down = false; prevDown = false;
+			}
 			break;
+		case 3:			// Mouse wheel scroll
+		case 4:			// Mouse wheel scroll
+
+			break;
+		default: break;
 	}
 
 }

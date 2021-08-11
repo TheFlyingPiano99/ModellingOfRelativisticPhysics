@@ -479,6 +479,33 @@ Dnum<T> Pow(Dnum<T> g, float n) {
 	return Dnum<T>(powf(g.f, n), n * powf(g.f, n - 1) * g.d);
 }
 
+static vec2 solveQuadraticFunction(float a, float b, float c, int& noOfRealSolutions) {
+	if (a == 0.0f && b != 0.0f) {
+		noOfRealSolutions = 1;
+		return vec2(-c / b, -c / b);
+	}
+	float discriminant = b * b - 4 * a * c;
+	vec2 results;
+	if (discriminant > 0.0f) {
+		noOfRealSolutions = 2;
+		results.x = (-b + sqrtf(discriminant)) / (2 * a);
+		results.y = (-b - sqrtf(discriminant)) / (2 * a);
+	}
+	else if (discriminant == 0.0f) {
+		noOfRealSolutions = 1;
+		results.x = (-b + sqrtf(discriminant)) / (2 * a);
+		results.y = results.x;
+	}
+	else {
+		noOfRealSolutions = 0;
+	}
+	return results;
+}
+
+static float LorentzianProduct(vec4 v1, vec4 v2) {
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z - v1.w * v2.w;
+}
+
 /*
 //Transformaciok eloadasbol:
 vec4 qmul(vec4 q1, vec4 q2) {

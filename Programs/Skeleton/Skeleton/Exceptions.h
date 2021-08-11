@@ -8,3 +8,8 @@ struct LightspeedExceededException : public std::exception {
 	}
 };
 
+struct DoesNotIntersectException : public std::exception {
+	char const* what() const {
+		return "Does not intersect exception";
+	}
+};

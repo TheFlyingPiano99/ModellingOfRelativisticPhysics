@@ -16,18 +16,62 @@ const char* const vertexSource = R"(
 
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
-	
+
+	uniform int intersectionType;	// 0 = lightCone, 1 = hyperplane
+
 	//WorldLine:
-	uniform int worldLineType;
+	uniform int worldLineType;	// 0 = geodetic
 
 	out vec3 wPos;
 	out vec3 norm;
 	out vec2 texCoord;
 	out float dopplerShift;
 
+
+	vec2 solveQuadraticFunction(float a, float b, float c, out int noOfRealSolutions) {
+		if (a == 0.0f && b != 0.0f) {
+			noOfRealSolutions = 1;
+			return vec2(-c / b, -c / b);
+		}
+		float discriminant = b * b - 4 * a * c;
+		vec2 results;
+		if (discriminant > 0.0f) {
+			noOfRealSolutions = 2;
+			results.x = (-b + sqrt(discriminant)) / (2 * a);
+			results.y = (-b - sqrt(discriminant)) / (2 * a);
+		}
+		else if (discriminant == 0.0f) {
+			noOfRealSolutions = 1;
+			results.x = (-b + sqrt(discriminant)) / (2 * a);
+			results.y = results.x;
+		}
+		else {
+			noOfRealSolutions = 0;
+		}
+		return results;
+	}
+
+
 	//if Geodetic:-----------------------------------------------------------
 	uniform vec4 subjectsStartPos;
 	uniform vec4 subjectsVelocity;
+
+	float GeodeticIntersectLightCone(vec4 offsetedStartPos, vec4 coneLocation)
+	{
+		float a, b, c, t;
+		a = dot(subjectsVelocity.xyz, subjectsVelocity.xyz) - subjectsVelocity.w * subjectsVelocity.w;
+		vec3 temp = (offsetedStartPos.xyz * subjectsVelocity.xyz - subjectsVelocity.xyz * coneLocation.xyz);
+		b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * subjectsVelocity.w - subjectsVelocity.w * coneLocation.w));
+		c = dot(coneLocation.xyz - offsetedStartPos.xyz, coneLocation.xyz - offsetedStartPos.xyz)
+			- pow(coneLocation.w - offsetedStartPos.w, 2);
+
+		int noOfSolutions;
+		vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+
+		t = solutions.x;	// Should be tested, whether its from the past!
+		return t;
+	}
+
 
 	float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 planeLocation, vec4 planeNormal) {
 		return dot(planeLocation - offsetedStartPos, planeNormal)
@@ -62,16 +106,25 @@ const char* const vertexSource = R"(
 		Calculates the intersection of a hyperplane and world line of this vertex
 		Also calculates the Doppler shift for this vertex.
 	*/
-	void simultaneity() {
+	void geodetic() {
 
         vec4 offsetedStartPos = subjectsStartPos + vec4(vp, 0);		// Start position of the world line of this vertex.
 		
-		//Simultaneous hyperplane of the observer:
-		vec4 planeLocation = observersLocation;
-		vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
 		
 		//Intersect:
-		float t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);
+		float t = 0;
+		if (intersectionType == 0) {
+			//Light cone:
+			vec4 coneLocation = observersLocation;
+			t = GeodeticIntersectLightCone(offsetedStartPos, coneLocation);
+		}
+		else if (intersectionType == 1) {
+			//Simultaneous hyperplane of the observer:
+			vec4 planeLocation = observersLocation;
+			vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
+			t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);			
+		}
+
 		vec4 vertexLocation = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t);
 		vec4 vertexVelocity = GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t);
 		
@@ -82,7 +135,7 @@ const char* const vertexSource = R"(
 
 
 	void main() {
-		simultaneity();
+		geodetic();
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		gl_Position = vec4(wPos, 1) * MVP;

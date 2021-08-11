@@ -32,7 +32,7 @@ void Scene::Create()
 	vec3 color = vec3(1, 1, 1);
 	ParamSurface* pSurface = new SphereSurface(0.5f);
 	pSurface->GenSurface(25, 25);
-	wrdln = new GeodeticLine(vec3(2.0f, -20.0f, 0.0f), vec3(0.5f, 0.4f, 0.0f), "Obj1's world line");
+	wrdln = new GeodeticLine(vec3(3.0f, -20.0f, 0.0f), vec3(0.5f, 0.4f, 0.0f), "Obj1's world line");
 	Object* obj = new Object(
 		vec3(1.0f, 1.0f, 1.0f),
 		0.0f,
@@ -53,4 +53,14 @@ void Scene::Create()
 	
 	//Other:
 	toggleCurrentObserver();
+
+
+	//Test:----------------------------------
+	/*
+	LightCone cone(vec4(0,0,1,3));
+	GeodeticLine line(vec3(4.6,5,835), vec3(0,0,0), "Test line", "");
+	float t = line.intersectLightCone(cone);
+	vec4 intersection = line.getLocationAtAbsoluteTime(t);
+	std::cout << "Test intersection = " << intersection.x << ", " << intersection.y << ", " << intersection.z << ", " << intersection.w << std::endl;
+	*/
 }

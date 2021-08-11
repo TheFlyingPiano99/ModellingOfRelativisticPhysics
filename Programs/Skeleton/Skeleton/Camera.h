@@ -98,4 +98,9 @@ public:
 		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
 		setLookat(vec3(rotated.x, rotated.y, rotated.z) + eye);
 	}
+
+	void zoom(float delta) {
+		fov *= delta;
+	}
+
 };

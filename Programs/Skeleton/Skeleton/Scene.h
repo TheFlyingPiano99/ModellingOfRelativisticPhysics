@@ -10,11 +10,17 @@
 #include "TextOperations.h"
 #include "MenuSystem.h"
 
+enum IntersectionType {
+	lightCone,
+	hyperplane
+};
+
 class Scene {
 	float timeScale = 10; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float absoluteTimeSpent = 0.0f;
 
 	Camera* camera = NULL;
+	IntersectionType intersectionType = lightCone;
 
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
@@ -26,6 +32,7 @@ class Scene {
 	MenuSystem menu;
 	bool running = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
+
 
 public:
 
@@ -82,6 +89,7 @@ public:
 		if (currentObserver != nullptr) {
 			//Prefase:
 			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
+			gpuProgram.setUniform(intersectionType, "intersectionType");
 			camera->loadOnGPU(gpuProgram);
 
 			//Actual drawing:
@@ -99,7 +107,7 @@ public:
 
 	void toggleCurrentObserver() {
 		static int currentIdx = -1;
-		if (!observers.empty()) {
+		if (!observers.empty()) {	// Incrementation with overflow
 			currentIdx = (observers.size() > currentIdx + 1)? currentIdx + 1 : 0;
 			currentObserver = observers.at(currentIdx);
 			camera->update(currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
@@ -110,6 +118,10 @@ public:
 	void moveCamera(float cx, float cy) {
 		static float camSpeed = 0.01f;
 		camera->rotate(cx, -cy);
+	}
+
+	void zoomCamera(float delta) {
+		camera->zoom(delta);
 	}
 
 	void togglePause() {
