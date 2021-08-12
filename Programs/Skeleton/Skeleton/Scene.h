@@ -33,7 +33,7 @@ class Scene {
 
 	MenuSystem menu;
 	bool running = true;
-	bool symulateDoppler = true;
+	bool symulateDoppler = false;
 	bool doLorentz = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
@@ -104,7 +104,7 @@ public:
 			
 			
 
-			gpuProgram.setUniform(vec3(0.01, 0.01, 0.01), "La");
+			gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 			camera->loadOnGPU(gpuProgram);
 			for each (LightSource * lt in lights)
@@ -166,14 +166,26 @@ public:
 
 	void setTime(float t) {
 		absoluteTimeSpent = t;
+		bool prevState = running;
+		running = true;
+		Animate(0.0f);
+		running = prevState;
 	}
 
 	void reset() {
 		setTime(0.0f);
+		bool prevState = running;
+		running = true;
+		Animate(0.0f);
+		running = prevState;
 	}
 
 	void windTime(float deltaT) {
 		absoluteTimeSpent += deltaT;
+		bool prevState = running;
+		running = true;
+		Animate(0.0f);
+		running = prevState;
 	}
 
 };

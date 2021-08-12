@@ -67,7 +67,7 @@ public:
 		Object* obj = new Object(
 			vec3(1.0f, 1.0f, 1.0f),
 			0.0f,
-			0.01f,
+			0.0f,
 			vec3(2.5f, 0.0f, 0.0f),
 			vec3(0.0f, 0.0f, 1.0f),
 			wrdln,

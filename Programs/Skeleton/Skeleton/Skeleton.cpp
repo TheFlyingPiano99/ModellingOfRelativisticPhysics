@@ -54,10 +54,10 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 		scene->toggleDoppler();
 	}
 	if (key == 'r') {
-		scene->windTime(-10);
+		scene->windTime(-5);
 	}
 	if (key == 'f') {
-		scene->windTime(10);
+		scene->windTime(5);
 	}
 	if (key == 'i') {
 		scene->toggleIntersectionType();

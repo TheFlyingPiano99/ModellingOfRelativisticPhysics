@@ -54,7 +54,7 @@ public:
 	mat4 V() {
 		vec3 w = normalize(eye - lookat);
 
-		return /*TranslateMatrix(-eye)*/  mat4(vRight.x, vUp.x, w.x, 0,
+		return /* TranslateMatrix(-eye) * */ mat4(vRight.x, vUp.x, w.x, 0,
 			vRight.y, vUp.y, w.y, 0,
 			vRight.z, vUp.z, w.z, 0,
 			0, 0, 0, 1);

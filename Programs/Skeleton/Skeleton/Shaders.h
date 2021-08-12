@@ -152,8 +152,20 @@ const char* const vertexSource = R"(
 	*/
 	void geodetic() {
 
-        vec4 offsetedStartPos = subjectsStartPos + vec4(vp, 0);		// Start position of the world line of this vertex in absolute frame.
-		
+        // Start position of the world line of this vertex in absolute frame.	(Length contraction is applied)
+		vec4 offsetedStartPos;
+		if (doLorentz) {
+			vec3 v = To3DVelocity(subjectsVelocity);
+			float gamma = lorentzFactor(length(v));
+			vec3 n = normalize(v);
+			vec3 pParalel = dot(vp, n) * n;
+			vec3 pPerpend = vp - pParalel;
+			offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + subjectsStartPos;
+		}
+		else {
+			offsetedStartPos = vec4(vp, 0) + subjectsStartPos;
+		}
+
 		//Intersect:
 		float t = 0;	// absolute time parametre
 		if (intersectionType == 0) {
@@ -196,7 +208,8 @@ const char* const vertexSource = R"(
 		wPos = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
-		gl_Position = vec4(vertexLocationProperFrame, 1) * TranslateMatrix(-observersLocationProperFrame) * MVP;
+		mat4 M = /* TranslateMatrix(-observersLocationProperFrame) * */ MVP;
+		gl_Position = vec4(vertexLocationProperFrame, 1) * M;
 	}
 
 	void main() {
