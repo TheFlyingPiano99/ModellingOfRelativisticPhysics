@@ -10,6 +10,7 @@ const char* const vertexSource = R"(
 	
 	uniform float speedOfLight;
 	uniform bool symulateDoppler;
+	uniform bool doLorentz;
 	uniform mat4 MVP;
 	uniform mat4 M;
 	uniform mat4 invM;
@@ -104,11 +105,11 @@ const char* const vertexSource = R"(
 	}
 
 	float lorentzFactor(float relVelocity) {
-		return 1.0f / (1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
+		return 1.0f / sqrt(1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
 	}
 
 	vec4 lorentzTransformation(vec4 toTransform, vec3 relVelocity) {
-		if (length(relVelocity) >= speedOfLight || length(relVelocity) == 0.0f) {
+		if (length(relVelocity) >= speedOfLight) {
 			return toTransform;
 		}
 		vec3 v = relVelocity;
@@ -169,12 +170,21 @@ const char* const vertexSource = R"(
 
 		// From here forward everything is in observers frame:
 		
-		vec4 toOrigo = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;
-		vec3 vertexLocationProperFrame = lorentzTransformation(toOrigo, To3DVelocity(observersVelocity)).xyz;
-		vec3 vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)), To3DVelocity(observersVelocity));
-		
-		toOrigo = observersLocation - observersStartPos;
-		vec3 observersLocationProperFrame = lorentzTransformation(toOrigo, To3DVelocity(observersVelocity)).xyz;
+		vec3 vertexLocationProperFrame;
+		vec3 vertexVelocityProperFrame;
+		vec3 observersLocationProperFrame;
+		if (doLorentz) {
+			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;
+			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;
+			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)), To3DVelocity(observersVelocity));
+			shiftedOrigoFrame = observersLocation - observersStartPos;
+			observersLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;
+		}
+		else {
+			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
+			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t));
+			observersLocationProperFrame = observersLocation.xyz;
+		}
 		
 		if (symulateDoppler) {
 			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
@@ -182,17 +192,11 @@ const char* const vertexSource = R"(
 		else {
 			dopplerShift = 1.0f;		
 		}
-	/*
-		vec3 vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;	// This value shouldnt be in observers Frame
-		vec3 vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t));
-		vec3 observersLocationProperFrame = observersLocation.xyz;
-		dopplerShift = 1.0f;		
-	*/
 
 		wPos = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
-		gl_Position = vec4(vertexLocationProperFrame, 1) * MVP;
+		gl_Position = vec4(vertexLocationProperFrame, 1) * TranslateMatrix(-observersLocationProperFrame) * MVP;
 	}
 
 	void main() {

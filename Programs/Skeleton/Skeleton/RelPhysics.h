@@ -43,7 +43,7 @@ namespace RelPhysics
 		if (relVelocity > speedOfLight) {
 			throw new LightspeedExceededException;
 		}
-		return 1.0f / (1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
+		return 1.0f / sqrtf(1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
 	}
 
 	static vec4 lorentzTransformation(vec4 toTransform, vec3 relVelocity) {

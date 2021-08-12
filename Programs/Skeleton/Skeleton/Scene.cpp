@@ -38,19 +38,4 @@ void Scene::Create()
 	//Other:
 	toggleCurrentObserver();
 
-
-	//Test:----------------------------------
-
-	vec3 u = vec3(0.0f, 0.2f, 0.0f);
-	vec3 r = vec3(0, 0, 0.0f);
-	vec4 transformed = RelPhysics::lorentzTransformation(vec4(r.x, r.y, r.z, 0), u);
-	std::cout << "transformed u = " << transformed.x << ", " << transformed.y << ", " << transformed.z << std::endl;
-
-	/*
-	LightCone cone(vec4(0,0,1,3));
-	GeodeticLine line(vec3(4.6,5,835), vec3(0,0,0), "Test line", "");
-	float t = line.intersectLightCone(cone);
-	vec4 intersection = line.getLocationAtAbsoluteTime(t);
-	std::cout << "Test intersection = " << intersection.x << ", " << intersection.y << ", " << intersection.z << ", " << intersection.w << std::endl;
-	*/
 }

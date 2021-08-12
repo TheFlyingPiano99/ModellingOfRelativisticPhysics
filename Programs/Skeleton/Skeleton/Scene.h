@@ -34,6 +34,7 @@ class Scene {
 	MenuSystem menu;
 	bool running = true;
 	bool symulateDoppler = true;
+	bool doLorentz = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
 
@@ -99,6 +100,8 @@ public:
 			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 			gpuProgram.setUniform(intersectionType, "intersectionType");
 			gpuProgram.setUniform(symulateDoppler, "symulateDoppler");
+			gpuProgram.setUniform(doLorentz, "doLorentz");
+			
 			
 
 			gpuProgram.setUniform(vec3(0.01, 0.01, 0.01), "La");
@@ -144,6 +147,14 @@ public:
 
 	void toggleDoppler() {
 		symulateDoppler = !symulateDoppler;
+	}
+
+	void toggleLorentzTransformation() {
+		doLorentz = !doLorentz;
+	}
+
+	void toggleIntersectionType() {
+		intersectionType = (IntersectionType)((2 > intersectionType + 1) ? (intersectionType + 1) : 0);
 	}
 
 	//Time manipulation:

@@ -59,6 +59,12 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	if (key == 'f') {
 		scene->windTime(10);
 	}
+	if (key == 'i') {
+		scene->toggleIntersectionType();
+	}
+	if (key == 'l') {
+		scene->toggleLorentzTransformation();
+	}
 
 
 }

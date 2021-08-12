@@ -70,10 +70,6 @@ public:
 			0, 0, b, 0);
 	}
 
-	void Animate(float dt) {
-		eye = eye + vec3(0, 0, 1) * dt;
-	}
-
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(velocityFV, "observersVelocity");
 		gpuProgram.setUniform(locationFV, "observersLocation");
