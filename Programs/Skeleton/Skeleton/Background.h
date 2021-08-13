@@ -43,13 +43,25 @@ public:
 		gpuProgram.setUniform(*texture, "textureUnit");
 		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
-		//gpuProgram.setUniform(M(), "M");
+		gpuProgram.setUniform(texture == nullptr, "M");
 
 		glDisable(GL_CULL_FACE);
-		geometry->Draw(gpuProgram);
+		geometry->Draw();
 		glEnable(GL_CULL_FACE);
 	}
 
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
+		material->loadOnGPU(gpuProgram);
+		gpuProgram.setUniform(*texture, "textureUnit");
+		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(UnitMatrix(), "invM");
+		gpuProgram.setUniform(UnitMatrix(), "M");
+		gpuProgram.setUniform(texture == nullptr, "noTexture");
+
+		glDisable(GL_CULL_FACE);
+		geometry->Draw();
+		glEnable(GL_CULL_FACE);
+	}
 
 
 };

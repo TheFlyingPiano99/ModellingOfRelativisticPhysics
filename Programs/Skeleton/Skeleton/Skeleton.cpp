@@ -19,7 +19,7 @@ void onInitialization() {
 	glEnable(GL_CULL_FACE);
 
 	scene = new Scene();
-	scene->Create();
+	scene->Initialise();
 
 	gpuProgram.create(vertexSource, fragmentSource, "outColor");
 }
@@ -64,6 +64,9 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	}
 	if (key == 'l') {
 		scene->toggleLorentzTransformation();
+	}
+	if (key == 'v') {
+		scene->toggleViewMode();
 	}
 
 

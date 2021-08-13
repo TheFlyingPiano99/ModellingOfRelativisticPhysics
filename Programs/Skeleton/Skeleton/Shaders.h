@@ -9,7 +9,8 @@ const char* const vertexSource = R"(
 	layout(location = 2) in vec2 uv;
 	
 	uniform float speedOfLight;
-	uniform bool symulateDoppler;
+	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
+	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 	uniform bool doLorentz;
 	uniform mat4 MVP;
 	uniform mat4 M;
@@ -19,7 +20,7 @@ const char* const vertexSource = R"(
 	uniform vec4 observersLocation;
 	uniform vec4 observersStartPos;
 
-	uniform int intersectionType;	// 0 = lightCone, 1 = hyperplane
+	uniform int intersectionMode;	// 0 = lightCone, 1 = hyperplane
 
 	//WorldLine:
 	uniform int worldLineType;	// 0 = geodetic
@@ -168,12 +169,12 @@ const char* const vertexSource = R"(
 
 		//Intersect:
 		float t = 0;	// absolute time parametre
-		if (intersectionType == 0) {
+		if (intersectionMode == 0) {
 			//Light cone:
 			vec4 coneLocation = observersLocation;
 			t = GeodeticIntersectLightCone(offsetedStartPos, coneLocation);
 		}
-		else if (intersectionType == 1) {
+		else if (intersectionMode == 1) {
 			//Simultaneous hyperplane of the observer:
 			vec4 planeLocation = observersLocation;
 			vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
@@ -198,28 +199,49 @@ const char* const vertexSource = R"(
 			observersLocationProperFrame = observersLocation.xyz;
 		}
 		
-		if (symulateDoppler) {
+		if (dopplerMode == 0) {	// Full
 			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
 		}
-		else {
-			dopplerShift = 1.0f;		
+		else if (dopplerMode == 1) {	// Mild
+			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
+			dopplerShift = (dopplerShift - 1) * 0.1 + 1;
+		}
+		else if (dopplerMode == 2) {	// Off
+			dopplerShift = 1.0f;			
 		}
 
 		wPos = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
-		mat4 M = /* TranslateMatrix(-observersLocationProperFrame) * */ MVP;
-		gl_Position = vec4(vertexLocationProperFrame, 1) * M;
+		mat4 Mat = /* TranslateMatrix(-observersLocationProperFrame) * */ MVP;
+		gl_Position = vec4(vertexLocationProperFrame, 1) * Mat;
+	}
+
+	void diagram() {
+		wPos = (vec4(vp, 1) * M).xyz;
+		texCoord = vec2(uv.x, 1 - uv.y);
+		norm = (invM * vec4(vn, 0)).xyz;
+		dopplerShift = 1.0f;			
+		gl_Position = vec4(vp, 1) * MVP;
 	}
 
 	void main() {
-		geodetic();
+		if (viewMode == 0) {	// RealTime3D
+			if (worldLineType == 0) {
+				geodetic();
+			}
+		}
+		else if (viewMode == 1) {	// Diagram
+			diagram();
+		}
 	}
 )";
 
 const char* const fragmentSource = R"(
 	#version 330			// Shader 3.3
 	precision highp float;	// normal floats, makes no difference on desktop computers
+
+	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 
 //Object:
 	in vec3 wPos;
@@ -230,6 +252,8 @@ const char* const fragmentSource = R"(
 	uniform mat4 M;
 	uniform mat4 invM;
 	uniform bool glow;
+	uniform bool noTexture;
+	
 	
 	uniform sampler2D textureUnit;
 	uniform sampler2D normalMapUnit;
@@ -368,15 +392,25 @@ const char* const fragmentSource = R"(
 		return outRadiance;
 	}
 
-	void main() {
+	void realTime3D() {
 		vec4 rawColor = texture(textureUnit, texCoord);		
 		
 		vec3 shaded;
 		if (glow) {
-			shaded = rawColor.xyz;
+			if (noTexture) {
+				shaded = normalize(kd);
+			}
+			else {
+				shaded = rawColor.xyz;
+			}
 		}
 		else {
-			shaded = DirectLight(rawColor.xyz);	
+			if (noTexture) {
+				shaded = DirectLight(kd.xyz);
+			}
+			else {
+				shaded = DirectLight(rawColor.xyz);
+			}
 		}
 
 		vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
@@ -385,6 +419,10 @@ const char* const fragmentSource = R"(
 		vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);
 		
 		outColor = vec4(sumShifted, rawColor.w);
+	}
+
+	void main() {
+		realTime3D();
 	}
 )";
 

@@ -22,16 +22,18 @@ public:
 		//return Hyperplane(locationFV, velocityFV);
 	}
 
-	void initBasic(const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp) {
+	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp) {
+		this->eye = eye;
 		this->lookat = lookat;
 		this->prefUp = prefUp;
 		this->fov = fov;
 		this->asp = asp;
 		this->fp = fp;
 		this->bp = bp;
+		setLookat(lookat);
 	}
 
-	void update(const vec4 _location, const vec4 _velocity, const vec4 _startPos) {
+	void syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos) {
 		locationFV = _location;
 		velocityFV = _velocity;
 		startPosFV = _startPos;
@@ -89,13 +91,23 @@ public:
 		return eye;
 	}
 
-	void rotate(float verticalAxisAngle, float horizontalAxisAngle) {
+	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle) {
 		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
 		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
 
 		vec3 centered = lookat - eye;
 		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
 		setLookat(vec3(rotated.x, rotated.y, rotated.z) + eye);
+	}
+
+	void rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle) {
+		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
+		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
+
+		vec3 centered = eye - lookat;
+		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
+		eye = (vec3(rotated.x, rotated.y, rotated.z) + lookat);
+		setLookat(lookat);
 	}
 
 	void zoom(float delta) {

@@ -2,15 +2,29 @@
 #include "Geometry.h"
 #include "Material.h"
 
-void Scene::Create()
+void Scene::Initialise()
 {
+	//View:
+	view = new RealTime3DView(this);
+
 	//Camera:
-	camera = new Camera();
-	camera->initBasic(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+	realTime3DCamera = new Camera();
+	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+	diagramCamera = new Camera();
+	diagramCamera->initBasic(vec3(-5.0f, -5.0f, -5.0f), vec3(3.0f, 3.0f, 3.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+
+	if (viewMode == realTime3D) {
+		activeCamera = realTime3DCamera;
+	}
+	else {
+		activeCamera = diagramCamera;
+	}
 
 	//LightSources:----------------------------------------------
-	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(1000, 1000, 1000), 0));
+	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(0.1, 0.1, 0.1), 0));
 	lights.push_back(new LightSource(vec3(-80, 0, 0), vec3(1000, 1000, 1000), 0));
+	diagramLights.push_back(new LightSource(vec3(-10, -10, -10), vec3(10000, 10000, 10000), 0));
+	diagramLights.push_back(new LightSource(vec3(0, 0, 0), vec3(10000, 10000, 10000), 0));
 
 	//Observers:-------------------------------------------------
 	//1.:
@@ -44,4 +58,62 @@ void Scene::Create()
 	//Other:
 	toggleCurrentObserver();
 
+}
+
+void Scene::Draw(GPUProgram& gpuProgram) {
+	if (currentObserver != nullptr || viewMode == diagram) {
+		//Prefase:
+		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
+		gpuProgram.setUniform(intersectionMode, "intersectionMode");
+		gpuProgram.setUniform(dopplerMode, "dopplerMode");
+		gpuProgram.setUniform(doLorentz, "doLorentz");
+		gpuProgram.setUniform(viewMode, "viewMode");
+		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
+		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
+		activeCamera->loadOnGPU(gpuProgram);
+
+		view->Draw(gpuProgram);
+	}
+}
+
+void Scene::toggleCurrentObserver() {
+	static int currentIdx = -1;
+	if (!observers.empty()) {	// Incrementation with overflow
+		currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;
+		currentObserver = observers.at(currentIdx);
+		realTime3DCamera->syncToObserver(currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
+			currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
+			currentObserver->getLocationAtAbsoluteTime(0.0f));
+	}
+}
+
+// Camera controls:
+
+void Scene::moveCamera(float cx, float cy) {
+	static float camSpeed = 0.01f;
+	if (viewMode == realTime3D) {
+		activeCamera->rotateAroundEye(cx, -cy);
+	}
+	else if (viewMode == diagram) {
+		activeCamera->rotateAroundLookat(cx, -cy);
+	}
+}
+
+void Scene::toggleViewMode() {
+	viewMode = (ViewMode)((2 > viewMode + 1) ? (viewMode + 1) : 0);
+	switch (viewMode)
+	{
+	case ViewMode::realTime3D:
+		activeCamera = realTime3DCamera;
+		delete view;
+		view = new RealTime3DView(this);
+		break;
+	case ViewMode::diagram:
+		activeCamera = diagramCamera;
+		delete view;
+		view = new DiagramView(this);
+		break;
+	default:
+		break;
+	}
 }

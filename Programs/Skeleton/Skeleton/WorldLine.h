@@ -15,15 +15,25 @@
 class WorldLine : public Entity
 {
 protected:
+	unsigned int vao, vbo;
 	enum WorldLineType {
 		geodetic,
 		other
 	} type;
 
 	WorldLine(std::string _name = "", std::string _desc = ""): Entity(_name, _desc) {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	}
 
 public:
+
+	~WorldLine() {
+		glDeleteBuffers(1, &vbo);
+		glDeleteVertexArrays(1, &vao);
+	}
 
 	/*
 	* The time measured by the absolute observer at the hyperplane,
@@ -91,13 +101,18 @@ public:
 
 	virtual void loadOnGPU(GPUProgram& gpuProgram) = 0;
 
+	/*
+	* Used to draw in diagram view.
+	*/
+	virtual void Draw() = 0;
 };
 
 class GeodeticLine : public WorldLine
 {
 	vec4 locationAtZeroT;	//When tau = 0
 	vec4 fourVelocity;
-
+	int noOfVds;
+	std::vector<vec3> vds;
 public:
 
 	/*
@@ -108,9 +123,28 @@ public:
 		type = WorldLineType::geodetic;
 		locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
 		fourVelocity = RelPhysics::ToFourVelocity(_velocity);
+		genGeometry();
 	}
+
 	GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name = "", std::string _desc = "")
 		: locationAtZeroT(_posAtZeroT), fourVelocity(_velocity), WorldLine(_name, _desc) {
+		genGeometry();
+	}
+
+	void genGeometry() {
+		vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
+
+		for (int i = 0; i < 10; i++) {
+			vec4 pos = locationAtZeroT + fourVelocity * i * 2;
+			vds.push_back(vec3(pos.x, pos.y, pos.w));
+		}
+		noOfVds = vds.size();
+
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	}
 
 	float getAbsoluteTimeAtProperTime(float tau);
@@ -125,6 +159,6 @@ public:
 	virtual float intersectLightCone(LightCone& cone);
 	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
 	virtual void loadOnGPU(GPUProgram& gpuProgram);
-
+	virtual void Draw();
 
 };

@@ -123,4 +123,12 @@ void GeodeticLine::loadOnGPU(GPUProgram& gpuProgram)
     gpuProgram.setUniform(fourVelocity, "subjectsVelocity");
 }
 
+void GeodeticLine::Draw()
+{
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glLineWidth(5);
+    glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
+}
+
 //------------------------------------------------------------------------

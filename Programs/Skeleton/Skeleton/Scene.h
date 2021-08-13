@@ -10,30 +10,48 @@
 #include "TextOperations.h"
 #include "MenuSystem.h"
 #include "LightSource.h"
+#include "View.h"
 
-enum IntersectionType {
+enum IntersectionMode {
 	lightCone,
 	hyperplane
+};
+
+enum ViewMode {
+	realTime3D,
+	diagram
+};
+
+enum DopplerMode {
+	full,
+	mild,
+	off
 };
 
 class Scene {
 	float timeScale = 2; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float absoluteTimeSpent = 0.0f;
 
-	Camera* camera = NULL;
-	IntersectionType intersectionType = lightCone;
+	View* view;
+
+	Camera* realTime3DCamera = NULL;
+	Camera* diagramCamera = NULL;
+	Camera* activeCamera = NULL;
+	IntersectionMode intersectionMode = lightCone;
+	DopplerMode dopplerMode = full;
+	ViewMode viewMode = realTime3D;
 
 	Observer* currentObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
 	std::vector<LightSource*> lights;
+	std::vector<LightSource*> diagramLights;
 	std::vector<Caption*> captions;
 
 	Background* background;
 
 	MenuSystem menu;
-	bool running = true;
-	bool symulateDoppler = false;
+	bool running = false;
 	bool doLorentz = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
@@ -44,6 +62,7 @@ public:
 	}
 
 	~Scene() {
+		delete view;
 		for each (Observer* obs in observers)
 		{
 			delete obs;
@@ -60,11 +79,18 @@ public:
 		{
 			delete lt;
 		}
+		for each (LightSource * lt in diagramLights)
+		{
+			delete lt;
+		}
 
 		delete background;
 	}
 
-	void Create();
+	/*
+	* Called once, after the app is launched.
+	*/
+	void Initialise();
 
 	void Control(float dt) {
 		if (running) {
@@ -77,11 +103,12 @@ public:
 	void Animate(float dt) {
 		if (running) {
 			dt *= timeScale;
-			camera->update(
-				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getLocationAtAbsoluteTime(0.0f)
-			);
+			if (currentObserver != nullptr) {
+				realTime3DCamera->syncToObserver(
+					currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
+					currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
+					currentObserver->getLocationAtAbsoluteTime(0.0f));
+			}
 			for each (Object * obj in objects)
 			{
 				obj->Animate(dt, absoluteTimeSpent);
@@ -94,59 +121,20 @@ public:
 		}
 	}
 
-	void Draw(GPUProgram& gpuProgram) {
-		if (currentObserver != nullptr) {
-			//Prefase:
-			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-			gpuProgram.setUniform(intersectionType, "intersectionType");
-			gpuProgram.setUniform(symulateDoppler, "symulateDoppler");
-			gpuProgram.setUniform(doLorentz, "doLorentz");
-			
-			
+	void Draw(GPUProgram& gpuProgram);
 
-			gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
-			gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-			camera->loadOnGPU(gpuProgram);
-			for each (LightSource * lt in lights)
-			{
-				lt->loadOnGPU(gpuProgram);
-			}
+	void toggleCurrentObserver();
 
-			//Actual drawing:
-			background->Draw(gpuProgram, *camera);		// Background
-			for each (Object * obj in objects)			// Objects
-			{
-				obj->Draw(gpuProgram, *camera);
-			}
-		}
-		for each (Caption* cap in captions)
-		{
-			cap->Draw();
-		}
-	}
-
-	void toggleCurrentObserver() {
-		static int currentIdx = -1;
-		if (!observers.empty()) {	// Incrementation with overflow
-			currentIdx = (observers.size() > currentIdx + 1)? currentIdx + 1 : 0;
-			currentObserver = observers.at(currentIdx);
-			camera->update(currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getLocationAtAbsoluteTime(0.0f));
-		}
-	}
-
-	void moveCamera(float cx, float cy) {
-		static float camSpeed = 0.01f;
-		camera->rotate(cx, -cy);
-	}
+	// Camera controls:
+	void moveCamera(float cx, float cy);
 
 	void zoomCamera(float delta) {
-		camera->zoom(delta);
+		activeCamera->zoom(delta);
 	}
 
+	// Symulation controls:
 	void toggleDoppler() {
-		symulateDoppler = !symulateDoppler;
+		dopplerMode = (DopplerMode)((3 > dopplerMode + 1) ? (dopplerMode + 1) : 0);
 	}
 
 	void toggleLorentzTransformation() {
@@ -154,8 +142,11 @@ public:
 	}
 
 	void toggleIntersectionType() {
-		intersectionType = (IntersectionType)((2 > intersectionType + 1) ? (intersectionType + 1) : 0);
+		intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
 	}
+
+	void toggleViewMode();
+
 
 	//Time manipulation:
 
@@ -186,6 +177,30 @@ public:
 		running = true;
 		Animate(0.0f);
 		running = prevState;
+	}
+
+	std::vector<LightSource*>* getLights() {
+		return &lights;
+	}
+
+	Background* getBackground() {
+		return background;
+	}
+
+	Camera* getActiveCamera() {
+		return activeCamera;
+	}
+
+	std::vector<Object*>* getObjects() {
+		return &objects;
+	}
+
+	std::vector<Caption*>* getCaptions() {
+		return &captions;
+	}
+
+	std::vector<LightSource*>* getDiagramLights() {
+		return &diagramLights;
 	}
 
 };

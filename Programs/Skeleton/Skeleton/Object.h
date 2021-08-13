@@ -17,6 +17,7 @@ class Object : public Entity
 	WorldLine* worldLine = NULL;
 	Geometry* geometry;
 	Material* material = NULL;
+	Material* diagramMaterial = NULL;
 	AdvancedTexture* texture = NULL;
 	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
 
@@ -31,6 +32,7 @@ public:
 		WorldLine* _worldLine,
 		Geometry* _geometry,
 		Material* _material,
+		Material* _diagramMaterial,
 		AdvancedTexture* _texture,
 		std::string _name = "",
 		std::string _desc = ""
@@ -44,6 +46,7 @@ public:
 		worldLine(_worldLine),
 		geometry(_geometry),
 		material(_material),
+		diagramMaterial(_diagramMaterial),
 		texture(_texture)
 	{
 	}
@@ -62,6 +65,8 @@ public:
 		if (texture->getTextureId() == 0) {
 			texture = NULL;
 		}
+		Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(5, 0, 5), vec3(5, 6, 20), 50);
+		diagramM->setGlow(true);
 		ParamSurface* pSurface = new SphereSurface(0.5f);
 		pSurface->GenSurface(100, 100);
 		Object* obj = new Object(
@@ -72,7 +77,8 @@ public:
 			vec3(0.0f, 0.0f, 1.0f),
 			wrdln,
 			pSurface,
-			new Material(vec3(3,1.5,1), vec3(10,10,20), vec3(5,6,20), 50),
+			new Material(vec3(3, 1.5, 1), vec3(5, 5, 5), vec3(5, 6, 20), 50),		// RealTime3D material
+			diagramM,		// Diagram material
 			texture,
 			"Earth",
 			"Inhabited planet"
@@ -110,8 +116,20 @@ public:
 		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
 		//gpuProgram.setUniform(M(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
+		gpuProgram.setUniform(texture == nullptr, "noTexture");
 
-		geometry->Draw(gpuProgram);
+		geometry->Draw();
+	}
+
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
+		diagramMaterial->loadOnGPU(gpuProgram);
+		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		//gpuProgram.setUniform(M(), "M");
+		gpuProgram.setUniform(UnitMatrix(), "invM");
+		gpuProgram.setUniform(true, "noTexture");
+
+		worldLine->Draw();
+		
 	}
 
 };
