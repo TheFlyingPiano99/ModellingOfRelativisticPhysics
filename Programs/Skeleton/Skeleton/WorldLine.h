@@ -131,22 +131,7 @@ public:
 		genGeometry();
 	}
 
-	void genGeometry() {
-		vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
-
-		for (int i = 0; i < 10; i++) {
-			vec4 pos = getLocationAtAbsoluteTime(i * 10);
-			vds.push_back(vec3(pos.x, pos.y, pos.w));
-		}
-		noOfVds = vds.size();
-
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	}
-
+	void genGeometry();
 	float getAbsoluteTimeAtProperTime(float tau);
 	float getProperTimeAtAbsoluteTime(float t);
 	vec4 getLocationAtProperTime(float tau);
@@ -160,5 +145,4 @@ public:
 	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
 	virtual void loadOnGPU(GPUProgram& gpuProgram);
 	virtual void Draw();
-
 };

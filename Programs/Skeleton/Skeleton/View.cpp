@@ -34,6 +34,10 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		obj->DrawDiagram(gpuProgram, *scene->getActiveCamera());			// Objects
 	}
+	for each (Observer * obs in *(scene->getObservers()))
+	{
+		obs->DrawDiagram(gpuProgram, *scene->getActiveCamera());			// Observers
+	}
 	system->Draw(gpuProgram, *(scene->getActiveCamera()));					// Coordinate system
 	for each (Caption * cap in *(scene->getCaptions()))						// Captions
 	{

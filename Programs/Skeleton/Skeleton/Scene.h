@@ -92,34 +92,9 @@ public:
 	*/
 	void Initialise();
 
-	void Control(float dt) {
-		if (running) {
-			dt *= timeScale;
-			absoluteTimeSpent += dt;
-			//Todo
-		}
-	}
+	void Control(float dt);
 
-	void Animate(float dt) {
-		if (running) {
-			dt *= timeScale;
-			if (currentObserver != nullptr) {
-				realTime3DCamera->syncToObserver(
-					currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-					currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
-					currentObserver->getLocationAtAbsoluteTime(0.0f));
-			}
-			for each (Object * obj in objects)
-			{
-				obj->Animate(dt, absoluteTimeSpent);
-			}
-			for each (Caption * cap in captions)
-			{
-				cap->Animate();
-			}
-
-		}
-	}
+	void Animate(float dt);
 
 	void Draw(GPUProgram& gpuProgram);
 
@@ -128,56 +103,30 @@ public:
 	// Camera controls:
 	void moveCamera(float cx, float cy);
 
-	void zoomCamera(float delta) {
-		activeCamera->zoom(delta);
-	}
+	void zoomCamera(float delta);
 
 	// Symulation controls:
-	void toggleDoppler() {
-		dopplerMode = (DopplerMode)((3 > dopplerMode + 1) ? (dopplerMode + 1) : 0);
-	}
+	void toggleDoppler();
 
-	void toggleLorentzTransformation() {
-		doLorentz = !doLorentz;
-	}
+	void toggleLorentzTransformation();
 
-	void toggleIntersectionType() {
-		intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
-	}
+	void toggleIntersectionType();
 
 	void toggleViewMode();
 
 
 	//Time manipulation:
 
-	void togglePause() {
-		running = !running;
-		captions.push_back(new Caption(vec2(200.0f, 200.0f), defaultFont, vec3(0.0f, 1.0f, 0.5f), "Paused"));
-	}
+	void togglePause();
 
-	void setTime(float t) {
-		absoluteTimeSpent = t;
-		bool prevState = running;
-		running = true;
-		Animate(0.0f);
-		running = prevState;
-	}
+	void setTime(float t);
 
-	void reset() {
-		setTime(0.0f);
-		bool prevState = running;
-		running = true;
-		Animate(0.0f);
-		running = prevState;
-	}
+	void reset();
 
-	void windTime(float deltaT) {
-		absoluteTimeSpent += deltaT;
-		bool prevState = running;
-		running = true;
-		Animate(0.0f);
-		running = prevState;
-	}
+	void windTime(float deltaT);
+
+
+	// Getters:--------------------------------------------------------------------
 
 	std::vector<LightSource*>* getLights() {
 		return &lights;
@@ -203,4 +152,7 @@ public:
 		return &diagramLights;
 	}
 
+	std::vector<Observer*>* getObservers() {
+		return &observers;
+	}
 };

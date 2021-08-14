@@ -399,7 +399,7 @@ const char* const fragmentSource = R"(
 		vec3 shaded;
 		if (glow) {
 			if (noTexture) {
-				shaded = normalize(kd);
+				shaded = kd;
 			}
 			else {
 				shaded = rawColor.xyz;
@@ -413,13 +413,17 @@ const char* const fragmentSource = R"(
 				shaded = DirectLight(rawColor.xyz);
 			}
 		}
-
-		vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
-		vec3 greenShifted = waveLengthToRGB(525.0 * dopplerShift);	// Green
-		vec3 blueShifted = waveLengthToRGB(460.0 * dopplerShift);	// Blue
-		vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);
 		
-		outColor = vec4(sumShifted, rawColor.w);
+		if (dopplerShift != 1.0) {
+			vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
+			vec3 greenShifted = waveLengthToRGB(525.0 * dopplerShift);	// Green
+			vec3 blueShifted = waveLengthToRGB(460.0 * dopplerShift);	// Blue
+			vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);		
+			outColor = vec4(sumShifted, rawColor.w);
+		}
+		else {
+			outColor = vec4(shaded, rawColor.w);;
+		}
 	}
 
 	void main() {

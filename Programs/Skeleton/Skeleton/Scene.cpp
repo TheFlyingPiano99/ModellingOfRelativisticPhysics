@@ -27,20 +27,21 @@ void Scene::Initialise()
 	diagramLights.push_back(new LightSource(vec3(0, 0, 0), vec3(10000, 10000, 10000), 0));
 
 	//Observers:-------------------------------------------------
+	Material* observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(5, 6, 20), 50);
 	//1.:
 	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
-	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
+	Observer* observer = new Observer(wrdln, observerMaterial, "Obs1", "An observer");
 	observers.push_back(observer);
 
 	//2.:
 	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obs1's world line");
-	observer = new Observer(wrdln, "Obs2", "An observer");
+	observer = new Observer(wrdln, observerMaterial, "Obs2", "An observer");
 	observers.push_back(observer);
 
 
 	//3.:
 	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.5f, 0.2f, 0.0f), "Obs1's world line");
-	observer = new Observer(wrdln, "Obs3", "An observer");
+	observer = new Observer(wrdln, observerMaterial, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
@@ -58,6 +59,35 @@ void Scene::Initialise()
 	//Other:
 	toggleCurrentObserver();
 
+}
+
+void Scene::Control(float dt) {
+	if (running) {
+		dt *= timeScale;
+		absoluteTimeSpent += dt;
+		//Todo
+	}
+}
+
+void Scene::Animate(float dt) {
+	if (running) {
+		dt *= timeScale;
+		if (currentObserver != nullptr) {
+			realTime3DCamera->syncToObserver(
+				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
+				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
+				currentObserver->getLocationAtAbsoluteTime(0.0f));
+		}
+		for each (Object * obj in objects)
+		{
+			obj->Animate(dt, absoluteTimeSpent);
+		}
+		for each (Caption * cap in captions)
+		{
+			cap->Animate();
+		}
+
+	}
 }
 
 void Scene::Draw(GPUProgram& gpuProgram) {
@@ -98,6 +128,25 @@ void Scene::moveCamera(float cx, float cy) {
 	}
 }
 
+void Scene::zoomCamera(float delta) {
+	activeCamera->zoom(delta);
+}
+
+
+// Symulation controls:
+
+void Scene::toggleDoppler() {
+	dopplerMode = (DopplerMode)((3 > dopplerMode + 1) ? (dopplerMode + 1) : 0);
+}
+
+void Scene::toggleLorentzTransformation() {
+	doLorentz = !doLorentz;
+}
+
+void Scene::toggleIntersectionType() {
+	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
+}
+
 void Scene::toggleViewMode() {
 	viewMode = (ViewMode)((2 > viewMode + 1) ? (viewMode + 1) : 0);
 	switch (viewMode)
@@ -115,4 +164,33 @@ void Scene::toggleViewMode() {
 	default:
 		break;
 	}
+}
+
+void Scene::togglePause() {
+	running = !running;
+	captions.push_back(new Caption(vec2(200.0f, 200.0f), defaultFont, vec3(0.0f, 1.0f, 0.5f), "Paused"));
+}
+
+void Scene::setTime(float t) {
+	absoluteTimeSpent = t;
+	bool prevState = running;
+	running = true;
+	Animate(0.0f);
+	running = prevState;
+}
+
+void Scene::reset() {
+	setTime(0.0f);
+	bool prevState = running;
+	running = true;
+	Animate(0.0f);
+	running = prevState;
+}
+
+void Scene::windTime(float deltaT) {
+	absoluteTimeSpent += deltaT;
+	bool prevState = running;
+	running = true;
+	Animate(0.0f);
+	running = prevState;
 }

@@ -13,7 +13,9 @@ class CoordinateSystem {
 	vec3 color[3];
 	std::string name[3];
 
-	void drawAxis(GPUProgram& gpuProgram, const unsigned int idx);
+	void drawAxis(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx, const vec3 center);
+	void drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center, const float density);
+	void genGeometry(vec3 base, unsigned int* vao, unsigned int* vbo);
 
 public:
 	CoordinateSystem() {
@@ -42,23 +44,6 @@ public:
 		glDeleteVertexArrays(1, &vao[1]);
 		glDeleteVertexArrays(1, &vao[2]);
 	}
-
-	void genGeometry(vec3 base, unsigned int* vao, unsigned int* vbo) {
-		glGenVertexArrays(1, vao);
-		glBindVertexArray(*vao);
-		glGenBuffers(1, vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-		std::vector<vec3> vds;
-		for (int i = 0; i <= 20; i++) {
-			vds.push_back(origo + base * (i * 10 - 100));
-		}
-		noOfVds = vds.size();
-		glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
-	}
-
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 

@@ -60,31 +60,7 @@ public:
 	/*
 	* Factory for Earth-like object.
 	*/
-	static Object* createEarth(WorldLine* wrdln) {
-		AdvancedTexture* texture = new AdvancedTexture("../../../Resources/lowres/earth_daymap.bmp", "../../../Resources/lowres/earth_normal_map.bmp", "");
-		if (texture->getTextureId() == 0) {
-			texture = NULL;
-		}
-		Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(5, 0, 5), vec3(5, 6, 20), 50);
-		diagramM->setGlow(true);
-		ParamSurface* pSurface = new SphereSurface(0.5f);
-		pSurface->GenSurface(100, 100);
-		Object* obj = new Object(
-			vec3(1.0f, 1.0f, 1.0f),
-			0.0f,
-			0.0f,
-			vec3(2.5f, 0.0f, 0.0f),
-			vec3(0.0f, 0.0f, 1.0f),
-			wrdln,
-			pSurface,
-			new Material(vec3(3, 1.5, 1), vec3(5, 5, 5), vec3(5, 6, 20), 50),		// RealTime3D material
-			diagramM,		// Diagram material
-			texture,
-			"Earth",
-			"Inhabited planet"
-		);
-		return obj;
-	}
+	static Object* createEarth(WorldLine* wrdln);
 
 	mat4 M() {
 		return ScaleMatrix(scale) * RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);
@@ -95,42 +71,14 @@ public:
 	}
 
 	void Control(float dt, float absoluteTimeSpent) {
-
+		//Todo
+		;
 	}
 
-	void Animate(float dt, float absoluteTimeSpent) {
-		locationFV = worldLine->getLocationAtAbsoluteTime(absoluteTimeSpent);
-		velocityFV = worldLine->getVelocityAtAbsoluteTime(absoluteTimeSpent);
-		translation = vec3(locationFV.x, locationFV.y, locationFV.z);
-		rotationAngle = absoluteTimeSpent * rotationSpeed;
-	}
+	void Animate(float dt, float absoluteTimeSpent);
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera) {
-		//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
+	void Draw(GPUProgram& gpuProgram, Camera& camera);
 
-		worldLine->loadOnGPU(gpuProgram);
-		material->loadOnGPU(gpuProgram);
-		if (texture != nullptr) {
-			texture->loadOnGPU(gpuProgram);
-		}
-		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
-		//gpuProgram.setUniform(M(), "M");
-		gpuProgram.setUniform(UnitMatrix(), "invM");
-		gpuProgram.setUniform(texture == nullptr, "noTexture");
-
-		geometry->Draw();
-	}
-
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
-		diagramMaterial->loadOnGPU(gpuProgram);
-		gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
-		gpuProgram.setUniform(UnitMatrix(), "M");
-		gpuProgram.setUniform(UnitMatrix(), "invM");
-		gpuProgram.setUniform(true, "noTexture");
-
-		worldLine->Draw();
-		
-	}
-
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
 };
 

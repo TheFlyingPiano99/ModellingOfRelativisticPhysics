@@ -7,11 +7,27 @@
 
 using namespace RelPhysics;
 
+inline void GeodeticLine::genGeometry() {
+    vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
+
+    for (int i = 0; i < 10; i++) {
+        vec4 pos = getLocationAtAbsoluteTime(i * 10);
+        vds.push_back(vec3(pos.x, pos.y, pos.w));
+    }
+    noOfVds = vds.size();
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+}
+
 float GeodeticLine::getAbsoluteTimeAtProperTime(float tau)
 {
     float gamma = 1.0f;
     try {
-        gamma = lorentzFactor(relativeVelocity(absObserversFVelocity, fourVelocity));
+        gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, fourVelocity));
     }
     catch (LightspeedExceededException e) {
         std::cerr << e.what() << std::endl;
@@ -23,7 +39,7 @@ float GeodeticLine::getProperTimeAtAbsoluteTime(float t)
 {
     float gamma = 1.0f;
     try {
-        gamma = lorentzFactor(relativeVelocity(absObserversFVelocity, fourVelocity));
+        gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, fourVelocity));
     }
     catch (LightspeedExceededException e) {
         std::cerr << e.what() << std::endl;

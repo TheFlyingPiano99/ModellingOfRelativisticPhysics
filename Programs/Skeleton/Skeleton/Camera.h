@@ -14,44 +14,13 @@ class Camera {
 
 public:
 
-	Hyperplane getHyperplane() {
-		return Hyperplane::simultaneousHyperplane(
-			locationFV,
-			velocityFV
-		);
-		//return Hyperplane(locationFV, velocityFV);
-	}
+	Hyperplane getHyperplane();
 
-	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp) {
-		this->eye = eye;
-		this->lookat = lookat;
-		this->prefUp = prefUp;
-		this->fov = fov;
-		this->asp = asp;
-		this->fp = fp;
-		this->bp = bp;
-		setLookat(lookat);
-	}
+	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp);
 
-	void syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos) {
-		locationFV = _location;
-		velocityFV = _velocity;
-		startPosFV = _startPos;
-		vec3 updatedEye = vec3(locationFV.x, locationFV.y, locationFV.z);
-		vec3 delta = updatedEye - eye;
-		eye = updatedEye;
-		lookat = lookat + delta;
-		vec3 w = eye - lookat;
-		vRight = normalize(cross(prefUp, w));
-		vUp = normalize(cross(w, vRight));
-	}
+	void syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos);
 
-	void setLookat(const vec3 lat) {
-		lookat = lat;
-		vec3 w = eye - lookat;
-		vRight = normalize(cross(prefUp, w));
-		vUp = normalize(cross(w, vRight));
-	}
+	void setLookat(const vec3 lat);
 
 	mat4 Translate() {
 		return TranslateMatrix(-eye);
@@ -76,12 +45,17 @@ public:
 			0, 0, b, 0);
 	}
 
-	void loadOnGPU(GPUProgram& gpuProgram) {
-		gpuProgram.setUniform(velocityFV, "observersVelocity");
-		gpuProgram.setUniform(locationFV, "observersLocation");
-		gpuProgram.setUniform(startPosFV, "observersStartPos");
-		gpuProgram.setUniform(eye, "wEye");
+	mat4 invV() {
+		//Todo
+		return mat4();
 	}
+
+	mat4 invP() {
+		//Todo
+		return mat4();
+	}
+
+	void loadOnGPU(GPUProgram& gpuProgram);
 
 	vec4 getLocationFV() {
 		return locationFV;
@@ -95,44 +69,12 @@ public:
 		return eye;
 	}
 
-	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle) {
-		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
-		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
+	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle);
 
-		vec3 centered = lookat - eye;
-		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
-		setLookat(vec3(rotated.x, rotated.y, rotated.z) + eye);
-	}
+	void rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle);
 
-	void rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle) {
-		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
-		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
+	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point);
 
-		vec3 centered = eye - lookat;
-		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
-		eye = vec3(rotated.x, rotated.y, rotated.z) + lookat;
-		setLookat(lookat);
-	}
-
-	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point) {
-		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
-		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
-
-		vec3 centeredEye = eye - point;
-		vec3 centeredLookat = lookat - point;
-		vec4 rotatedEye = vec4(centeredEye.x, centeredEye.y, centeredEye.z, 1) * hRotationM * vRotationM;
-		vec4 rotatedLookat = vec4(centeredLookat.x, centeredLookat.y, centeredLookat.z, 1) * hRotationM * vRotationM;
-		eye = vec3(rotatedEye.x, rotatedEye.y, rotatedEye.z) + point;
-		lookat = vec3(rotatedLookat.x, rotatedLookat.y, rotatedLookat.z) + point;
-		setLookat(lookat);
-	}
-
-	void zoom(float delta) {
-		fov *= delta;
-		if (fov > M_PI)
-			fov = M_PI;
-		else if (fov < M_PI / 4.0f)
-			fov = M_PI / 4.0f;
-	}
+	void zoom(float delta);
 
 };
