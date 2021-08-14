@@ -123,8 +123,8 @@ public:
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 		diagramMaterial->loadOnGPU(gpuProgram);
-		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
-		//gpuProgram.setUniform(M(), "M");
+		gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(true, "noTexture");
 

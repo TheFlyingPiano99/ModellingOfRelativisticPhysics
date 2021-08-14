@@ -42,8 +42,9 @@ public:
 
 		gpuProgram.setUniform(*texture, "textureUnit");
 		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
-		gpuProgram.setUniform(texture == nullptr, "M");
+		gpuProgram.setUniform(texture == nullptr, "noTexture");
 
 		glDisable(GL_CULL_FACE);
 		geometry->Draw();
@@ -53,7 +54,7 @@ public:
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 		material->loadOnGPU(gpuProgram);
 		gpuProgram.setUniform(*texture, "textureUnit");
-		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");

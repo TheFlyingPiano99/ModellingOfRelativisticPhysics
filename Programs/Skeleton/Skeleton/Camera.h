@@ -53,10 +53,14 @@ public:
 		vUp = normalize(cross(w, vRight));
 	}
 
+	mat4 Translate() {
+		return TranslateMatrix(-eye);
+	}
+
 	mat4 V() {
 		vec3 w = normalize(eye - lookat);
 
-		return /* TranslateMatrix(-eye) * */ mat4(vRight.x, vUp.x, w.x, 0,
+		return mat4(vRight.x, vUp.x, w.x, 0,
 			vRight.y, vUp.y, w.y, 0,
 			vRight.z, vUp.z, w.z, 0,
 			0, 0, 0, 1);
@@ -106,7 +110,20 @@ public:
 
 		vec3 centered = eye - lookat;
 		vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
-		eye = (vec3(rotated.x, rotated.y, rotated.z) + lookat);
+		eye = vec3(rotated.x, rotated.y, rotated.z) + lookat;
+		setLookat(lookat);
+	}
+
+	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point) {
+		mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
+		mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
+
+		vec3 centeredEye = eye - point;
+		vec3 centeredLookat = lookat - point;
+		vec4 rotatedEye = vec4(centeredEye.x, centeredEye.y, centeredEye.z, 1) * hRotationM * vRotationM;
+		vec4 rotatedLookat = vec4(centeredLookat.x, centeredLookat.y, centeredLookat.z, 1) * hRotationM * vRotationM;
+		eye = vec3(rotatedEye.x, rotatedEye.y, rotatedEye.z) + point;
+		lookat = vec3(rotatedLookat.x, rotatedLookat.y, rotatedLookat.z) + point;
 		setLookat(lookat);
 	}
 

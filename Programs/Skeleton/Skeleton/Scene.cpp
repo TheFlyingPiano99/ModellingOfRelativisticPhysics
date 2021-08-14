@@ -11,7 +11,7 @@ void Scene::Initialise()
 	realTime3DCamera = new Camera();
 	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
 	diagramCamera = new Camera();
-	diagramCamera->initBasic(vec3(-5.0f, -5.0f, -5.0f), vec3(3.0f, 3.0f, 3.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+	diagramCamera->initBasic(20 * vec3(1,1,1), 19 * vec3(1, 1, 1), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
 
 	if (viewMode == realTime3D) {
 		activeCamera = realTime3DCamera;
@@ -69,7 +69,6 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(doLorentz, "doLorentz");
 		gpuProgram.setUniform(viewMode, "viewMode");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
-		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 		activeCamera->loadOnGPU(gpuProgram);
 
 		view->Draw(gpuProgram);
@@ -92,10 +91,10 @@ void Scene::toggleCurrentObserver() {
 void Scene::moveCamera(float cx, float cy) {
 	static float camSpeed = 0.01f;
 	if (viewMode == realTime3D) {
-		activeCamera->rotateAroundEye(cx, -cy);
+		realTime3DCamera->rotateAroundEye(cx, -cy);
 	}
 	else if (viewMode == diagram) {
-		activeCamera->rotateAroundLookat(cx, -cy);
+		diagramCamera->rotateAroundPoint(cx, -cy, vec3(0, 0, 0));
 	}
 }
 

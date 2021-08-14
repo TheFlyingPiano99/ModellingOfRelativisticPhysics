@@ -34,7 +34,7 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		obj->DrawDiagram(gpuProgram, *scene->getActiveCamera());			// Objects
 	}
-	system.Draw(gpuProgram, *(scene->getActiveCamera()));
+	system->Draw(gpuProgram, *(scene->getActiveCamera()));					// Coordinate system
 	for each (Caption * cap in *(scene->getCaptions()))						// Captions
 	{
 		cap->Draw();

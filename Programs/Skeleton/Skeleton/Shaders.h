@@ -16,6 +16,7 @@ const char* const vertexSource = R"(
 	uniform mat4 M;
 	uniform mat4 invM;
 
+	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
 	uniform vec4 observersStartPos;
@@ -79,17 +80,17 @@ const char* const vertexSource = R"(
 		vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
 
 		t = solutions.x;	// Should be tested, whether its from the past!
-		return t;
+		return t * subjectsVelocity.w;
 	}
 
 
 	float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 planeLocation, vec4 planeNormal) {
 		return dot(planeLocation - offsetedStartPos, planeNormal)
-				/ dot(subjectsVelocity, planeNormal);
+				/ dot(subjectsVelocity, planeNormal) * subjectsVelocity.w;
 	}
 
 	vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, float t) {
-		return offsetedStartPos + subjectsVelocity * t;
+		return offsetedStartPos + subjectsVelocity / subjectsVelocity.w * t;
 	}
 
 	vec4 GeodeticVelocityAtAbsoluteTime(vec4 offsetedStartPos, float t) {
@@ -222,7 +223,7 @@ const char* const vertexSource = R"(
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(vp, 1) * MVP;
+		gl_Position = vec4(vp, 1) *  MVP;
 	}
 
 	void main() {

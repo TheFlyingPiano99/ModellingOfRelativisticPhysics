@@ -2,6 +2,7 @@
 
 #include "framework.h"
 #include "CoordinateSystem.h"
+#include "WorldLine.h"
 
 class View {
 protected:
@@ -27,9 +28,15 @@ public:
 };
 
 class DiagramView : public View {
-	CoordinateSystem system;
+	CoordinateSystem* system = NULL;
 public:
-	DiagramView(void* _owner) : View(_owner) {}
+	DiagramView(void* _owner) : View(_owner) {
+		system = new CoordinateSystem();
+	}
+
+	~DiagramView() {
+		delete system;
+	}
 
 	void Draw(GPUProgram& gpuProgram);
 

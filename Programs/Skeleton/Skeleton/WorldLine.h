@@ -135,7 +135,7 @@ public:
 		vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
 
 		for (int i = 0; i < 10; i++) {
-			vec4 pos = locationAtZeroT + fourVelocity * i * 2;
+			vec4 pos = getLocationAtAbsoluteTime(i * 10);
 			vds.push_back(vec3(pos.x, pos.y, pos.w));
 		}
 		noOfVds = vds.size();

@@ -51,7 +51,7 @@ Hyperplane GeodeticLine::getSimultaneousHyperplaneAtProperTime(float tau)
 
 vec4 GeodeticLine::getLocationAtAbsoluteTime(float t)
 {
-    return locationAtZeroT + fourVelocity * t;
+    return locationAtZeroT + fourVelocity / fourVelocity.w * t;
 }
 
 vec4 GeodeticLine::getVelocityAtAbsoluteTime(float t)
@@ -72,7 +72,7 @@ Hyperplane GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
 */
 float GeodeticLine::intersectHyperplane(Hyperplane& plane)
 {
-    return (dot(plane.getLocation() - locationAtZeroT, plane.getNormal())) / dot(fourVelocity, plane.getNormal());
+    return (dot(plane.getLocation() - locationAtZeroT, plane.getNormal())) / dot(fourVelocity, plane.getNormal()) * fourVelocity.w;
 }
 
 float GeodeticLine::intersectLightCone(LightCone& cone)
@@ -104,7 +104,7 @@ float GeodeticLine::intersectLightCone(LightCone& cone)
     else {
         throw DoesNotIntersectException();
     }
-    return t;
+    return t * fourVelocity.w;
 }
 
 WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
@@ -127,7 +127,7 @@ void GeodeticLine::Draw()
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glLineWidth(5);
+    glLineWidth(3);
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
 
