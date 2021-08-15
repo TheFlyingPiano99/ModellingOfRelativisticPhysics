@@ -75,7 +75,7 @@ public:
 		;
 	}
 
-	void Animate(float dt, float absoluteTimeSpent);
+	void Animate(float dt);
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 

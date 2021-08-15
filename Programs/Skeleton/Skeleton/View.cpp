@@ -30,15 +30,19 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 
 	//Actual drawing:
 	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
+	Camera* activeCamera = scene->getActiveCamera();
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->DrawDiagram(gpuProgram, *scene->getActiveCamera());			// Objects
+		obj->DrawDiagram(gpuProgram, *activeCamera);			// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
-		obs->DrawDiagram(gpuProgram, *scene->getActiveCamera());			// Observers
+		obs->DrawDiagram(gpuProgram, *activeCamera);			// Observers
 	}
-	system->Draw(gpuProgram, *(scene->getActiveCamera()));					// Coordinate system
+	system->Draw(gpuProgram, *activeCamera);					// Coordinate system
+
+	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera);
+
 	for each (Caption * cap in *(scene->getCaptions()))						// Captions
 	{
 		cap->Draw();

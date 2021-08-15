@@ -5,6 +5,7 @@
 //=============================================================================================
 
 #include "framework.h"
+#include "DiagramAssets.h"
 
 // Initialization
 void onInitialization();
@@ -68,6 +69,9 @@ int main(int argc, char * argv[]) {
 	glutKeyboardUpFunc(onKeyboardUp);
 	glutMotionFunc(onMouseMotion);
 
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 	glutMainLoop();
-	return 1;
+
+	DiagramAssets::cleanUp();
+	return 0;
 }

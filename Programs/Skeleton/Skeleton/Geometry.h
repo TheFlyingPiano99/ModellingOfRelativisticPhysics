@@ -144,6 +144,47 @@ public:
 	}
 };
 
+class PlaneSurface : public ParamSurface {
+	vec3 normal;
+	float width, height;
+public:
+	PlaneSurface(vec3 _n, float _width, float _height) :normal(_n), width(_width), height(_height) {
+	}
+
+	void Eval(float u, float v, vec3& pos, vec3& norm) {
+		norm = normal;
+		vec3 prefX;
+		if (normal.x != 1 && normal.y != 0 && normal.z != 0) {
+			prefX = vec3(1, 0, 0);
+		}
+		else {
+			prefX = vec3(0, 1, 0);
+		}
+		vec3 yBase = cross(normal, prefX);
+		vec3 xBase = cross(yBase, normal);
+
+		pos = xBase * (width * u - width / 2.0f) + yBase * (height * v - height / 2.0f);
+	}
+};
+
+class ConeSurface : public ParamSurface {
+public:
+
+	void Eval(float u, float v, vec3& pos, vec3& norm) {
+		//Todo
+		/*
+		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
+		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
+		Dnum<vec2> X = R * Cos(U) * Sin(V);
+		Dnum<vec2> Y = R * Sin(U) * Sin(V);
+		Dnum<vec2> Z = R * Cos(V);
+
+		pos = vec3(X.f, Y.f, Z.f);
+		norm = -normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
+		*/
+	}
+};
+
 class Stars : public ParamSurface {
 	Dnum<vec2> R;
 public:

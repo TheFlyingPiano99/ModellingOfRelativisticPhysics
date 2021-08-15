@@ -243,7 +243,7 @@ const char* const fragmentSource = R"(
 	precision highp float;	// normal floats, makes no difference on desktop computers
 
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
-
+	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
 //Object:
 	in vec3 wPos;
 	in vec3 norm;
@@ -276,6 +276,7 @@ const char* const fragmentSource = R"(
 	uniform vec3 ks;
 	uniform float shininess;
 	uniform bool depthShading;
+	uniform float transparency;
 
 	out vec4 outColor;
 
@@ -414,15 +415,15 @@ const char* const fragmentSource = R"(
 			}
 		}
 		
-		if (dopplerShift != 1.0) {
+		if (viewMode == 0) {
 			vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
-			vec3 greenShifted = waveLengthToRGB(525.0 * dopplerShift);	// Green
-			vec3 blueShifted = waveLengthToRGB(460.0 * dopplerShift);	// Blue
+			vec3 greenShifted = waveLengthToRGB(526.0 * dopplerShift);	// Green
+			vec3 blueShifted = waveLengthToRGB(444.0 * dopplerShift);	// Blue
 			vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);		
 			outColor = vec4(sumShifted, rawColor.w);
 		}
 		else {
-			outColor = vec4(shaded, rawColor.w);;
+			outColor = vec4(shaded, transparency);
 		}
 	}
 

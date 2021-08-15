@@ -12,6 +12,7 @@ class Observer : public Entity
 {
 	WorldLine* worldLine = NULL;
 	Material* diagramMaterial = NULL;
+	float currentProperTime = 0.0f;
 public:
 
 	Observer(WorldLine* _worldLine, Material* _diagramMaterial, std::string _name = "", std::string _desc = "")
@@ -22,11 +23,30 @@ public:
 		delete worldLine;
 	}
 
-	vec4 getLocationAtAbsoluteTime(float t);
+	vec4 getLocation();
 
-	vec4 getVelocityAtAbsoluteTime(float t);
+	vec4 getVelocity();
+
+	vec4 getStartPos();
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera);
+	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera);
+	void DrawNode(GPUProgram& gpuProgram, Camera& camera);
+	void DrawExtras(GPUProgram& gpuProgram, Camera& camera);
 
+	/*
+	* Receives time in absolute frame.
+	*/
+	void setTimeAtAbsoluteTime(float t);
+
+	/*
+	* Receives delta time in proper frame.
+	*/
+	void increaseTimeByDelta(float deltaTau);
+
+	void syncCamera(Camera* camera);
+
+	void loadOnGPU(GPUProgram& gpuProgram);
 };
 

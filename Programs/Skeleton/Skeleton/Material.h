@@ -10,6 +10,7 @@ protected:
 	vec3 ka, kd, ks;
 	float shininess, wavelength = 435;
 	bool glow = false;
+	float transparency = 1.0f;
 
 
 public:
@@ -26,5 +27,6 @@ public:
 		gpuProgram.setUniform(ks, "ks");
 		gpuProgram.setUniform(shininess, "shininess");
 		gpuProgram.setUniform(glow, "glow");
+		gpuProgram.setUniform(transparency, "transparency");
 	}
 };

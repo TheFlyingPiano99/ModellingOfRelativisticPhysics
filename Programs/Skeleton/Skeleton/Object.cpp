@@ -30,11 +30,8 @@ Object* Object::createEarth(WorldLine* wrdln) {
 	return obj;
 }
 
-void Object::Animate(float dt, float absoluteTimeSpent) {
-	locationFV = worldLine->getLocationAtAbsoluteTime(absoluteTimeSpent);
-	velocityFV = worldLine->getVelocityAtAbsoluteTime(absoluteTimeSpent);
-	translation = vec3(locationFV.x, locationFV.y, locationFV.z);
-	rotationAngle = absoluteTimeSpent * rotationSpeed;
+void Object::Animate(float dt) {
+	//Todo
 }
 
 void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {

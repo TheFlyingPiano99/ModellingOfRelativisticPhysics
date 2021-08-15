@@ -21,10 +21,10 @@ void Scene::Initialise()
 	}
 
 	//LightSources:----------------------------------------------
-	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(0.1, 0.1, 0.1), 0));
 	lights.push_back(new LightSource(vec3(-80, 0, 0), vec3(1000, 1000, 1000), 0));
-	diagramLights.push_back(new LightSource(vec3(-10, -10, -10), vec3(10000, 10000, 10000), 0));
-	diagramLights.push_back(new LightSource(vec3(0, 0, 0), vec3(10000, 10000, 10000), 0));
+	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(0, 0, 0), 1));	// off
+	diagramLights.push_back(new LightSource(vec3(10, 10, 10), vec3(0, 0, 0), 0));
+	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 
 	//Observers:-------------------------------------------------
 	Material* observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(5, 6, 20), 50);
@@ -64,7 +64,9 @@ void Scene::Initialise()
 void Scene::Control(float dt) {
 	if (running) {
 		dt *= timeScale;
-		absoluteTimeSpent += dt;
+		if (activeObserver != nullptr) {
+			activeObserver->increaseTimeByDelta(dt);
+		}
 		//Todo
 	}
 }
@@ -72,15 +74,12 @@ void Scene::Control(float dt) {
 void Scene::Animate(float dt) {
 	if (running) {
 		dt *= timeScale;
-		if (currentObserver != nullptr) {
-			realTime3DCamera->syncToObserver(
-				currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
-				currentObserver->getLocationAtAbsoluteTime(0.0f));
+		if (activeObserver != nullptr) {
+			activeObserver->syncCamera(realTime3DCamera);
 		}
 		for each (Object * obj in objects)
 		{
-			obj->Animate(dt, absoluteTimeSpent);
+			obj->Animate(dt);
 		}
 		for each (Caption * cap in captions)
 		{
@@ -91,7 +90,7 @@ void Scene::Animate(float dt) {
 }
 
 void Scene::Draw(GPUProgram& gpuProgram) {
-	if (currentObserver != nullptr || viewMode == diagram) {
+	if (activeObserver != nullptr || viewMode == diagram) {
 		//Prefase:
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 		gpuProgram.setUniform(intersectionMode, "intersectionMode");
@@ -100,7 +99,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(viewMode, "viewMode");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
-
+		activeObserver->loadOnGPU(gpuProgram);
 		view->Draw(gpuProgram);
 	}
 }
@@ -109,10 +108,8 @@ void Scene::toggleCurrentObserver() {
 	static int currentIdx = -1;
 	if (!observers.empty()) {	// Incrementation with overflow
 		currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;
-		currentObserver = observers.at(currentIdx);
-		realTime3DCamera->syncToObserver(currentObserver->getLocationAtAbsoluteTime(absoluteTimeSpent),
-			currentObserver->getVelocityAtAbsoluteTime(absoluteTimeSpent),
-			currentObserver->getLocationAtAbsoluteTime(0.0f));
+		activeObserver = observers.at(currentIdx);
+		activeObserver->syncCamera(realTime3DCamera);
 	}
 }
 
@@ -172,7 +169,9 @@ void Scene::togglePause() {
 }
 
 void Scene::setTime(float t) {
-	absoluteTimeSpent = t;
+	if (activeObserver != nullptr) {
+		activeObserver->setTimeAtAbsoluteTime(t);
+	}
 	bool prevState = running;
 	running = true;
 	Animate(0.0f);
@@ -188,7 +187,7 @@ void Scene::reset() {
 }
 
 void Scene::windTime(float deltaT) {
-	absoluteTimeSpent += deltaT;
+	activeObserver->increaseTimeByDelta(deltaT);
 	bool prevState = running;
 	running = true;
 	Animate(0.0f);

@@ -66,6 +66,9 @@
     <ClCompile Include="CoordinateSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DiagramAssets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CoordinateSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiagramAssets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

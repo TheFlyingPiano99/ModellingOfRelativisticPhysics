@@ -30,8 +30,6 @@ enum DopplerMode {
 
 class Scene {
 	float timeScale = 2; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
-	float absoluteTimeSpent = 0.0f;
-
 	View* view;
 
 	Camera* realTime3DCamera = NULL;
@@ -41,7 +39,7 @@ class Scene {
 	DopplerMode dopplerMode = full;
 	ViewMode viewMode = realTime3D;
 
-	Observer* currentObserver = NULL;
+	Observer* activeObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
 	std::vector<LightSource*> lights;
@@ -58,8 +56,6 @@ class Scene {
 
 public:
 
-	Scene() {
-	}
 
 	~Scene() {
 		delete view;
@@ -154,5 +150,9 @@ public:
 
 	std::vector<Observer*>* getObservers() {
 		return &observers;
+	}
+
+	Observer* getActiveObserver() {
+		return activeObserver;
 	}
 };

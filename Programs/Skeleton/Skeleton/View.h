@@ -6,7 +6,7 @@
 
 class View {
 protected:
-	void* owner;
+	void* owner;	// Must be of type Scene.
 
 public:
 	View(void* _owner): owner(_owner) {

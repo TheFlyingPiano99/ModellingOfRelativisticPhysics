@@ -40,9 +40,6 @@ void Camera::setLookat(const vec3 lat) {
 }
 
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
-	gpuProgram.setUniform(velocityFV, "observersVelocity");
-	gpuProgram.setUniform(locationFV, "observersLocation");
-	gpuProgram.setUniform(startPosFV, "observersStartPos");
 	gpuProgram.setUniform(eye, "wEye");
 }
 
