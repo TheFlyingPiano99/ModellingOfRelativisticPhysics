@@ -1,3 +1,4 @@
+
 //=============================================================================================
 // Collection of classes from lecture slides.
 // Framework for assignments. Valid from 2019.
@@ -6,6 +7,7 @@
 
 #include "framework.h"
 #include "DiagramAssets.h"
+#include "Skeleton.h"
 
 // Initialization
 void onInitialization();
@@ -72,6 +74,8 @@ int main(int argc, char * argv[]) {
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 	glutMainLoop();
 
+	// Cleanup phase:
 	DiagramAssets::cleanUp();
+	delete scene;
 	return 0;
 }

@@ -69,6 +69,9 @@
     <ClCompile Include="DiagramAssets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StringOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -144,6 +147,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DiagramAssets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

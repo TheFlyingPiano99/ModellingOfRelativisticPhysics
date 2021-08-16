@@ -2,8 +2,13 @@
 
 #include "framework.h"
 #include "Color.h"
-#include "Hyperplane.h"
 #include "WorldLine.h"
+#include <fstream>
+
+struct VertexData {
+	vec3 pos, norm;
+	vec2 uv;
+};
 
 class Geometry {
 protected:
@@ -24,61 +29,15 @@ public:
 
 	virtual void Draw() = 0;
 
-	virtual void updateBeforeDraw(
-		vec4 observersVelocity,
-		vec4 observersLocation,
-		WorldLine& subjectsLine
-		) = 0;
 
 };
 
-class MeshSurface : public Geometry {
-protected:
-	struct VertexData {
-		vec3 pos, norm;
-		vec2 uv;
-	};
-	std::vector<VertexData> vds;
-
-public:
-
-	virtual void updateBeforeDraw(
-		vec4 observersVelocity,
-		vec4 observersLocation,
-		WorldLine& subjectsLine) {
-
-		std::vector<VertexData> transformedVds(vds.size());
-		for (int i = 0; i < transformedVds.size(); i++)
-		{
-			WorldLine* offsettedLine = subjectsLine.getWorldLineWithOffset(vds[i].pos);
-			Hyperplane observersPlane = Hyperplane::simultaneousHyperplane(observersLocation, observersVelocity);
-			float t = offsettedLine->intersectHyperplane(observersPlane);
-
-			vec4 vertexLocation = offsettedLine->getLocationAtAbsoluteTime(t);
-			vec4 vertexVelocity = offsettedLine->getVelocityAtAbsoluteTime(t);
-
-			float vertexDopplerShift = calculateDopplerShift(
-				observersVelocity,
-				vertexVelocity,
-				observersLocation,
-				vertexLocation);
-			transformedVds[i].norm = vds[i].norm;
-			transformedVds[i].pos = vec3(vertexLocation.x, vertexLocation.y, vertexLocation.z);
-			transformedVds[i].uv = vds[i].uv;
-			delete offsettedLine;
-		}
-
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, transformedVds.size() * sizeof(VertexData), &transformedVds[0], GL_DYNAMIC_DRAW);
-	}
 
 
-};
-
-class ParamSurface : public MeshSurface {
+class ParamSurface : public Geometry {
 	unsigned int nVtxStrip, nStrip;
 	bool depthShading = false;
+	std::vector<VertexData> vds;
 
 public:
 
@@ -168,20 +127,19 @@ public:
 };
 
 class ConeSurface : public ParamSurface {
+	float height = 50;
 public:
 
 	void Eval(float u, float v, vec3& pos, vec3& norm) {
-		//Todo
-		/*
+		Dnum<vec2> Height = Dnum<vec2>(height, vec2(0, 0));
 		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
-		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
-		Dnum<vec2> X = R * Cos(U) * Sin(V);
-		Dnum<vec2> Y = R * Sin(U) * Sin(V);
-		Dnum<vec2> Z = R * Cos(V);
+		Dnum<vec2> V = Dnum<vec2>(v * 2 * height - height, vec2(0, 1));
+		Dnum<vec2> X =  V * Cos(U);
+		Dnum<vec2> Y = V * Sin(U);
+		Dnum<vec2> Z = V;
 
 		pos = vec3(X.f, Y.f, Z.f);
-		norm = -normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
-		*/
+		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
 	}
 };
 
@@ -226,4 +184,18 @@ public:
 	//	glDrawArrays(GL_TRI, 0, vds.size());
 	//	glLineWidth(1);
 	//}
+};
+
+class OBJGeometry : public Geometry {
+	unsigned int nVtxStrip, nStrip;
+	std::vector<VertexData> vds;
+	bool depthShading = false;
+
+
+public:
+
+	virtual void load(const char* route);
+
+	virtual void Draw();
+
 };

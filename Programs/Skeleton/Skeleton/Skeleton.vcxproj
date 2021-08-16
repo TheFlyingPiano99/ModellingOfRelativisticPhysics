@@ -89,6 +89,7 @@
     <ClCompile Include="RelPhysics.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="StringOperations.cpp" />
     <ClCompile Include="TextOperations.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="WorldLine.cpp" />
@@ -107,6 +108,8 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
+    <ClInclude Include="Skeleton.h" />
+    <ClInclude Include="StringOperations.h" />
     <ClInclude Include="TextOperations.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="LightCone.h" />

@@ -1,7 +1,6 @@
 #include "WorldLine.h"
 #include <iostream>
 
-
 //----------------------------------------------------
 //GeodeticLine:
 

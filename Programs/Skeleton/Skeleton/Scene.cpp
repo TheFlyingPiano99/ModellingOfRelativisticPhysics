@@ -27,21 +27,20 @@ void Scene::Initialise()
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 
 	//Observers:-------------------------------------------------
-	Material* observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(5, 6, 20), 50);
 	//1.:
 	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
-	Observer* observer = new Observer(wrdln, observerMaterial, "Obs1", "An observer");
+	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
 	//2.:
 	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obs1's world line");
-	observer = new Observer(wrdln, observerMaterial, "Obs2", "An observer");
+	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
 
 	//3.:
 	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.5f, 0.2f, 0.0f), "Obs1's world line");
-	observer = new Observer(wrdln, observerMaterial, "Obs3", "An observer");
+	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
@@ -57,8 +56,7 @@ void Scene::Initialise()
 	background = new Background();
 	
 	//Other:
-	toggleCurrentObserver();
-
+	toggleActiveObserver();
 }
 
 void Scene::Control(float dt) {
@@ -104,11 +102,18 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 	}
 }
 
-void Scene::toggleCurrentObserver() {
+void Scene::toggleActiveObserver() {
 	static int currentIdx = -1;
-	if (!observers.empty()) {	// Incrementation with overflow
-		currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;
-		activeObserver = observers.at(currentIdx);
+	if (!observers.empty()) {
+		currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;	// Incrementation with overflow
+		if (activeObserver != nullptr) {
+			Observer* prevObs = activeObserver;
+			activeObserver = observers.at(currentIdx);
+			activeObserver->syncTimeToObserversSimultaneity(*prevObs);
+		}
+		else {
+			activeObserver = observers.at(currentIdx);
+		}
 		activeObserver->syncCamera(realTime3DCamera);
 	}
 }
@@ -170,7 +175,7 @@ void Scene::togglePause() {
 
 void Scene::setTime(float t) {
 	if (activeObserver != nullptr) {
-		activeObserver->setTimeAtAbsoluteTime(t);
+		activeObserver->setCurrentTimeAtAbsoluteTime(t);
 	}
 	bool prevState = running;
 	running = true;

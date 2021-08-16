@@ -423,7 +423,7 @@ const char* const fragmentSource = R"(
 			outColor = vec4(sumShifted, rawColor.w);
 		}
 		else {
-			outColor = vec4(shaded, transparency);
+			outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
 		}
 	}
 

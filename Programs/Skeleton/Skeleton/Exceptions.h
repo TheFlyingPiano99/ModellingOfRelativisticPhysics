@@ -13,3 +13,9 @@ struct DoesNotIntersectException : public std::exception {
 		return "Does not intersect exception";
 	}
 };
+
+struct CannotLoadGeometry : public std::exception {
+	char const* what() const {
+		return "Cannot load geometry exception";
+	}
+};

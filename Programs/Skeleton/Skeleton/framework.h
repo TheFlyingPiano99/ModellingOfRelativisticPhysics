@@ -1,3 +1,4 @@
+#pragma once
 //=============================================================================================
 // Collection of programs from lecture slides.
 // Framework for assignments. Valid from 2020.

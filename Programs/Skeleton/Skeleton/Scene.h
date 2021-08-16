@@ -94,7 +94,7 @@ public:
 
 	void Draw(GPUProgram& gpuProgram);
 
-	void toggleCurrentObserver();
+	void toggleActiveObserver();
 
 	// Camera controls:
 	void moveCamera(float cx, float cy);

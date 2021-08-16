@@ -3,7 +3,6 @@
 #include "framework.h"
 #include "Intersectable.h"
 
-
 /*
 * Hyper plane in space-time continuum described by a space-time location and a normal four-vector.
 * These vectors are described in the absolute observer's coordinate system.

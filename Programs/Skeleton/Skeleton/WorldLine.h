@@ -84,12 +84,12 @@ public:
 	virtual Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t) = 0;
 
 	/*
-	* Returns intersection event in space-time between this world line and the intersectable hyperplane.
+	* Returns the absolute time spent, where the world line intersects the hyperplane.
 	*/
 	virtual float intersectHyperplane(Hyperplane& plane) = 0;
 
 	/*
-	* Returns intersection event in space-time between this world line and the intersectable light cone.
+	* Returns the absolute time spent, where the world line intersects the light cone.
 	*/
 	virtual float intersectLightCone(LightCone& cone) = 0;
 
@@ -113,6 +113,8 @@ class GeodeticLine : public WorldLine
 	vec4 fourVelocity;
 	int noOfVds;
 	std::vector<vec3> vds;
+
+	void genGeometry();
 public:
 
 	/*
@@ -128,10 +130,10 @@ public:
 
 	GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name = "", std::string _desc = "")
 		: locationAtZeroT(_posAtZeroT), fourVelocity(_velocity), WorldLine(_name, _desc) {
+		type = WorldLineType::geodetic;
 		genGeometry();
 	}
 
-	void genGeometry();
 	float getAbsoluteTimeAtProperTime(float tau);
 	float getProperTimeAtAbsoluteTime(float t);
 	vec4 getLocationAtProperTime(float tau);

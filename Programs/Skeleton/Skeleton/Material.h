@@ -14,7 +14,8 @@ protected:
 
 
 public:
-	Material(vec3 _ka, vec3 _kd, vec3 _ks, float _shininess) : ka(_ka), kd(_kd), ks(_ks), shininess(_shininess) {
+	Material(vec3 _ka, vec3 _kd, vec3 _ks, float _shininess, float _transparency = 1.0f)
+		: ka(_ka), kd(_kd), ks(_ks), shininess(_shininess), transparency(_transparency) {
 	}
 
 	void setGlow(bool _glow) {

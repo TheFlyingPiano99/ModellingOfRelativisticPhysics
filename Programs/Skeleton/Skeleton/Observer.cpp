@@ -17,8 +17,13 @@ vec4 Observer::getStartPos()
 	return worldLine->getLocationAtAbsoluteTime(0.0f);
 }
 
+Hyperplane Observer::getHyperplane()
+{
+	return worldLine->getSimultaneousHyperplaneAtProperTime(currentProperTime);
+}
+
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
-	diagramMaterial->loadOnGPU(gpuProgram);
+	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
@@ -30,13 +35,12 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
 {
-	diagramMaterial->loadOnGPU(gpuProgram);
+	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
-	gpuProgram.setUniform(true, "glow");
+	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
-	gpuProgram.setUniform(0.4f, "transparency");
 	PlaneSurface* plane = new PlaneSurface(normalize(vec3(-getVelocity().x, -getVelocity().y, getVelocity().w)), 100, 100);
 	plane->GenSurface(20, 20);
 	glDisable(GL_CULL_FACE);
@@ -46,13 +50,12 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
 
 void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera)
 {
-	diagramMaterial->loadOnGPU(gpuProgram);
+	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
-	gpuProgram.setUniform(true, "glow");
+	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
-	gpuProgram.setUniform(0.4f, "transparency");
 	glDisable(GL_CULL_FACE);
 	DiagramAssets::getLightConeGeomtry()->Draw();
 	glEnable(GL_CULL_FACE);
@@ -60,7 +63,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera)
 
 void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera)
 {
-	diagramMaterial->loadOnGPU(gpuProgram);
+	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
@@ -76,9 +79,14 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera)
 	DrawNode(gpuProgram, camera);
 }
 
-void Observer::setTimeAtAbsoluteTime(float t)
+void Observer::setCurrentTimeAtAbsoluteTime(float t)
 {
 	currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+}
+
+float Observer::getAbsoluteTimeAtCurrentTime()
+{
+	return worldLine->getAbsoluteTimeAtProperTime(currentProperTime);
 }
 
 void Observer::increaseTimeByDelta(float deltaTau)
@@ -92,6 +100,13 @@ void Observer::syncCamera(Camera* camera)
 		getLocation(),
 		getVelocity(),
 		getStartPos());
+}
+
+void Observer::syncTimeToObserversSimultaneity(Observer& observer)
+{
+	Hyperplane plane = observer.getHyperplane();
+	float t = worldLine->intersectHyperplane(plane);
+	currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
 }
 
 void Observer::loadOnGPU(GPUProgram& gpuProgram)

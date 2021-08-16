@@ -1,14 +1,6 @@
-#include "framework.h"
-
-#include "Shaders.h"
-#include "Scene.h"
-#include <iostream>
+#include "Skeleton.h"
 
 
-GPUProgram gpuProgram; // vertex and fragment shaders
-unsigned int vao;	   // virtual world on the GPU
-
-Scene* scene = NULL;
 
 
 // Initialization, create an OpenGL context
@@ -19,11 +11,10 @@ void onInitialization() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	gpuProgram.create(vertexSource, fragmentSource, "outColor");
 
 	scene = new Scene();
 	scene->Initialise();
-
-	gpuProgram.create(vertexSource, fragmentSource, "outColor");
 }
 
 // Window has become invalid: Redraw
@@ -39,7 +30,7 @@ void onDisplay() {
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
 	if (key == 'c') {
-		scene->toggleCurrentObserver();
+		scene->toggleActiveObserver();
 		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
 	}
 	if (key == ' ') {
