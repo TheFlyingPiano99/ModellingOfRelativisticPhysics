@@ -1,4 +1,4 @@
-#include "Scene.h"
+﻿#include "Scene.h"
 #include "Geometry.h"
 #include "Material.h"
 
@@ -51,6 +51,23 @@ void Scene::Initialise()
 		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
 		objects.push_back(Object::createEarth(wrdln));
 	}
+
+	OBJGeometry* mesh = new OBJGeometry();
+	mesh->load("../../../Resources/geometry/MyCube.obj");
+	Object* meshObj = new Object(
+		vec3(1,1,1),
+		0.0f,
+		0.0f,
+		vec3(0, 0, 0),
+		vec3(0,0,1),
+		wrdln = new GeodeticLine(vec3(6.0f, -5.0f, 2.0f), vec3(0.0f, 0.93f, 0.0f), "MeshObj's world line"),
+		mesh,
+		new Material(vec3(1, 1, 1), vec3(5, 5, 5), vec3(20, 20, 20), 50),		// RealTime3D material
+		new Material(vec3(0.5f, 0.5f, 0.5f), vec3(0.8f, 0.8f, 0.8f), vec3(0.5f, 0.5f, 0.5f), 40, 1.0f),		// Diagram material
+		new AdvancedTexture("../../../Resources/lowRes/dice.bmp", "", ""),
+		"Mesh object",
+		"");
+	objects.push_back(meshObj);
 
 	//Background:------------------------------------------------------
 	background = new Background();
