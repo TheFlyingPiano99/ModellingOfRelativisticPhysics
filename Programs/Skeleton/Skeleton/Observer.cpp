@@ -1,6 +1,6 @@
 #include "Observer.h"
 #include "Geometry.h"
-#include "DiagramAssets.h"
+#include "Assets.h"
 
 vec4 Observer::getLocation()
 {
@@ -23,7 +23,7 @@ Hyperplane Observer::getHyperplane()
 }
 
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
-	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
+	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
@@ -35,7 +35,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
 {
-	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
+	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
@@ -50,26 +50,26 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
 
 void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera)
 {
-	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
+	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
 	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	glDisable(GL_CULL_FACE);
-	DiagramAssets::getLightConeGeomtry()->Draw();
+	Assets::getLightConeGeomtry()->Draw();
 	glEnable(GL_CULL_FACE);
 }
 
 void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera)
 {
-	DiagramAssets::getObserverMaterial()->loadOnGPU(gpuProgram);
+	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(vec3(getLocation().x, getLocation().y, getLocation().w)), "M");
 	gpuProgram.setUniform(TranslateMatrix(-vec3(getLocation().x, getLocation().y, getLocation().w)), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
-	DiagramAssets::getObserverNodeGeometry()->Draw();
+	Assets::getObserverNodeGeometry()->Draw();
 }
 
 void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera)

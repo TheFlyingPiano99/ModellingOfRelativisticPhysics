@@ -205,7 +205,10 @@ const char* const vertexSource = R"(
 		}
 		else if (dopplerMode == 1) {	// Mild
 			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
-			dopplerShift = (dopplerShift - 1) * 0.1 + 1;
+			dopplerShift = (dopplerShift - 1) * 0.2 + 1;
+			if (dopplerShift > 1.6) {
+				dopplerShift = 1.6;
+			}
 		}
 		else if (dopplerMode == 2) {	// Off
 			dopplerShift = 1.0f;			
@@ -244,6 +247,7 @@ const char* const fragmentSource = R"(
 
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
+	uniform bool doShading;
 //Object:
 	in vec3 wPos;
 	in vec3 norm;
@@ -269,6 +273,10 @@ const char* const fragmentSource = R"(
 	uniform vec3 lightPos1;
 	uniform vec3 lightL0;
 	uniform vec3 lightL1;
+//Direction light:
+	uniform vec3 lightPos2;
+	uniform vec3 lightL2;
+
 
 //Material:	
 	uniform vec3 ka;
@@ -372,19 +380,33 @@ const char* const fragmentSource = R"(
 			}
 		}
 
-		//Light1:
+		//Light1:	(Point light)
 		lightDir = normalize(lightPos1 - wPos);
 		dist = length(lightPos1 - wPos);
 		radiance = lightL1 / dist / dist;
 		cosTheta = dot(norm, lightDir);
 		if (cosTheta > 0) {
-			outRadiance = outRadiance + radiance * kd * cosTheta;
+			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
 			halfway = normalize(eyeDir + lightDir);
 			cosDelta = dot(norm, halfway);
 			if (cosDelta > 0) {
 				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
 			}
 		}
+
+		//Light2:	(Direction light)
+		lightDir = normalize(lightPos2);
+		radiance = lightL2;
+		cosTheta = dot(norm, lightDir);
+		if (cosTheta > 0) {
+			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
+			halfway = normalize(eyeDir + lightDir);
+			cosDelta = dot(norm, halfway);
+			if (cosDelta > 0) {
+				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
+			}
+		}
+
 		if (depthShading) {
 			int depth = int(-wPos.z * 3.0f);
 			if (depth > 0) {
@@ -398,7 +420,7 @@ const char* const fragmentSource = R"(
 		vec4 rawColor = texture(textureUnit, texCoord);		
 		
 		vec3 shaded;
-		if (glow) {
+		if (glow || !doShading) {
 			if (noTexture) {
 				shaded = kd;
 			}

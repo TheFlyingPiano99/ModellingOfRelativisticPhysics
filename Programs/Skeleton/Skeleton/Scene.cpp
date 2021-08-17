@@ -21,8 +21,9 @@ void Scene::Initialise()
 	}
 
 	//LightSources:----------------------------------------------
-	lights.push_back(new LightSource(vec3(-80, 0, 0), vec3(1000, 1000, 1000), 0));
-	lights.push_back(new LightSource(vec3(0, 0, 0), vec3(0, 0, 0), 1));	// off
+	lights.push_back(new LightSource(vec3(70, 50, 50), vec3(1000, 1000, 1000), 0));
+	lights.push_back(new LightSource(vec3(-60, -10, 10), vec3(500, 500, 500), 1));
+	lights.push_back(new LightSource(vec3(-1, 1, 1), vec3(0.01, 0.01, 0.01), 2));
 	diagramLights.push_back(new LightSource(vec3(10, 10, 10), vec3(0, 0, 0), 0));
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 
@@ -33,18 +34,18 @@ void Scene::Initialise()
 	observers.push_back(observer);
 
 	//2.:
-	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
 
 	//3.:
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.5f, 0.2f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
-	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.93f, 0.0f), "Obj1's world line");
+	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
 	objects.push_back(Object::createEarth(wrdln));
 
 	for (int i = 0; i < 10; i++) {
@@ -52,22 +53,20 @@ void Scene::Initialise()
 		objects.push_back(Object::createEarth(wrdln));
 	}
 
-	OBJGeometry* mesh = new OBJGeometry();
-	mesh->load("../../../Resources/geometry/MyCube.obj");
-	Object* meshObj = new Object(
-		vec3(1,1,1),
-		0.0f,
-		0.0f,
-		vec3(0, 0, 0),
-		vec3(0,0,1),
-		wrdln = new GeodeticLine(vec3(6.0f, -5.0f, 2.0f), vec3(0.0f, 0.93f, 0.0f), "MeshObj's world line"),
-		mesh,
-		new Material(vec3(1, 1, 1), vec3(5, 5, 5), vec3(20, 20, 20), 50),		// RealTime3D material
-		new Material(vec3(0.5f, 0.5f, 0.5f), vec3(0.8f, 0.8f, 0.8f), vec3(0.5f, 0.5f, 0.5f), 40, 1.0f),		// Diagram material
-		new AdvancedTexture("../../../Resources/lowRes/dice.bmp", "", ""),
-		"Mesh object",
-		"");
-	objects.push_back(meshObj);
+	//Dice:
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	objects.push_back(Object::createDice(wrdln));
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	objects.push_back(Object::createDice(wrdln));
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	objects.push_back(Object::createDice(wrdln));
+	for (int i = 0; i < 10; i++) {
+		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		objects.push_back(Object::createDice(wrdln));
+		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		objects.push_back(Object::createDice(wrdln));
+	}
+
 
 	//Background:------------------------------------------------------
 	background = new Background();
@@ -111,6 +110,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(intersectionMode, "intersectionMode");
 		gpuProgram.setUniform(dopplerMode, "dopplerMode");
 		gpuProgram.setUniform(doLorentz, "doLorentz");
+		gpuProgram.setUniform(doShading, "doShading");		
 		gpuProgram.setUniform(viewMode, "viewMode");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
@@ -183,6 +183,11 @@ void Scene::toggleViewMode() {
 	default:
 		break;
 	}
+}
+
+void Scene::toggleShading()
+{
+	doShading = !doShading;
 }
 
 void Scene::togglePause() {

@@ -33,10 +33,10 @@ void OBJGeometry::load(const char* route) {
 					vt = vec2(std::stof(words.at(1)), 0.0f);					// v := 0 by default
 				}
 				else if (words.size() == 3) {	// 2 component vector	u v
-					vt = vec2(std::stof(words.at(1)), std::stof(words.at(2)));
+					vt = vec2(std::stof(words.at(1)), 1 - std::stof(words.at(2)));
 				}
 				else if (words.size() == 4) {	// 3 component vector	u v w
-					vt = vec2(std::stof(words.at(1)), std::stof(words.at(2)));	// Discard 3. component
+					vt = vec2(std::stof(words.at(1)), 1 - std::stof(words.at(2)));	// Discard 3. component
 				}
 				textureCoords.push_back(vt);
 			}

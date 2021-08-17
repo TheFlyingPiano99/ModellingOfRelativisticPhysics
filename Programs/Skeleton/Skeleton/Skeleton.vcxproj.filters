@@ -146,7 +146,7 @@
     <ClInclude Include="CoordinateSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DiagramAssets.h">
+    <ClInclude Include="Assets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Skeleton.h">

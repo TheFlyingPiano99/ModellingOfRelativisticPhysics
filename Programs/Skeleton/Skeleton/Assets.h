@@ -5,11 +5,11 @@
 /*
 * Static getters for frequently used geomtries etc.
 */
-class DiagramAssets {
+class Assets {
 	static SphereSurface* observerNodeGeometry;
 	static ConeSurface* lightConeGeometry;
 	static Material* observerMaterial;
-
+	static OBJGeometry* cubeGeometry;
 
 
 public:
@@ -30,6 +30,14 @@ public:
 		return lightConeGeometry;
 	}
 
+	static Geometry* getCubeGeometry() {
+		if (cubeGeometry == nullptr) {
+			cubeGeometry = new OBJGeometry();
+			cubeGeometry->load("../../../Resources/geometry/cube.obj");
+		}
+		return cubeGeometry;
+	}
+
 	static Material* getObserverMaterial() {
 		if (observerMaterial == nullptr) {
 			observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(0.2, 0.2, 0.2), 3, 0.4f);
@@ -44,6 +52,7 @@ public:
 		delete observerNodeGeometry;
 		delete lightConeGeometry;
 		delete observerMaterial;
+		delete cubeGeometry;
 	}
 };
 

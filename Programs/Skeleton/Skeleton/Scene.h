@@ -51,6 +51,7 @@ class Scene {
 	MenuSystem menu;
 	bool running = false;
 	bool doLorentz = true;
+	bool doShading = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
 
@@ -92,6 +93,9 @@ public:
 
 	void Animate(float dt);
 
+	/*
+	* Renders everything on screen.
+	*/
 	void Draw(GPUProgram& gpuProgram);
 
 	void toggleActiveObserver();
@@ -109,6 +113,8 @@ public:
 	void toggleIntersectionType();
 
 	void toggleViewMode();
+
+	void toggleShading();
 
 
 	//Time manipulation:

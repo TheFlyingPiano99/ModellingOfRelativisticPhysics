@@ -61,6 +61,9 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	if (key == 'v') {
 		scene->toggleViewMode();
 	}
+	if (key == 's') {
+		scene->toggleShading();
+	}
 
 
 }

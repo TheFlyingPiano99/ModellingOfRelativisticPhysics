@@ -1,5 +1,6 @@
 #include "Object.h"
 
+#include "Assets.h"
 /*
 * Factory for Earth-like object.
 */
@@ -21,13 +22,30 @@ Object* Object::createEarth(WorldLine* wrdln) {
 		vec3(0.0f, 0.0f, 1.0f),
 		wrdln,
 		pSurface,
-		new Material(vec3(3, 1.5, 1), vec3(5, 5, 5), vec3(5, 6, 20), 50),		// RealTime3D material
+		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
 		diagramM,		// Diagram material
 		texture,
 		"Earth",
 		"Inhabited planet"
 	);
 	return obj;
+}
+
+Object* Object::createDice(WorldLine* wrdln)
+{
+	return new Object(
+		vec3(1, 1, 1),
+		0.0f,
+		0.0f,
+		vec3(0, 0, 0),
+		vec3(0, 0, 1),
+		wrdln,
+		Assets::getCubeGeometry(),
+		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
+		new Material(vec3(0.5f, 0.5f, 0.5f), vec3(0.8f, 0.8f, 0.8f), vec3(0.5f, 0.5f, 0.5f), 40, 1.0f),		// Diagram material
+		new AdvancedTexture("../../../Resources/lowRes/dice.bmp", "", ""),
+		"Dice",
+		"It's a cube!");
 }
 
 void Object::Animate(float dt) {

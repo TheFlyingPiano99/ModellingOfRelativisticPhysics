@@ -62,6 +62,10 @@ public:
 	*/
 	static Object* createEarth(WorldLine* wrdln);
 
+	/*
+	*/
+	static Object* createDice(WorldLine* wrdln);
+
 	mat4 M() {
 		return ScaleMatrix(scale) * RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);
 	}

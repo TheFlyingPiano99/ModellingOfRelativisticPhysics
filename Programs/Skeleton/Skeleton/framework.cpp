@@ -6,7 +6,7 @@
 //=============================================================================================
 
 #include "framework.h"
-#include "DiagramAssets.h"
+#include "Assets.h"
 #include "Skeleton.h"
 
 // Initialization
@@ -75,7 +75,7 @@ int main(int argc, char * argv[]) {
 	glutMainLoop();
 
 	// Cleanup phase:
-	DiagramAssets::cleanUp();
+	Assets::cleanUp();
 	delete scene;
 	return 0;
 }

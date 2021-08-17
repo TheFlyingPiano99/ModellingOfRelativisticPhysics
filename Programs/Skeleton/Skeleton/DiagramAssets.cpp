@@ -1,5 +1,6 @@
-#include "DiagramAssets.h"
+#include "Assets.h"
 
-SphereSurface* DiagramAssets::observerNodeGeometry = NULL;
-ConeSurface* DiagramAssets::lightConeGeometry = NULL;
-Material* DiagramAssets::observerMaterial = NULL;
+SphereSurface* Assets::observerNodeGeometry = NULL;
+ConeSurface* Assets::lightConeGeometry = NULL;
+OBJGeometry* Assets::cubeGeometry = NULL;
+Material* Assets::observerMaterial = NULL;
