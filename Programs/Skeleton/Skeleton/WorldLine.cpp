@@ -1,5 +1,6 @@
 #include "WorldLine.h"
 #include <iostream>
+#include "StringOperations.h"
 
 //----------------------------------------------------
 //GeodeticLine:
@@ -144,6 +145,61 @@ void GeodeticLine::Draw()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glLineWidth(3);
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
+}
+
+GeodeticLine* GeodeticLine::loadFromFile(std::ifstream& file)
+{
+    int _ID;
+    std::string _name;
+    std::string _description;
+    vec4 _locationAtZeroT;
+    vec4 _fourVelocity;
+
+    std::string line;
+    while (getline(file, line)) {
+        std::vector<std::string> words = split(line, ' ');
+        if (words.empty()) {									// Empty line
+            continue;
+        }
+        else if (words.at(0).at(0) == '#') {					// Comment
+            continue;
+        }
+        else if (words.at(0).compare("!GeodeticLine") == 0) {	// End of declaration
+            GeodeticLine* retVal = new GeodeticLine(_locationAtZeroT, _fourVelocity, _name, _description);
+            retVal->setID(_ID);
+            return retVal;
+        }
+        else if (words.at(0).compare("ID") == 0) {              // ID
+            _ID = std::stoi(words.at(1));
+        }
+        else if (words.at(0).compare("name") == 0) {              // name
+            _name = join(words, 1);
+        }
+        else if (words.at(0).compare("description") == 0) {         // description
+            _description = join(words, 1);
+        }
+        else if (words.at(0).compare("locationAtZeroT") == 0) {         // locationAtZeroT
+            _locationAtZeroT = vec4(stof(words[1]), stof(words[2]), stof(words[3]), stof(words[4]));
+        }
+        else if (words.at(0).compare("fourVelocity") == 0) {         // fourVelocity
+            _fourVelocity = vec4(stof(words[1]), stof(words[2]), stof(words[3]), stof(words[4]));
+        }
+    }
+    return nullptr;
+}
+
+std::string GeodeticLine::genSaveString()
+{
+    std::string str(
+        "GeodeticLine\n"
+        "ID " + std::to_string(getID()) + "\n"
+        "name " + name + "\n"
+        "description " + description + "\n"
+        "locationAtZeroT " + std::to_string(locationAtZeroT.x) + " " + std::to_string(locationAtZeroT.y) + " " + std::to_string(locationAtZeroT.z) + " " + std::to_string(locationAtZeroT.w) + "\n"
+        "fourVelocity " + std::to_string(fourVelocity.x) + " " + std::to_string(fourVelocity.y) + " " + std::to_string(fourVelocity.z) + " " + std::to_string(fourVelocity.w) + "\n"
+        "!GeodeticLine\n"
+    );
+    return str;
 }
 
 //------------------------------------------------------------------------

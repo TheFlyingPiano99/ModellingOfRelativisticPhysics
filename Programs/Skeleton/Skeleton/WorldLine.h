@@ -7,6 +7,7 @@
 #include "LightCone.h"
 #include "RelPhysics.h"
 #include "Exceptions.h"
+#include <fstream>
 
 /*
 * World-line of an object / observer in space-time continuum.
@@ -142,9 +143,15 @@ public:
 	vec4 getLocationAtAbsoluteTime(float t);
 	vec4 getVelocityAtAbsoluteTime(float t);
 	Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t);
-	virtual float intersectHyperplane(Hyperplane& plane);
-	virtual float intersectLightCone(LightCone& cone);
-	virtual WorldLine* getWorldLineWithOffset(vec3 offset);
-	virtual void loadOnGPU(GPUProgram& gpuProgram);
-	virtual void Draw();
+	float intersectHyperplane(Hyperplane& plane);
+	float intersectLightCone(LightCone& cone);
+	WorldLine* getWorldLineWithOffset(vec3 offset);
+	void loadOnGPU(GPUProgram& gpuProgram);
+	void Draw();
+	std::string genSaveString();
+
+	/*
+	* Returns the loaded object.
+	*/
+	static GeodeticLine* loadFromFile(std::ifstream& file);
 };

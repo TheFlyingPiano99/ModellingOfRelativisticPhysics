@@ -19,3 +19,9 @@ struct CannotLoadGeometry : public std::exception {
 		return "Cannot load geometry exception";
 	}
 };
+
+struct CannotLoadScene : public std::exception {
+	char const* what() const {
+		return "Cannot load scene exception";
+	}
+};

@@ -75,7 +75,8 @@ int main(int argc, char * argv[]) {
 	glutMainLoop();
 
 	// Cleanup phase:
-	Assets::cleanUp();
+	//scene->save("../../../Saves/default.txt");
 	delete scene;
+	Assets::cleanUp();
 	return 0;
 }

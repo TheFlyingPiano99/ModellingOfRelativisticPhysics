@@ -1,6 +1,9 @@
 ﻿#include "Scene.h"
 #include "Geometry.h"
 #include "Material.h"
+#include <fstream>
+#include "StringOperations.h"
+#include "Exceptions.h"
 
 void Scene::Initialise()
 {
@@ -30,40 +33,51 @@ void Scene::Initialise()
 	//Observers:-------------------------------------------------
 	//1.:
 	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	worldLines.push_back(wrdln);
 	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
 	//2.:
 	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	worldLines.push_back(wrdln);
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
 
 	//3.:
 	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs1's world line");
+	worldLines.push_back(wrdln);
 	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
 	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
+	worldLines.push_back(wrdln);
 	objects.push_back(Object::createEarth(wrdln));
 
 	for (int i = 0; i < 10; i++) {
 		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		worldLines.push_back(wrdln);
 		objects.push_back(Object::createEarth(wrdln));
 	}
 
 	//Dice:
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	worldLines.push_back(wrdln);
+	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
 	for (int i = 0; i < 10; i++) {
-		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "");
+		worldLines.push_back(wrdln);
 		objects.push_back(Object::createDice(wrdln));
-		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "");
+		worldLines.push_back(wrdln);
 		objects.push_back(Object::createDice(wrdln));
 	}
 
@@ -219,4 +233,95 @@ void Scene::windTime(float deltaT) {
 	running = true;
 	Animate(0.0f);
 	running = prevState;
+}
+
+void Scene::clearEntities()
+{
+	for each (Observer * obs in observers)
+	{
+		delete obs;
+	}
+	for each (Object * obj in objects)
+	{
+		delete obj;
+	}
+	for each (WorldLine * wl in worldLines)
+	{
+		delete wl;
+	}
+
+	worldLines.clear();
+	observers.clear();
+	objects.clear();
+	activeObserver = NULL;
+}
+
+void Scene::save(const char* destination)
+{
+	std::ofstream file;
+	file.open(destination);
+	if (file.is_open()) {
+		file.clear();
+		for each (WorldLine * wl in worldLines)
+		{
+			file << wl->genSaveString() << std::endl;
+		}
+		for each (Observer * obs in observers)
+		{
+			file << obs->genSaveString() << std::endl;
+		}
+		for each (Object * obj in objects)
+		{
+			file << obj->genSaveString() << std::endl;
+		}
+		file.close();
+	}
+}
+
+void Scene::load(const char* source)
+{
+	std::ifstream file;
+	file.open(source);
+	if (file.is_open()) {
+		// Clear everything, what will be loaded:
+
+		std::string line;
+		while (getline(file, line)) {
+			std::vector<std::string> words;
+			words = split(line, ' ');
+			if (words.empty()) {									// Empty line
+				continue;
+			}
+			else if (words.at(0).at(0) == '#') {					// Comment
+				continue;
+			}
+			else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
+				 WorldLine* wrdLn = GeodeticLine::loadFromFile(file);
+				 if (wrdLn != nullptr) {
+					 worldLines.push_back(wrdLn);
+				 }
+			}
+			else if (words.at(0).compare("Observer") == 0) {		// Observer
+				Observer* obs = Observer::loadFromFile(file);
+				if (obs != nullptr) {
+					observers.push_back(obs);
+				}
+			}
+			else if (words.at(0).compare("Object") == 0) {		// Object
+				Object* obj = Object::loadFromFile(file);
+				if (obj != nullptr) {
+					objects.push_back(obj);
+				}
+			}
+		}
+
+		// Linking objects:
+		//Todo
+
+		toggleActiveObserver();
+		file.close();
+	}
+	else {
+		throw CannotLoadScene();
+	}
 }

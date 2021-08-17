@@ -1,0 +1,37 @@
+	 _______________________________
+	/								\
+	|	Save string conventions		|
+	\_______________________________/
+
+
+_________________________________________
+
+# <- comment line
+
+GeodeticLine
+ID [int]
+name [string]
+description [string]
+locationAtZeroT [x] [y] [z] [w]
+fourVelocity [x] [y] [z] [w]
+!GeodeticLine
+
+Observer
+ID [int]
+name [string]
+description [string]
+worldLine [ID(int)]
+!Observer
+
+Object
+type [dice / earth / ...]
+ID [int]
+name [string]
+description [string]
+worldLine [ID(int)]
+!Object
+
+
+
+
+

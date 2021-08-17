@@ -9,6 +9,11 @@
 #include "Camera.h"
 #include "AdvancedTexture.h"
 
+enum ObjectType {
+	earth,
+	dice,
+	none
+};
 
 class Object : public Entity
 {
@@ -20,6 +25,7 @@ class Object : public Entity
 	Material* diagramMaterial = NULL;
 	AdvancedTexture* texture = NULL;
 	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
+	ObjectType type = none;
 
 public:
 
@@ -57,6 +63,10 @@ public:
 		}
 	}
 
+	void setType(ObjectType _type) {
+		type = _type;
+	}
+
 	/*
 	* Factory for Earth-like object.
 	*/
@@ -84,5 +94,12 @@ public:
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+
+	std::string genSaveString();
+
+	/*
+	* Returns the loaded object.
+	*/
+	static Object* loadFromFile(std::ifstream& file);
 };
 

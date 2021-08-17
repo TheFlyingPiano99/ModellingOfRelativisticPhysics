@@ -23,3 +23,12 @@ std::vector<std::string> split(std::string str, const char separator) {
 	}
 	return words;
 }
+
+std::string join(std::vector<std::string> strings, const int firstIndex)
+{
+	std::string joined;
+	for (int i = firstIndex; i < strings.size(); i++) {
+		joined.append(strings[i]);
+	}
+	return joined;
+}

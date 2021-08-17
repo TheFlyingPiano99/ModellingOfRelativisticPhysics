@@ -14,7 +14,10 @@ void OBJGeometry::load(const char* route) {
 		while (getline(file, line)) {
 			std::vector<std::string> words;
 			words = split(line, ' ');
-			if (words.at(0).at(0) == '#') {					// Comment
+			if (words.empty()) {									// Empty line
+				continue;
+			}
+			else if (words.at(0).at(0) == '#') {					// Comment
 				continue;
 			}
 			else if (words.at(0).compare("v") == 0) {		// vertex
@@ -64,12 +67,12 @@ void OBJGeometry::load(const char* route) {
 				;
 			}
 		}
+		file.close();
 	}
 	else {
 		throw CannotLoadGeometry();
 	}
 
-	file.close();
 
 	//OpenGL:
 	glBindVertexArray(vao);

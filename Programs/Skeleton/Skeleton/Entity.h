@@ -9,15 +9,29 @@
 */
 class Entity
 {
-protected:
 	int ID;
 	static int nextID;
+
+protected:
+
 	std::string name;
 	std::string description;
-protected:
+
 	Entity(std::string _name = "", std::string _desc = "") : name(_name), description(_desc) {
 		ID = nextID++;
 	}
+
+	/*
+	* Ensures, that the nextID is always greater than the ID of any object.
+	*/
+	void setID(int id) {
+		ID = id;
+		if (ID >= nextID) {
+			nextID = ID + 1;
+		}
+	}
+
+public:
 
 	int getID() {
 		return ID;
@@ -44,7 +58,13 @@ protected:
 	}
 
 	void setDescription(std::string desc) {
-		description = desc;
+		this->description = desc;
 	}
+
+	void setName(std::string name) {
+		this->name = name;
+	}
+
+	virtual std::string genSaveString() = 0;
 };
 

@@ -55,5 +55,13 @@ public:
 	void syncTimeToObserversSimultaneity(Observer& observer);
 
 	void loadOnGPU(GPUProgram& gpuProgram);
+
+	std::string genSaveString();
+
+	/*
+	* Returns the loaded object.
+	*/
+	static Observer* loadFromFile(std::ifstream& file);
+
 };
 

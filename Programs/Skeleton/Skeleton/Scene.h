@@ -42,6 +42,7 @@ class Scene {
 	Observer* activeObserver = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
+	std::vector<WorldLine*> worldLines;
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
 	std::vector<Caption*> captions;
@@ -80,7 +81,10 @@ public:
 		{
 			delete lt;
 		}
-
+		for each (WorldLine * wl in worldLines)
+		{
+			delete wl;
+		}
 		delete background;
 	}
 
@@ -161,4 +165,11 @@ public:
 	Observer* getActiveObserver() {
 		return activeObserver;
 	}
+
+	//-----------------------------------------------------------------
+
+	void clearEntities();
+
+	void save(const char* destination);
+	void load(const char* source);
 };
