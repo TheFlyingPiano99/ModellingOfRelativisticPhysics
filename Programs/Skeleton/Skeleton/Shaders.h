@@ -138,11 +138,11 @@ const char* const vertexSource = R"(
 	}
 
 	/*
-	* Calculates coeficient for Doppler shift of perceived color.
+	* Calculates coeficient for Doppler shift of perceived color. Given, that observer is positioned in (0,0,0).
 	*/
-	float calculateDopplerShift(vec3 vertexVelocity, vec3 vertexLocation, vec3 observerLocationProperFrame) {
+	float calculateDopplerShift(vec3 vertexVelocity, vec3 vertexLocation) {
 
-		vec3 toSubject = normalize(vertexLocation - observerLocationProperFrame);
+		vec3 toSubject = normalize(vertexLocation);
 
 		float v = dot(toSubject, vertexVelocity);  //Approach speed
 		return sqrt((speedOfLight + v) / (speedOfLight - v));
@@ -154,9 +154,9 @@ const char* const vertexSource = R"(
 	*/
 	void geodetic() {
 
-        // Start position of the world line of this vertex in absolute frame.	(Length contraction is applied)
+        // Start position of the world line of this vertex in absolute frame:
 		vec4 offsetedStartPos;
-		if (doLorentz) {
+		if (doLorentz) {			// (Length contraction is applied)
 			vec3 v = To3DVelocity(subjectsVelocity);
 			float gamma = lorentzFactor(length(v));
 			vec3 n = normalize(v);
@@ -179,32 +179,28 @@ const char* const vertexSource = R"(
 			//Simultaneous hyperplane of the observer:
 			vec4 planeLocation = observersLocation;
 			vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
-			t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);			
+			t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);		
 		}
 
-		// From here forward everything is in observers frame:
 		
 		vec3 vertexLocationProperFrame;
 		vec3 vertexVelocityProperFrame;
 		vec3 observersLocationProperFrame;
 		if (doLorentz) {
-			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;
-			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;
+			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
+			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
 			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)), To3DVelocity(observersVelocity));
-			shiftedOrigoFrame = observersLocation - observersStartPos;
-			observersLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;
 		}
 		else {
-			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
-			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t));
-			observersLocationProperFrame = observersLocation.xyz;
+			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz - observersLocation.xyz;	// Euclidean transformation
+			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)) - To3DVelocity(observersVelocity);	// Euclidean transformation
 		}
 		
 		if (dopplerMode == 0) {	// Full
-			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
+			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame);
 		}
 		else if (dopplerMode == 1) {	// Mild
-			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame, observersLocationProperFrame);
+			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame);
 			dopplerShift = (dopplerShift - 1) * 0.2 + 1;
 			if (dopplerShift > 1.6) {
 				dopplerShift = 1.6;
@@ -214,11 +210,10 @@ const char* const vertexSource = R"(
 			dopplerShift = 1.0f;			
 		}
 
-		wPos = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz;
+		wPos = vertexLocationProperFrame;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
-		mat4 Mat = /* TranslateMatrix(-observersLocationProperFrame) * */ MVP;
-		gl_Position = vec4(vertexLocationProperFrame, 1) * Mat;
+		gl_Position = vec4(vertexLocationProperFrame, 1) * MVP;			// Now the MVP doesn't contain translation by -eye! Because eye is in (0,0,0)
 	}
 
 	void diagram() {
@@ -226,7 +221,7 @@ const char* const vertexSource = R"(
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(vp, 1) *  MVP;
+		gl_Position = vec4(vp, 1) *  MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void main() {
@@ -359,7 +354,14 @@ const char* const fragmentSource = R"(
 	}
 
 	vec3 DirectLight(vec3 rawColor) {
-		vec3 eyeDir = normalize(wEye - wPos);
+		vec3 eyeDir;
+		if (viewMode == 0) {		// Real3D
+			eyeDir = normalize(-wPos);			// eye is in (0,0,0)
+		}
+		else {
+			eyeDir = normalize(wEye - wPos);
+		}
+		 
 
 		vec3 outRadiance = ka * La;
 
@@ -440,7 +442,7 @@ const char* const fragmentSource = R"(
 
 	void realTime3D() {
 		if (outline) {
-			if (dot(normalize(wEye - wPos), norm) < 0.3) {
+			if (dot(normalize(-wPos), norm) < 0.3) {		// Eye position is in (0,0,0), when using intersections
 				outColor = vec4(0,1,0,1);							// green outline
 				return;
 			}
