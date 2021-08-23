@@ -30,6 +30,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
+	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
 }

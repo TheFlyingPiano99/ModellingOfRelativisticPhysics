@@ -243,7 +243,29 @@ void Scene::toggleSelected()
 
 void Scene::selectByClick(float cX, float cY)
 {
-	//Todo
+	if (!objects.empty() && viewMode == ViewMode::diagram) {
+		Ray ray = diagramCamera->getRayFromCameraCoord(vec2(cX, cY));
+		float constraint = 0.5f;
+		int selectionIdx = -1;
+		float shortestDistance = objects[0]->rayDistanceToDiagram(ray);
+		if (constraint > shortestDistance) {
+			selectionIdx = 0;
+		}
+		for (int i = 1; i < objects.size(); i++) {
+			float d = objects[i]->rayDistanceToDiagram(ray);
+			if (shortestDistance > d && constraint > d) {
+				shortestDistance = d;
+				selectionIdx = i;
+			}
+		}
+		if (selectionIdx >= 0) {
+			if (selected != nullptr) {
+				selected->deselect();
+			}
+			selected = objects[selectionIdx];
+			selected->select();
+		}
+	}
 }
 
 void Scene::save(const char* destination)

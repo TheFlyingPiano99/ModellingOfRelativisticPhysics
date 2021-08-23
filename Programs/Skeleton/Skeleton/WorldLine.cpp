@@ -147,6 +147,13 @@ void GeodeticLine::Draw()
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
 
+float GeodeticLine::distanceBetweenRayAndDiagram(const Ray& ray)
+{
+    vec3 wlPos = vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w);
+    vec3 wlDir = normalize(vec3(fourVelocity.x, fourVelocity.y, fourVelocity.w));
+    return abs(dot(ray.pos - wlPos, cross(wlDir, ray.dir)));
+}
+
 GeodeticLine* GeodeticLine::loadFromFile(std::ifstream& file)
 {
     int _ID;

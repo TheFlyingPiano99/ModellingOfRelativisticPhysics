@@ -70,6 +70,13 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
 
+	if (selected) {
+		gpuProgram.setUniform(true, "outline");
+	}
+	else {
+		gpuProgram.setUniform(false, "outline");
+	}
+
 	geometry->Draw();
 }
 
@@ -85,6 +92,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
+	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
 

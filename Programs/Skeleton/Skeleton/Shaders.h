@@ -258,7 +258,7 @@ const char* const fragmentSource = R"(
 	uniform mat4 invM;
 	uniform bool glow;
 	uniform bool noTexture;
-	
+	uniform bool outline;
 	
 	uniform sampler2D textureUnit;
 	uniform sampler2D normalMapUnit;
@@ -416,8 +416,7 @@ const char* const fragmentSource = R"(
 		return outRadiance;
 	}
 
-	void realTime3D() {
-		vec4 rawColor = texture(textureUnit, texCoord);		
+	vec3 shading(vec4 rawColor) {
 		
 		vec3 shaded;
 		if (glow || !doShading) {
@@ -436,21 +435,39 @@ const char* const fragmentSource = R"(
 				shaded = DirectLight(rawColor.xyz);
 			}
 		}
-		
-		if (viewMode == 0) {
-			vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
-			vec3 greenShifted = waveLengthToRGB(526.0 * dopplerShift);	// Green
-			vec3 blueShifted = waveLengthToRGB(444.0 * dopplerShift);	// Blue
-			vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);		
-			outColor = vec4(sumShifted, rawColor.w);
+		return shaded;
+	}
+
+	void realTime3D() {
+		if (outline) {
+			if (dot(normalize(wEye - wPos), norm) < 0.3) {
+				outColor = vec4(0,1,0,1);							// green outline
+				return;
+			}
 		}
-		else {
-			outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
-		}
+		vec4 rawColor = texture(textureUnit, texCoord);		
+		vec3 shaded = shading(rawColor);
+
+		vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
+		vec3 greenShifted = waveLengthToRGB(526.0 * dopplerShift);	// Green
+		vec3 blueShifted = waveLengthToRGB(444.0 * dopplerShift);	// Blue
+		vec3 sumShifted = (shaded.x * redShifted + shaded.y * greenShifted + shaded.z * blueShifted);		
+		outColor = vec4(sumShifted, rawColor.w);
+	}
+
+	void diagram() {
+		vec4 rawColor = texture(textureUnit, texCoord);		
+		vec3 shaded = shading(rawColor);
+		outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
 	}
 
 	void main() {
-		realTime3D();
+		if (viewMode == 0) {		// RealTime3D
+			realTime3D();
+		}
+		else if (viewMode == 1) {	// Diagram
+			diagram();
+		}
 	}
 )";
 

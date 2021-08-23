@@ -116,7 +116,13 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 	char * buttonStat;
 
 	switch (button) {
-		case GLUT_LEFT_BUTTON: break;
+		case GLUT_LEFT_BUTTON:
+			if (state == GLUT_DOWN) {
+				scene->selectByClick(cX, cY);
+			}
+			else if (state == GLUT_UP) {
+			}
+			break;
 		case GLUT_MIDDLE_BUTTON: break;
 		case GLUT_RIGHT_BUTTON:
 			if (state == GLUT_DOWN) {	//Start dragging camera

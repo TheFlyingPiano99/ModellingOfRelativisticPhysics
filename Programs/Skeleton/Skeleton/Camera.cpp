@@ -102,12 +102,13 @@ void Camera::zoom(float delta) {
 		fov = M_PI / 4.0f;
 }
 
-inline Ray Camera::getRayFromCameraCoord(vec2 cPos) {
+Ray Camera::getRayFromCameraCoord(vec2 cPos) {
 
+	float l = length(lookat - eye);
 	vec3 wPos =
 		lookat
-		+ vRight * cPos.x * tanf(fov / 2.0f) * asp
-		+ vUp * cPos.y * tanf(fov / 2.0f);
+		+ vRight * cPos.x * tanf(fov / 2.0f) * asp * l
+		+ vUp * cPos.y * tanf(fov / 2.0f) * l;
 
 	return Ray(eye, normalize(wPos - eye));
 }

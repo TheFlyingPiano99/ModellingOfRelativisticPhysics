@@ -8,6 +8,7 @@
 #include "RelPhysics.h"
 #include "Exceptions.h"
 #include <fstream>
+#include "Ray.h"
 
 /*
 * World-line of an object / observer in space-time continuum.
@@ -106,6 +107,8 @@ public:
 	* Used to draw in diagram view.
 	*/
 	virtual void Draw() = 0;
+
+	virtual float distanceBetweenRayAndDiagram(const Ray& ray) = 0;
 };
 
 class GeodeticLine : public WorldLine
@@ -149,6 +152,7 @@ public:
 	void loadOnGPU(GPUProgram& gpuProgram);
 	void Draw();
 	std::string genSaveString();
+	virtual float distanceBetweenRayAndDiagram(const Ray& ray);
 
 	/*
 	* Returns the loaded object.

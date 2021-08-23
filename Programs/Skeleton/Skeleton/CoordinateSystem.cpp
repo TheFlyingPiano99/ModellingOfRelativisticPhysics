@@ -9,6 +9,7 @@ void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, Camera& camera, const un
     gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");
     gpuProgram.setUniform(M, "M");
     gpuProgram.setUniform(invM, "invM");
+    gpuProgram.setUniform(false, "outline");
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
 
@@ -47,6 +48,7 @@ void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
     gpuProgram.setUniform(UnitMatrix(), "invM");
     gpuProgram.setUniform(true, "glow");
     gpuProgram.setUniform(true, "noTexture");
+    gpuProgram.setUniform(false, "outline");
     glLineWidth(2);
     gpuProgram.setUniform(color[0], "kd");
     drawAxis(gpuProgram, camera, 0, origo);

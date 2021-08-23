@@ -45,6 +45,7 @@ public:
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");
+		gpuProgram.setUniform(false, "outline");
 
 		glDisable(GL_CULL_FACE);
 		geometry->Draw();
@@ -58,6 +59,7 @@ public:
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");
+		gpuProgram.setUniform(false, "outline");
 
 		glDisable(GL_CULL_FACE);
 		geometry->Draw();

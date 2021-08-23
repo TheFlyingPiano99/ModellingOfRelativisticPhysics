@@ -115,5 +115,9 @@ public:
 	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
 		worldLine = worldLines.at(worldLineID);
 	}
+
+	float rayDistanceToDiagram(const Ray& ray) {
+		return worldLine->distanceBetweenRayAndDiagram(ray);
+	}
 };
 
