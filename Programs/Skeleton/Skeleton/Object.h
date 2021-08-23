@@ -8,6 +8,7 @@
 #include "Geometry.h"
 #include "Camera.h"
 #include "AdvancedTexture.h"
+#include <map>
 
 enum ObjectType {
 	earth,
@@ -26,6 +27,7 @@ class Object : public Entity
 	AdvancedTexture* texture = NULL;
 	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
 	ObjectType type = none;
+	int worldLineID = 0;
 
 public:
 
@@ -101,5 +103,17 @@ public:
 	* Returns the loaded object.
 	*/
 	static Object* loadFromFile(std::ifstream& file);
+
+	void setWorldLineID(const int id) {
+		worldLineID = id;
+	}
+
+	int getWorldLineID() {
+		return worldLineID;
+	}
+
+	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
+		worldLine = worldLines.at(worldLineID);
+	}
 };
 

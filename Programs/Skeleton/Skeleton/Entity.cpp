@@ -1,3 +1,13 @@
 #include "Entity.h"
 
 int Entity::nextID = 0;
+
+void Entity::select()
+{
+	selected = true;
+}
+
+void Entity::deselect()
+{
+	selected = false;
+}

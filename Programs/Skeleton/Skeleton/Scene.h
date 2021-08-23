@@ -11,6 +11,7 @@
 #include "MenuSystem.h"
 #include "LightSource.h"
 #include "View.h"
+#include <map>
 
 enum IntersectionMode {
 	lightCone,
@@ -35,14 +36,14 @@ class Scene {
 	Camera* realTime3DCamera = NULL;
 	Camera* diagramCamera = NULL;
 	Camera* activeCamera = NULL;
-	IntersectionMode intersectionMode = lightCone;
+	IntersectionMode intersectionType = lightCone;
 	DopplerMode dopplerMode = full;
 	ViewMode viewMode = realTime3D;
 
 	Observer* activeObserver = NULL;
+	Entity* selected = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
-	std::vector<WorldLine*> worldLines;
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
 	std::vector<Caption*> captions;
@@ -81,10 +82,7 @@ public:
 		{
 			delete lt;
 		}
-		for each (WorldLine * wl in worldLines)
-		{
-			delete wl;
-		}
+
 		delete background;
 	}
 
@@ -114,6 +112,9 @@ public:
 
 	void toggleLorentzTransformation();
 
+	/*
+	* Switches between simultaneous hyperplane intersection and light cone intersection.
+	*/
 	void toggleIntersectionType();
 
 	void toggleViewMode();
@@ -121,7 +122,7 @@ public:
 	void toggleShading();
 
 
-	//Time manipulation:
+	// Time manipulation:
 
 	void togglePause();
 
@@ -131,6 +132,15 @@ public:
 
 	void windTime(float deltaT);
 
+	// Selection:
+
+	void toggleSelected();
+
+	/*
+	* Select object, where the mouse clicked
+	* Receives X, and Y coordinates in camera space... [-1; 1]
+	*/
+	void selectByClick(float cX, float cY);
 
 	// Getters:--------------------------------------------------------------------
 
@@ -168,8 +178,22 @@ public:
 
 	//-----------------------------------------------------------------
 
-	void clearEntities();
-
+	/*
+	* Saves scene.
+	*/
 	void save(const char* destination);
+
+	/*
+	* Loads scene.
+	*/
 	void load(const char* source);
+
+	/*
+	* Removes all Observers and Objects from the scene.
+	*/
+	void clearScene();
+
+	void pause();
+	void resume();
+
 };

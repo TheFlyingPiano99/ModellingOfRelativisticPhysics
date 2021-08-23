@@ -120,6 +120,7 @@ void Observer::loadOnGPU(GPUProgram& gpuProgram)
 std::string Observer::genSaveString()
 {
 	std::string str(
+		worldLine->genSaveString() + "\n"
 		"Observer\n"
 		"ID " + std::to_string(getID()) + "\n"
 		"name " + name + "\n"
@@ -149,6 +150,7 @@ Observer* Observer::loadFromFile(std::ifstream& file)
 		else if (words.at(0).compare("!Observer") == 0) {	// End of declaration
 			Observer* retVal = new Observer(NULL, _name, _description);
 			retVal->setID(_ID);
+			retVal->worldLineID = _worldLine;
 			return retVal;
 		}
 		else if (words.at(0).compare("ID") == 0) {              // ID

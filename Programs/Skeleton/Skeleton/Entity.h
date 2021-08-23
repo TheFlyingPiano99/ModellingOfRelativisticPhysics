@@ -14,6 +14,7 @@ class Entity
 
 protected:
 
+	bool selected = false;
 	std::string name;
 	std::string description;
 
@@ -66,5 +67,8 @@ public:
 	}
 
 	virtual std::string genSaveString() = 0;
+
+	void select();
+	void deselect();
 };
 

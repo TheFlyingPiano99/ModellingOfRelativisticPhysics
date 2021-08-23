@@ -9,6 +9,7 @@ class Assets {
 	static SphereSurface* observerNodeGeometry;
 	static ConeSurface* lightConeGeometry;
 	static Material* observerMaterial;
+	static Material* selectedObjectMaterial;
 	static OBJGeometry* cubeGeometry;
 
 
@@ -45,6 +46,14 @@ public:
 		return observerMaterial;
 	}
 
+	static Material* getSelectedObjectMaterial() {
+		if (selectedObjectMaterial == nullptr) {
+			selectedObjectMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), 3, 0.4f);
+			selectedObjectMaterial->setGlow(true);
+		}
+		return selectedObjectMaterial;
+	}
+
 	/*
 	* Must be called befor the application is closed!
 	*/
@@ -52,6 +61,7 @@ public:
 		delete observerNodeGeometry;
 		delete lightConeGeometry;
 		delete observerMaterial;
+		delete selectedObjectMaterial;
 		delete cubeGeometry;
 	}
 };

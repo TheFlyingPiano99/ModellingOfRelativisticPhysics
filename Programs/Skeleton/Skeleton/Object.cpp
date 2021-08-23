@@ -74,7 +74,13 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 }
 
 void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
-	diagramMaterial->loadOnGPU(gpuProgram);
+	if (selected) {
+		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
+	}
+	else {
+		diagramMaterial->loadOnGPU(gpuProgram);
+	}
+
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
@@ -87,6 +93,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 std::string Object::genSaveString()
 {
 	std::string str(
+		worldLine->genSaveString() + "\n"
 		"Object\n"
 		"type " + std::to_string(type) + "\n"
 		"ID " + std::to_string(getID()) + "\n"
@@ -133,6 +140,7 @@ Object* Object::loadFromFile(std::ifstream& file)
 			retVal->setID(_ID);
 			retVal->setName(_name);
 			retVal->setDescription(_description);
+			retVal->worldLineID = _worldLine;
 			return retVal;
 		}
 		else if (words.at(0).compare("type") == 0) {              // type

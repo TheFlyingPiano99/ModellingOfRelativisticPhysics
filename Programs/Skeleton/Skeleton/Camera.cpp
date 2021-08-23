@@ -39,6 +39,25 @@ void Camera::setLookat(const vec3 lat) {
 	vUp = normalize(cross(w, vRight));
 }
 
+mat4 Camera::V() {
+	vec3 w = normalize(eye - lookat);
+
+	return mat4(vRight.x, vUp.x, w.x, 0,
+		vRight.y, vUp.y, w.y, 0,
+		vRight.z, vUp.z, w.z, 0,
+		0, 0, 0, 1);
+}
+
+mat4 Camera::P() {
+	float sy = 1.0f / tanf(fov / 2.0f);
+	float a = -(fp + bp) / (bp - fp);
+	float b = -2.0f * fp * bp / (bp - fp);
+	return mat4(sy / asp, 0, 0, 0,
+		0, sy, 0, 0,
+		0, 0, a, -1,
+		0, 0, b, 0);
+}
+
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
 	gpuProgram.setUniform(eye, "wEye");
 }
@@ -81,4 +100,14 @@ void Camera::zoom(float delta) {
 		fov = M_PI;
 	else if (fov < M_PI / 4.0f)
 		fov = M_PI / 4.0f;
+}
+
+inline Ray Camera::getRayFromCameraCoord(vec2 cPos) {
+
+	vec3 wPos =
+		lookat
+		+ vRight * cPos.x * tanf(fov / 2.0f) * asp
+		+ vUp * cPos.y * tanf(fov / 2.0f);
+
+	return Ray(eye, normalize(wPos - eye));
 }

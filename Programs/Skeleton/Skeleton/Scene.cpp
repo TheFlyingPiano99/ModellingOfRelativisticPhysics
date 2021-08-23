@@ -12,9 +12,9 @@ void Scene::Initialise()
 
 	//Camera:
 	realTime3DCamera = new Camera();
-	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
 	diagramCamera = new Camera();
-	diagramCamera->initBasic(20 * vec3(1,1,1), 19 * vec3(1, 1, 1), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowHeight / (float)windowWidth, 0.02f, 3.0f);
+	diagramCamera->initBasic(20 * vec3(1,1,1), 19 * vec3(1, 1, 1), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
 
 	if (viewMode == realTime3D) {
 		activeCamera = realTime3DCamera;
@@ -33,51 +33,40 @@ void Scene::Initialise()
 	//Observers:-------------------------------------------------
 	//1.:
 	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
-	worldLines.push_back(wrdln);
 	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
 	//2.:
 	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
-	worldLines.push_back(wrdln);
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
 
 	//3.:
 	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs1's world line");
-	worldLines.push_back(wrdln);
 	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
 	//Objects:----------------------------------------------------
 	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
-	worldLines.push_back(wrdln);
 	objects.push_back(Object::createEarth(wrdln));
 
 	for (int i = 0; i < 10; i++) {
 		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
-		worldLines.push_back(wrdln);
 		objects.push_back(Object::createEarth(wrdln));
 	}
 
 	//Dice:
 	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "");
-	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
 	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "");
-	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
-	worldLines.push_back(wrdln);
 	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.99f, 0.0f), "");
-	worldLines.push_back(wrdln);
 	objects.push_back(Object::createDice(wrdln));
 	for (int i = 0; i < 10; i++) {
 		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "");
-		worldLines.push_back(wrdln);
 		objects.push_back(Object::createDice(wrdln));
 		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "");
-		worldLines.push_back(wrdln);
 		objects.push_back(Object::createDice(wrdln));
 	}
 
@@ -121,7 +110,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 	if (activeObserver != nullptr || viewMode == diagram) {
 		//Prefase:
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(intersectionMode, "intersectionMode");
+		gpuProgram.setUniform(intersectionType, "intersectionMode");
 		gpuProgram.setUniform(dopplerMode, "dopplerMode");
 		gpuProgram.setUniform(doLorentz, "doLorentz");
 		gpuProgram.setUniform(doShading, "doShading");		
@@ -136,13 +125,14 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 void Scene::toggleActiveObserver() {
 	static int currentIdx = -1;
 	if (!observers.empty()) {
-		currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;	// Incrementation with overflow
 		if (activeObserver != nullptr) {
+			currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;	// Incrementation with overflow
 			Observer* prevObs = activeObserver;
 			activeObserver = observers.at(currentIdx);
 			activeObserver->syncTimeToObserversSimultaneity(*prevObs);
 		}
 		else {
+			currentIdx = 0;
 			activeObserver = observers.at(currentIdx);
 		}
 		activeObserver->syncCamera(realTime3DCamera);
@@ -177,7 +167,7 @@ void Scene::toggleLorentzTransformation() {
 }
 
 void Scene::toggleIntersectionType() {
-	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
+	intersectionType = (IntersectionMode)((2 > intersectionType + 1) ? (intersectionType + 1) : 0);
 }
 
 void Scene::toggleViewMode() {
@@ -235,25 +225,25 @@ void Scene::windTime(float deltaT) {
 	running = prevState;
 }
 
-void Scene::clearEntities()
+void Scene::toggleSelected()
 {
-	for each (Observer * obs in observers)
-	{
-		delete obs;
+	static int currentIdx = -1;
+	if (!objects.empty()) {
+		if (selected != nullptr) {
+			currentIdx = (objects.size() > currentIdx + 1) ? currentIdx + 1 : 0;	// Incrementation with overflow
+			selected->deselect();
+		}
+		else {
+			currentIdx = 0;
+		}
+		selected = objects[currentIdx];
+		selected->select();
 	}
-	for each (Object * obj in objects)
-	{
-		delete obj;
-	}
-	for each (WorldLine * wl in worldLines)
-	{
-		delete wl;
-	}
+}
 
-	worldLines.clear();
-	observers.clear();
-	objects.clear();
-	activeObserver = NULL;
+void Scene::selectByClick(float cX, float cY)
+{
+	//Todo
 }
 
 void Scene::save(const char* destination)
@@ -262,10 +252,12 @@ void Scene::save(const char* destination)
 	file.open(destination);
 	if (file.is_open()) {
 		file.clear();
-		for each (WorldLine * wl in worldLines)
+/*
+		for (const auto& [id, wl] : worldLines)
 		{
 			file << wl->genSaveString() << std::endl;
 		}
+*/
 		for each (Observer * obs in observers)
 		{
 			file << obs->genSaveString() << std::endl;
@@ -284,7 +276,11 @@ void Scene::load(const char* source)
 	file.open(source);
 	if (file.is_open()) {
 		// Clear everything, what will be loaded:
+		
+		pause();
+		clearScene();
 
+		std::map<int, WorldLine*> worldLines;	// map<ID, pointer>
 		std::string line;
 		while (getline(file, line)) {
 			std::vector<std::string> words;
@@ -298,7 +294,7 @@ void Scene::load(const char* source)
 			else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
 				 WorldLine* wrdLn = GeodeticLine::loadFromFile(file);
 				 if (wrdLn != nullptr) {
-					 worldLines.push_back(wrdLn);
+					 worldLines.insert({ wrdLn->getID(), wrdLn });
 				 }
 			}
 			else if (words.at(0).compare("Observer") == 0) {		// Observer
@@ -315,8 +311,13 @@ void Scene::load(const char* source)
 			}
 		}
 
-		// Linking objects:
-		//Todo
+		// Linking objects (WorldLines to Obserers and Objects):
+		for (const auto& obs : observers) {
+			obs->setWorldLine(worldLines);
+		}
+		for (const auto& obj : objects) {
+			obj->setWorldLine(worldLines);
+		}
 
 		toggleActiveObserver();
 		file.close();
@@ -324,4 +325,28 @@ void Scene::load(const char* source)
 	else {
 		throw CannotLoadScene();
 	}
+}
+
+void Scene::clearScene()
+{
+	for (const auto& obs : observers) {
+		delete obs;
+	}
+	for (const auto& obj : objects) {
+		delete obj;
+	}
+	observers.clear();
+	objects.clear();
+	activeObserver = NULL;
+	selected = NULL;
+}
+
+void Scene::pause()
+{
+	running = false;
+}
+
+void Scene::resume()
+{
+	running = true;
 }

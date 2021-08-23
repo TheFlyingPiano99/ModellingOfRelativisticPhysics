@@ -6,12 +6,15 @@
 #include "Entity.h"
 #include "WorldLine.h"
 #include "Material.h"
+#include <map>
 
 
 class Observer : public Entity
 {
 	WorldLine* worldLine = NULL;
 	float currentProperTime = 0.0f;
+	int worldLineID = 0;
+
 public:
 
 	Observer(WorldLine* _worldLine, std::string _name = "", std::string _desc = "")
@@ -63,5 +66,16 @@ public:
 	*/
 	static Observer* loadFromFile(std::ifstream& file);
 
+	void setWorldLineID(const int id) {
+		worldLineID = id;
+	}
+
+	int getWorldLineID() {
+		return worldLineID;
+	}
+
+	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
+		worldLine = worldLines.at(worldLineID);
+	}
 };
 

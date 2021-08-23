@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "Hyperplane.h"
+#include "Ray.h"
 
 /*
 * Viewing camera.
@@ -26,34 +27,10 @@ public:
 		return TranslateMatrix(-eye);
 	}
 
-	mat4 V() {
-		vec3 w = normalize(eye - lookat);
+	mat4 V();
 
-		return mat4(vRight.x, vUp.x, w.x, 0,
-			vRight.y, vUp.y, w.y, 0,
-			vRight.z, vUp.z, w.z, 0,
-			0, 0, 0, 1);
-	}
+	mat4 P();
 
-	mat4 P() {
-		float sy = tanf(fov / 2.0f);
-		float a = -(fp + bp) / (bp - fp);
-		float b = -2.0f * bp / (bp - fp);
-		return mat4(sy * asp, 0, 0, 0,
-			0, sy, 0, 0,
-			0, 0, a, -1,
-			0, 0, b, 0);
-	}
-
-	mat4 invV() {
-		//Todo
-		return mat4();
-	}
-
-	mat4 invP() {
-		//Todo
-		return mat4();
-	}
 
 	void loadOnGPU(GPUProgram& gpuProgram);
 
@@ -76,5 +53,7 @@ public:
 	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point);
 
 	void zoom(float delta);
+
+	Ray getRayFromCameraCoord(vec2 cPos);
 
 };
