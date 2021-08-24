@@ -35,22 +35,22 @@
       <FileName>CoordinateSystem.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Entity" Collapsed="true">
-    <Position X="9" Y="5.5" Width="1.5" />
+  <Class Name="Entity">
+    <Position X="4" Y="10.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>EAAAgAAAAAAggAKEIBAAAAABAAAEAABAAAAAAgAACAA=</HashCode>
       <FileName>Entity.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Event" Collapsed="true">
-    <Position X="9" Y="6.75" Width="1.5" />
+  <Class Name="Event">
+    <Position X="6.5" Y="16.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAIAAAAAAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Event.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Texture" Collapsed="true">
-    <Position X="16" Y="4.5" Width="1.5" />
+    <Position X="21.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAgAAAAAAAAAAAAAAAABAAAAJgAAAAAAA=</HashCode>
       <FileName>framework.h</FileName>
@@ -63,71 +63,87 @@
       <FileName>framework.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Geometry" Collapsed="true">
-    <Position X="9" Y="1.5" Width="1.5" />
+  <Class Name="Geometry">
+    <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAIAAAAAAAkAAAAAAAAAAAAAAgAAAAAAAAAAAgAA=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ParamSurface" Collapsed="true">
-    <Position X="10.25" Y="2.75" Width="1.5" />
+  <Class Name="ParamSurface">
+    <Position X="9.75" Y="3.5" Width="1.5" />
+    <InheritanceLine Type="Geometry" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.625" Y="2.814" />
+        <Point X="8.625" Y="3.125" />
+        <Point X="10.312" Y="3.125" />
+        <Point X="10.312" Y="3.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAgAAAAAAAAAAAAAAFAAAAASEAAAAAAE=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="SphereSurface" Collapsed="true">
-    <Position X="9" Y="4.25" Width="1.5" />
+  <Class Name="SphereSurface">
+    <Position X="9" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAQA=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="PlaneSurface" Collapsed="true">
-    <Position X="11.25" Y="4.25" Width="1.5" />
+  <Class Name="PlaneSurface">
+    <Position X="11.25" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAABAAQAQAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ConeSurface" Collapsed="true">
-    <Position X="13.5" Y="4.25" Width="1.5" />
+  <Class Name="ConeSurface">
+    <Position X="13.5" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Stars" Collapsed="true">
-    <Position X="6.75" Y="4.25" Width="1.5" />
+  <Class Name="Stars">
+    <Position X="6.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="OBJGeometry" Collapsed="true">
-    <Position X="4.5" Y="2.75" Width="1.5" />
+  <Class Name="OBJGeometry">
+    <Position X="5.5" Y="3.5" Width="1.5" />
+    <InheritanceLine Type="Geometry" FixedFromPoint="true">
+      <Path>
+        <Point X="7.938" Y="2.814" />
+        <Point X="7.938" Y="3.125" />
+        <Point X="6.25" Y="3.125" />
+        <Point X="6.25" Y="3.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAgAAAAAAAAAAAAAAEAAAAACEAAAAAAE=</HashCode>
       <FileName>Geometry.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Hyperplane" Collapsed="true">
-    <Position X="9.25" Y="10.75" Width="1.5" />
+  <Class Name="Hyperplane">
+    <Position X="19.25" Y="12.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAIAAAAAAAAAAAAAIAAAAgwCACAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>Hyperplane.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Intersectable" Collapsed="true">
-    <Position X="10.5" Y="9.5" Width="1.5" />
+  <Class Name="Intersectable">
+    <Position X="21.25" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Intersectable.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LightCone" Collapsed="true">
-    <Position X="11.5" Y="10.75" Width="1.5" />
+  <Class Name="LightCone">
+    <Position X="22.25" Y="12.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAIAABAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>LightCone.h</FileName>
@@ -154,22 +170,22 @@
       <FileName>MenuSystem.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Object" Collapsed="true">
-    <Position X="4.5" Y="6.75" Width="1.5" />
+  <Class Name="Object">
+    <Position X="0.5" Y="16.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>ACOECAoEAQIAAwAgAAAEUAQDgBABAgAAAABQQANBAAA=</HashCode>
       <FileName>Object.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Observer" Collapsed="true">
-    <Position X="6.75" Y="6.75" Width="1.5" />
+  <Class Name="Observer">
+    <Position X="3.25" Y="16.25" Width="2.75" />
     <TypeIdentifier>
       <HashCode>ACKUEAggAgEAAAAAAAEFYAEDgAAgAAAABABwAAIACAA=</HashCode>
       <FileName>Observer.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Scene" Collapsed="true">
-    <Position X="21.25" Y="3.5" Width="1.5" />
+  <Class Name="Scene">
+    <Position X="0.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>CAJIBZkOAICGBxACAAAQAA4QyQpAwAIQAWAgggJSICQ=</HashCode>
       <FileName>Scene.h</FileName>
@@ -189,29 +205,29 @@
       <FileName>TextOperations.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="View" Collapsed="true">
-    <Position X="5.5" Y="8.5" Width="1.5" />
+  <Class Name="View">
+    <Position X="15.75" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAggAAAEAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>View.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="RealTime3DView" Collapsed="true">
-    <Position X="4.25" Y="9.75" Width="1.5" />
+  <Class Name="RealTime3DView">
+    <Position X="14.5" Y="13.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>View.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DiagramView" Collapsed="true">
-    <Position X="6.5" Y="9.75" Width="1.5" />
+  <Class Name="DiagramView">
+    <Position X="16.75" Y="13.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAAAAgCAAAAAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>View.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="WorldLine" Collapsed="true">
-    <Position X="12.5" Y="6.75" Width="1.5" />
+  <Class Name="WorldLine">
+    <Position X="9.25" Y="16.25" Width="3.5" />
     <NestedTypes>
       <Enum Name="WorldLine::WorldLineType" Collapsed="true">
         <TypeIdentifier>
@@ -224,15 +240,15 @@
       <FileName>WorldLine.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="GeodeticLine" Collapsed="true">
-    <Position X="11.25" Y="8.25" Width="1.5" />
+  <Class Name="GeodeticLine">
+    <Position X="7.25" Y="23.25" Width="3.25" />
     <TypeIdentifier>
       <HashCode>UgCAAAAgBAAAIwAAEBCAAAgAAAEABQAAAIAAAAAVAAU=</HashCode>
       <FileName>WorldLine.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Line" Collapsed="true">
-    <Position X="13.5" Y="8.25" Width="1.5" />
+  <Class Name="Line">
+    <Position X="11.25" Y="23.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAEAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>WorldLine.h</FileName>
@@ -315,28 +331,28 @@
       <FileName>Ray.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Enum Name="ObjectType" Collapsed="true">
+  <Enum Name="ObjectType">
     <Position X="19.5" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
       <FileName>EnumTypes.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="IntersectionMode" Collapsed="true">
+  <Enum Name="IntersectionMode">
     <Position X="17.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
       <FileName>EnumTypes.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="ViewMode" Collapsed="true">
+  <Enum Name="ViewMode">
     <Position X="21.25" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>EnumTypes.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="DopplerMode" Collapsed="true">
+  <Enum Name="DopplerMode">
     <Position X="16" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAACAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
