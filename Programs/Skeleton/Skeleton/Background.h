@@ -4,6 +4,7 @@
 #include "Geometry.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Assets.h"
 
 class Background {
 	SphereSurface* geometry;
@@ -17,7 +18,7 @@ public:
 		vec3 color = vec3(0.1,0.1, 0.1);
 		material = new Material(color, color, color, 50);
 		material->setGlow(true);
-		texture = new Texture("../../../Resources/lowres/stars_milky_way.bmp");
+		texture = new Texture(Assets::getTexturePath().append("stars_milky_way.bmp"));
 	}
 
 	~Background() {

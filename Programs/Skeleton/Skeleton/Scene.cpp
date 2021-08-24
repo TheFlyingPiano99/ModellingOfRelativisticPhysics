@@ -4,6 +4,8 @@
 #include <fstream>
 #include "StringOperations.h"
 #include "Exceptions.h"
+#include "Assets.h"
+
 
 void Scene::Initialise()
 {
@@ -300,10 +302,10 @@ void Scene::selectByClick(float cX, float cY)
 	}
 }
 
-void Scene::save(const char* destination)
+void Scene::save(const char* destinationFile)
 {
 	std::ofstream file;
-	file.open(destination);
+	file.open(Assets::getSavesPath().append(destinationFile));
 	if (file.is_open()) {
 		file.clear();
 /*
@@ -324,10 +326,11 @@ void Scene::save(const char* destination)
 	}
 }
 
-void Scene::load(const char* source)
+void Scene::load(const char* sourceFile)
 {
+
 	std::ifstream file;
-	file.open(source);
+	file.open(Assets::getSavesPath().append(sourceFile));
 	if (file.is_open()) {
 		// Clear everything, what will be loaded:
 		

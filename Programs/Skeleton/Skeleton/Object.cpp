@@ -8,7 +8,7 @@
 */
 
 Object* Object::createEarth(WorldLine* wrdln) {
-	AdvancedTexture* texture = new AdvancedTexture("../../../Resources/lowres/earth_daymap.bmp", "../../../Resources/lowres/earth_normal_map.bmp", "");
+	AdvancedTexture* texture = new AdvancedTexture(Assets::getTexturePath().append("earth_daymap.bmp").c_str(), Assets::getTexturePath().append("earth_normal_map.bmp").c_str() , "");
 	if (texture->getTextureId() == 0) {
 		texture = NULL;
 	}
@@ -46,7 +46,7 @@ Object* Object::createDice(WorldLine* wrdln)
 		Assets::getCubeGeometry(),
 		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
 		new Material(vec3(0.5f, 0.5f, 0.5f), vec3(0.8f, 0.8f, 0.8f), vec3(0.5f, 0.5f, 0.5f), 40, 1.0f),		// Diagram material
-		new AdvancedTexture("../../../Resources/lowRes/dice.bmp", "", ""),
+		new AdvancedTexture(Assets::getTexturePath().append("dice.bmp").c_str(), "", ""),
 		"Dice",
 		"It's a cube!");
 	obj->setType(dice);

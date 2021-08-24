@@ -1,6 +1,9 @@
 #pragma once
 #include "Geometry.h"
 #include "Material.h"
+#include <string>
+#include <filesystem>
+
 
 /*
 * Static getters for frequently used geomtries etc.
@@ -12,7 +15,9 @@ class Assets {
 	static Material* selectedObjectMaterial;
 	static Material* selectedWorldLineMaterial;
 	static OBJGeometry* cubeGeometry;
-
+	static std::string* geometryPath;
+	static std::string* texturePath;
+	static std::string* savesPath;
 
 public:
 
@@ -35,7 +40,8 @@ public:
 	static Geometry* getCubeGeometry() {
 		if (cubeGeometry == nullptr) {
 			cubeGeometry = new OBJGeometry();
-			cubeGeometry->load("../../../Resources/geometry/cube.obj");
+			cubeGeometry->load(getGeometryPath().append("cube.obj").c_str());
+
 		}
 		return cubeGeometry;
 	}
@@ -62,6 +68,79 @@ public:
 		return selectedWorldLineMaterial;
 	}
 
+	static std::string getGeometryPath() {
+		if (geometryPath == nullptr) {
+			int n = 0;
+			while (n < 5) {
+
+				geometryPath = new std::string("");
+				for (int i = 0; i < n; i++) {
+					geometryPath->append("../");
+				}
+				geometryPath->append("Resources/Geometry/");
+				std::filesystem::path p = std::filesystem::path(geometryPath->c_str());
+				if (std::filesystem::is_directory(p)) {
+					break;
+				}
+				n++;
+				delete geometryPath;
+			}
+			if (geometryPath == nullptr) {
+				throw std::exception("Resources/Geometry folder not found!");
+			}
+		}
+
+		return *geometryPath;
+	}
+
+	static std::string getTexturePath() {
+		if (texturePath == nullptr) {
+			int n = 0;
+			while (n < 5) {
+
+				texturePath = new std::string("");
+				for (int i = 0; i < n; i++) {
+					texturePath->append("../");
+				}
+				texturePath->append("Resources/Texture/");
+				std::filesystem::path p = std::filesystem::path(texturePath->c_str());
+				if (std::filesystem::is_directory(p)) {
+					break;
+				}
+				n++;
+				delete texturePath;
+			}
+			if (texturePath == nullptr) {
+				throw std::exception("Resources/Texture folder not found!");
+			}
+		}
+		return *texturePath;
+	}
+
+	static std::string getSavesPath() {
+		if (savesPath == nullptr) {
+			int n = 0;
+			while (n < 5) {
+
+				savesPath = new std::string("");
+				for (int i = 0; i < n; i++) {
+					savesPath->append("../");
+				}
+				savesPath->append("Saves/");
+				std::filesystem::path p = std::filesystem::path(savesPath->c_str());
+				if (std::filesystem::is_directory(p)) {
+					break;
+				}
+				n++;
+				delete savesPath;
+			}
+			if (savesPath == nullptr) {
+				throw std::exception("Saves folder not found!");
+			}
+		}
+		return *savesPath;
+	}
+
 	/*
 	* Must be called befor the application is closed!
 	*/
@@ -72,6 +151,9 @@ public:
 		delete selectedObjectMaterial;
 		delete selectedWorldLineMaterial;
 		delete cubeGeometry;
+		delete geometryPath;
+		delete texturePath;
+		delete savesPath;
 	}
 };
 

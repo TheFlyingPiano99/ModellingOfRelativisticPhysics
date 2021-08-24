@@ -183,14 +183,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\..\..\Resources\geometry\cube.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="..\..\..\Resources\geometry\MyCube.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

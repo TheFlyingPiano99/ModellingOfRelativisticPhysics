@@ -10,7 +10,7 @@ class AdvancedTexture {
 
 public:
 
-	AdvancedTexture(char* _texturePath, char* _normalMapPath, char* _specularMapPath)
+	AdvancedTexture(const char* _texturePath, const char* _normalMapPath, const char* _specularMapPath)
 		: texture(new Texture(_texturePath)),
 		normalMap(new Texture(_normalMapPath)),
 		specularMap(new Texture(_specularMapPath))

@@ -65,7 +65,7 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	}
 	if (key == 'q') {
 		//scene->save("../../../Saves/defaultSave01.txt");
-		scene->load("../../../Saves/defaultSave01.txt");
+		scene->load("defaultSave01.txt");
 	}
 	if (key == 'o') {
 		scene->toggleSelected();
