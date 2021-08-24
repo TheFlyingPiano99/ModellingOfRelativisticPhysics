@@ -1,0 +1,30 @@
+
+	 ___________________
+	|					|
+	|	User manual		|
+	|___________________|
+
+_________________________________________________________________
+Keyboard controls:
+
+'c'	...toggle active observer
+'v'	...toggle viev mode (real time 3D / diagram)
+'i'	...toggle intersection mode (light cone / hyperplane)
+'l'	...toggle Lorentz transformation and length contraction (on / off)
+'o'	...toggle selected object
+'d'	...toggle light Doppler effect mode (full / mild / off)
+'s'	...toggle shading (on / off)
+'r'	...wind back time
+'f'	...wind forward time
+' '	...toggle pause (paused / runnig)
+'='	...zoom in
+'-'	...zoom out
+
+_________________________________________________________________
+Mouse controls:
+
+left click			...select object
+hold right + drag	...rotate camera
+middle click		...bring up menu
+
+_________________________________________________________________

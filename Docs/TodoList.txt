@@ -1,0 +1,15 @@
+
+	Todo list
+__________________________________________
+
+Implement CompositeLine class
+
+Add options to middle click menu
+
+Create more object factories
+
+Implement coordinate system tranformation in diagram view
+
+Implement a way to add objects to the scene while running.
+
+Solve the problem of saving and loading different scenes.
