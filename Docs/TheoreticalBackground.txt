@@ -40,14 +40,31 @@ ______________________________________________
 	in the mentioned frames since the specific world line crossed the simultaneous hyperplane, where the absolute observer measured tau=0 proper time <-> namely t=0 absolute time.
 	
 ______________________________________________
-	Process of projecting vertex mesh following relativistic behaviours
+	Implementation of transforming vertex mesh to world space following relativistic behaviours
 
 	First the object's and observer's world line data gets loaded on the GPU.
 	The vertex shader calculates the transformation for each vertex of the object's geometry.
 	Each vertex has a different world line, which is offseted version of the object's center's world line.
-	We get this by translating the centers world line in the absolute frame by the vertex position relative to the objet's center.
+	We get this by translating the center's world line in the absolute frame by the vertex offset relative to the object's center.
+	If we are symulating length contraction
+	Than we calculate the intersection event in the absolute frame between the light cone or hyperplane (depends on settings)
+	and the newly acquired world line.
+	Now we have the desired spacetime event in absolute frame.
+	If we are using Lorentz transformation, we perform the following:
+	First we translate the origo in absolute frame so,
+	that a geodetic world line touching the world line of the observer at the event of our presence goes through the new origo.
+	Than we perform the Lorentz transformation of the intersection event from this "shifted origo" frame to the observer's proper frame. (We use the observers velocity relative to the absolute observer at present as the parametre of the transformation.)
+	By discarding the time component we get the world space position of the vertex in a system, where the camera's eye position is in origo.
+	We also perform Lorentz transformation of velocity of the object.
+	We use the newly transformed values to calculate light Doppler shift.
+	We can proceed to perform matrix multiplications to transform from world space to camera space,
+	but be aware, that we already translated origo to meat the camera eye.
+	This is because since we translated the origo of the absolute frame
+	the Lorentz transformation of any event along the observers geodetic line will result in zeroed out world position.
+	In our model we asume that the camera's eye is following the observer's world line.
 	
-
+	
+	
 
 
 
