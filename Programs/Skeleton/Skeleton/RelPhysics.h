@@ -62,14 +62,19 @@ namespace RelPhysics
 	static vec4 lorentzTransformation(vec4 toTransform, vec3 relVelocity) {
 		vec3 v = relVelocity;
 		float vLength = length(v);
-		float gamma = lorentzFactor(vLength);
+		if (vLength > 0.0f && vLength < speedOfLight) {
+			float gamma = lorentzFactor(vLength);
 
-		vec3 r = vec3(toTransform.x, toTransform.y, toTransform.z);
-		float t = toTransform.w;
-		vec3 n = normalize(v);
-		float tTrans = gamma * (t - dot(vLength * n, r) / speedOfLight / speedOfLight);
-		vec3 rTrans = r + (gamma - 1) * dot(r, n) * n - gamma * t * vLength * n;
-		return vec4(rTrans.x, rTrans.y, rTrans.z, tTrans);
+			vec3 r = vec3(toTransform.x, toTransform.y, toTransform.z);
+			float t = toTransform.w;
+			vec3 n = normalize(v);
+			float tTrans = gamma * (t - dot(vLength * n, r) / speedOfLight / speedOfLight);
+			vec3 rTrans = r + (gamma - 1) * dot(r, n) * n - gamma * t * vLength * n;
+			return vec4(rTrans.x, rTrans.y, rTrans.z, tTrans);
+		}
+		else {
+			return toTransform;
+		}
 	}
 
 	static vec3 lorentzTransformationOfVelocity(vec3 toTransform, vec3 relVelocity) {

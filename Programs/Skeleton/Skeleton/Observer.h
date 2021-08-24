@@ -31,7 +31,15 @@ public:
 
 	vec4 getStartPos();
 
-	Hyperplane getHyperplane();
+	/*
+	* Returns simultaneous hyperplane, where the observer measures currentProperTime.
+	*/
+	Hyperplane* getHyperplane();
+
+	/*
+	* Returns light cone, where the observer measures currentProperTime.
+	*/
+	LightCone* getLightCone();
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
 	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera);
@@ -72,6 +80,10 @@ public:
 
 	int getWorldLineID() {
 		return worldLineID;
+	}
+
+	WorldLine* getWorldLine() {
+		return worldLine;
 	}
 
 	void setWorldLine(std::map<int, WorldLine*>& worldLines) {

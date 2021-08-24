@@ -7,19 +7,19 @@
 * Represents a section of space-time, bordered by a 4D cone of light traveling towards and hiting the observer.
 */
 class LightCone : public Intersectable {
-	vec4 observer;
+	vec4 location;
 
 public:
 
-	LightCone(vec4 _observer): observer(_observer) {
+	LightCone(vec4 _location): location(_location) {
 	}
 
-	vec4 getObserver() {
-		return observer;
+	vec4 getLocation() {
+		return location;
 	}
 
-	const vec4 getObserver() const {
-		return observer;
+	const vec4 getLocation() const {
+		return location;
 	}
 
 

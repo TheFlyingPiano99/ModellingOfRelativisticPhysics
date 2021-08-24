@@ -103,6 +103,7 @@
     <ClInclude Include="CoordinateSystem.h" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EnumTypes.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />

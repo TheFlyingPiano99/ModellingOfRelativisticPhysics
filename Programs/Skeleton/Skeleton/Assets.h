@@ -10,6 +10,7 @@ class Assets {
 	static ConeSurface* lightConeGeometry;
 	static Material* observerMaterial;
 	static Material* selectedObjectMaterial;
+	static Material* selectedWorldLineMaterial;
 	static OBJGeometry* cubeGeometry;
 
 
@@ -48,10 +49,17 @@ public:
 
 	static Material* getSelectedObjectMaterial() {
 		if (selectedObjectMaterial == nullptr) {
-			selectedObjectMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), 3, 0.4f);
-			selectedObjectMaterial->setGlow(true);
+			selectedObjectMaterial = new Material(vec3(3, 3, 3), vec3(8, 9, 8), vec3(2, 2, 2), 3, 1.0f);
 		}
 		return selectedObjectMaterial;
+	}
+
+	static Material* getSelectedWorldLineMaterial() {
+		if (selectedWorldLineMaterial == nullptr) {
+			selectedWorldLineMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), 3, 1.0f);
+			selectedWorldLineMaterial->setGlow(true);
+		}
+		return selectedWorldLineMaterial;
 	}
 
 	/*
@@ -62,6 +70,7 @@ public:
 		delete lightConeGeometry;
 		delete observerMaterial;
 		delete selectedObjectMaterial;
+		delete selectedWorldLineMaterial;
 		delete cubeGeometry;
 	}
 };

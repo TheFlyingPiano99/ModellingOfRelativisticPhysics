@@ -8,13 +8,9 @@
 #include "Geometry.h"
 #include "Camera.h"
 #include "AdvancedTexture.h"
+#include "EnumTypes.h"
 #include <map>
 
-enum ObjectType {
-	earth,
-	dice,
-	none
-};
 
 class Object : public Entity
 {
@@ -116,8 +112,16 @@ public:
 		worldLine = worldLines.at(worldLineID);
 	}
 
+	/*
+	* Returns shortest distance between given ray and the object's world line's diagram representation.
+	*/
 	float rayDistanceToDiagram(const Ray& ray) {
 		return worldLine->distanceBetweenRayAndDiagram(ray);
 	}
+
+	/*
+	* Returns shortest distance between center of the object in current world space with current relativistic transformations and the given ray.
+	*/
+	float rayDistanceToObject(const Ray& ray, IntersectionMode mode, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 };
 

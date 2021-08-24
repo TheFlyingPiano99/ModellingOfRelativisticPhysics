@@ -1,12 +1,5 @@
 #include "Camera.h"
 
-Hyperplane Camera::getHyperplane() {
-	return Hyperplane::simultaneousHyperplane(
-		locationFV,
-		velocityFV
-	);
-	//return Hyperplane(locationFV, velocityFV);
-}
 
 void Camera::initBasic(const vec3 _eye, const vec3 _lookat, const vec3 _prefUp, const float _fov, const float _asp, const float _fp, const float _bp) {
 	eye = _eye;

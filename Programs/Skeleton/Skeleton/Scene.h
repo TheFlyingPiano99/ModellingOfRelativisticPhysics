@@ -11,32 +11,16 @@
 #include "MenuSystem.h"
 #include "LightSource.h"
 #include "View.h"
+#include "EnumTypes.h"
 #include <map>
-
-enum IntersectionMode {
-	lightCone,
-	hyperplane
-};
-
-enum ViewMode {
-	realTime3D,
-	diagram
-};
-
-enum DopplerMode {
-	full,
-	mild,
-	off
-};
 
 class Scene {
 	float timeScale = 2; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	View* view;
-
 	Camera* realTime3DCamera = NULL;
 	Camera* diagramCamera = NULL;
 	Camera* activeCamera = NULL;
-	IntersectionMode intersectionType = lightCone;
+	IntersectionMode intersectionMode = lightCone;
 	DopplerMode dopplerMode = full;
 	ViewMode viewMode = realTime3D;
 
@@ -47,6 +31,7 @@ class Scene {
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
 	std::vector<Caption*> captions;
+	std::vector<WorldLine*> linesToDisplay;				// For testing only!!!
 
 	Background* background;
 
@@ -81,6 +66,11 @@ public:
 		for each (LightSource * lt in diagramLights)
 		{
 			delete lt;
+		}
+
+		for each (WorldLine* line in linesToDisplay)
+		{
+			delete line;
 		}
 
 		delete background;
@@ -195,5 +185,11 @@ public:
 
 	void pause();
 	void resume();
+
+
+	//For testing:
+	std::vector<WorldLine*>& getLines() {
+		return linesToDisplay;
+	}
 
 };

@@ -15,7 +15,6 @@ class Camera {
 
 public:
 
-	Hyperplane getHyperplane();
 
 	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp);
 

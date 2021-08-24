@@ -18,9 +18,16 @@ vec4 Observer::getStartPos()
 	return worldLine->getLocationAtAbsoluteTime(0.0f);
 }
 
-Hyperplane Observer::getHyperplane()
+Hyperplane* Observer::getHyperplane()
 {
 	return worldLine->getSimultaneousHyperplaneAtProperTime(currentProperTime);
+}
+
+
+
+LightCone* Observer::getLightCone()
+{
+	return worldLine->getLigtConeAtProperTime(currentProperTime);
 }
 
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
@@ -106,9 +113,10 @@ void Observer::syncCamera(Camera* camera)
 
 void Observer::syncTimeToObserversSimultaneity(Observer& observer)
 {
-	Hyperplane plane = observer.getHyperplane();
-	float t = worldLine->intersectHyperplane(plane);
+	Hyperplane* plane = observer.getHyperplane();
+	float t = worldLine->intersectHyperplane(*plane);
 	currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+	delete plane;
 }
 
 void Observer::loadOnGPU(GPUProgram& gpuProgram)

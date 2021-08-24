@@ -15,8 +15,8 @@ public:
 	Hyperplane(vec4 _location, vec4 _normal): location(_location), normal(_normal) {
 	}
 	
-	static Hyperplane simultaneousHyperplane(vec4 location, vec4 FVelocity) {
-		return Hyperplane(location, normalize(vec4(-FVelocity.x, -FVelocity.y, -FVelocity.z, FVelocity.w)));
+	static Hyperplane* simultaneousHyperplane(vec4 location, vec4 FVelocity) {
+		return new Hyperplane(location, normalize(vec4(-FVelocity.x, -FVelocity.y, -FVelocity.z, FVelocity.w)));
 	}
 
 	vec4 getLocation() {

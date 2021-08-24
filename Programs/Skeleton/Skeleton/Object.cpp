@@ -61,7 +61,12 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 	//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
 
 	worldLine->loadOnGPU(gpuProgram);
-	material->loadOnGPU(gpuProgram);
+	if (selected) {
+		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
+	}
+	else {
+		material->loadOnGPU(gpuProgram);
+	}
 	if (texture != nullptr) {
 		texture->loadOnGPU(gpuProgram);
 	}
@@ -69,20 +74,14 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 	//gpuProgram.setUniform(M(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
-
-	if (selected) {
-		gpuProgram.setUniform(true, "outline");
-	}
-	else {
-		gpuProgram.setUniform(false, "outline");
-	}
+	gpuProgram.setUniform(false, "outline");
 
 	geometry->Draw();
 }
 
 void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	if (selected) {
-		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
+		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
 	}
 	else {
 		diagramMaterial->loadOnGPU(gpuProgram);
@@ -169,3 +168,33 @@ Object* Object::loadFromFile(std::ifstream& file)
 	}
 	return nullptr;
 }
+
+float Object::rayDistanceToObject(const Ray& ray, IntersectionMode mode, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+{
+	//Intersect:
+	float t = 0;		// absolute time parametre
+
+	if (mode == IntersectionMode::lightCone) {
+		t = worldLine->intersectLightCone(*reinterpret_cast<LightCone*>(intersectable));
+	}
+	else if (mode == IntersectionMode::hyperplane) {
+		t = worldLine->intersectHyperplane(*reinterpret_cast<Hyperplane*>(intersectable));
+	}
+
+	vec3 locationInProperFrame;
+
+	if (doLorentz) {
+		vec4 shiftedOrigoFrame = worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero;	// The absolute observers frame, but with shifted origo.
+		vec4 location4D = RelPhysics::lorentzTransformation(shiftedOrigoFrame, RelPhysics::To3DVelocity(observersCurrentVelocity));	// In the current observer's frame.
+		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
+	}
+	else {			// Euclidean transformation
+		vec4 location4D = worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation;
+		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
+	}
+
+	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
+	float d = length(locationInProperFrame - rayPos - dot(ray.dir, locationInProperFrame - rayPos) * ray.dir);
+	return (dot(locationInProperFrame - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
+}
+

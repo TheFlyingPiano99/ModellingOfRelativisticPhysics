@@ -65,7 +65,13 @@ public:
 	* Simultaneous hyperplane according the the line's observer,
 	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
 	*/
-	virtual Hyperplane getSimultaneousHyperplaneAtProperTime(float tau) = 0;
+	virtual Hyperplane* getSimultaneousHyperplaneAtProperTime(float tau) = 0;
+
+	/*
+	* Light cone according the the line's observer,
+	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
+	*/
+	virtual LightCone* getLigtConeAtProperTime(float tau) = 0;
 
 	/*
 	* The space-time location on the world line according to the absolute observer,
@@ -83,7 +89,13 @@ public:
 	* Simultaneous hyperplane according the the line's observer,
 	* when it crosses the hyperplane, where absolute observer measures t absolute time.
 	*/
-	virtual Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t) = 0;
+	virtual Hyperplane* getSimultaneousHyperplaneAtAbsoluteTime(float t) = 0;
+
+	/*
+	* Light cone according the the line's observer,
+	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
+	*/
+	virtual LightCone* getLigtConeAtAbsoluteTime(float t) = 0;
 
 	/*
 	* Returns the absolute time spent, where the world line intersects the hyperplane.
@@ -142,10 +154,12 @@ public:
 	float getProperTimeAtAbsoluteTime(float t);
 	vec4 getLocationAtProperTime(float tau);
 	vec4 getVelocityAtProperTime(float tau);
-	Hyperplane getSimultaneousHyperplaneAtProperTime(float tau);
+	Hyperplane* getSimultaneousHyperplaneAtProperTime(float tau);
+	LightCone* getLigtConeAtProperTime(float tau);
 	vec4 getLocationAtAbsoluteTime(float t);
 	vec4 getVelocityAtAbsoluteTime(float t);
-	Hyperplane getSimultaneousHyperplaneAtAbsoluteTime(float t);
+	Hyperplane* getSimultaneousHyperplaneAtAbsoluteTime(float t);
+	LightCone* getLigtConeAtAbsoluteTime(float t);
 	float intersectHyperplane(Hyperplane& plane);
 	float intersectLightCone(LightCone& cone);
 	WorldLine* getWorldLineWithOffset(vec3 offset);
@@ -158,4 +172,17 @@ public:
 	* Returns the loaded object.
 	*/
 	static GeodeticLine* loadFromFile(std::ifstream& file);
+};
+
+class CompositeLine : public WorldLine {
+	std::vector<WorldLine*> parts;
+
+
+public:
+
+	CompositeLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name = "", std::string _desc = "")
+		: WorldLine(_name, _desc) {}
+
+	//Todo
+
 };

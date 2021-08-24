@@ -37,13 +37,12 @@ void Scene::Initialise()
 	observers.push_back(observer);
 
 	//2.:
-	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs2's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
-
 	//3.:
-	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs3's world line");
 	observer = new Observer(wrdln, "Obs3", "An observer");
 	observers.push_back(observer);
 
@@ -110,7 +109,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 	if (activeObserver != nullptr || viewMode == diagram) {
 		//Prefase:
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(intersectionType, "intersectionMode");
+		gpuProgram.setUniform(intersectionMode, "intersectionMode");
 		gpuProgram.setUniform(dopplerMode, "dopplerMode");
 		gpuProgram.setUniform(doLorentz, "doLorentz");
 		gpuProgram.setUniform(doShading, "doShading");		
@@ -167,7 +166,7 @@ void Scene::toggleLorentzTransformation() {
 }
 
 void Scene::toggleIntersectionType() {
-	intersectionType = (IntersectionMode)((2 > intersectionType + 1) ? (intersectionType + 1) : 0);
+	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
 }
 
 void Scene::toggleViewMode() {
@@ -243,21 +242,54 @@ void Scene::toggleSelected()
 
 void Scene::selectByClick(float cX, float cY)
 {
-	if (!objects.empty() && viewMode == ViewMode::diagram) {
-		Ray ray = diagramCamera->getRayFromCameraCoord(vec2(cX, cY));
-		float constraint = 0.5f;
-		int selectionIdx = -1;
-		float shortestDistance = objects[0]->rayDistanceToDiagram(ray);
-		if (constraint > shortestDistance) {
-			selectionIdx = 0;
-		}
-		for (int i = 1; i < objects.size(); i++) {
-			float d = objects[i]->rayDistanceToDiagram(ray);
-			if (shortestDistance > d && constraint > d) {
-				shortestDistance = d;
-				selectionIdx = i;
+	if (!objects.empty()) {		// There are objects in the scene.
+		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
+
+		//For testing:
+		vec4 eye = vec4(activeCamera->getEye().x, activeCamera->getEye().y, 0, activeCamera->getEye().z);
+		WorldLine* line = new GeodeticLine(vec4(0,0,0,0), vec4(ray.dir.x, ray.dir.y, 0, ray.dir.z), "Click ray", "");
+		linesToDisplay.push_back(line);
+
+
+		int selectionIdx = -1;			// index of the selected object
+		if (viewMode == ViewMode::diagram) {								// Diagram view
+			float constraint = 0.5f;
+			float shortestDistance = objects[0]->rayDistanceToDiagram(ray);		// First item handled separately.
+			if (constraint > shortestDistance && shortestDistance > 0) {
+				selectionIdx = 0;
+			}
+			for (int i = 1; i < objects.size(); i++) {
+				float d = objects[i]->rayDistanceToDiagram(ray);
+				if ((shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
+					shortestDistance = d;
+					selectionIdx = i;
+				}
 			}
 		}
+		else if (viewMode == ViewMode::realTime3D) {						// RealTime3D view
+			float constraint = 1.0f;		// greater constraint
+			Intersectable* intersectable;
+			if (intersectionMode == IntersectionMode::lightCone) {
+				intersectable = activeObserver->getLightCone();
+			}
+			else if (intersectionMode == IntersectionMode::hyperplane) {
+				intersectable = activeObserver->getHyperplane();
+			}
+			// First item handled separately:
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectionMode, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+			if (constraint > shortestDistance && shortestDistance > 0) {
+				selectionIdx = 0;
+			}
+			for (int i = 1; i < objects.size(); i++) {
+				float d = objects[i]->rayDistanceToObject(ray, intersectionMode, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+				if ( (shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
+					shortestDistance = d;
+					selectionIdx = i;
+				}
+			}
+			delete intersectable;
+		}
+
 		if (selectionIdx >= 0) {
 			if (selected != nullptr) {
 				selected->deselect();

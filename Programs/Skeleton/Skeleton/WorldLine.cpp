@@ -57,7 +57,7 @@ vec4 GeodeticLine::getVelocityAtProperTime(float tau)
     return fourVelocity;
 }
 
-Hyperplane GeodeticLine::getSimultaneousHyperplaneAtProperTime(float tau)
+Hyperplane* GeodeticLine::getSimultaneousHyperplaneAtProperTime(float tau)
 {
     return Hyperplane::simultaneousHyperplane(
         getLocationAtProperTime(tau),
@@ -75,7 +75,7 @@ vec4 GeodeticLine::getVelocityAtAbsoluteTime(float t)
     return fourVelocity;
 }
 
-Hyperplane GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
+Hyperplane* GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
 {
     return Hyperplane::simultaneousHyperplane(
         getLocationAtAbsoluteTime(t),
@@ -83,9 +83,10 @@ Hyperplane GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
     );
 }
 
-/*
-* Returns the absolute time spent, where the world line intersects the hyperplane.
-*/
+LightCone* GeodeticLine::getLigtConeAtAbsoluteTime(float t) {
+    return new LightCone(getLocationAtAbsoluteTime(t));
+}
+
 float GeodeticLine::intersectHyperplane(Hyperplane& plane)
 {
     return (dot(plane.getLocation() - locationAtZeroT, plane.getNormal())) / dot(fourVelocity, plane.getNormal()) * fourVelocity.w;
@@ -93,27 +94,41 @@ float GeodeticLine::intersectHyperplane(Hyperplane& plane)
 
 float GeodeticLine::intersectLightCone(LightCone& cone)
 {
+    /*
+    float a, b, c, t;
+    a = dot(subjectsVelocity.xyz, subjectsVelocity.xyz) - subjectsVelocity.w * subjectsVelocity.w;
+    vec3 temp = (offsetedStartPos.xyz * subjectsVelocity.xyz - subjectsVelocity.xyz * coneLocation.xyz);
+    b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * subjectsVelocity.w - subjectsVelocity.w * coneLocation.w));
+    c = dot(coneLocation.xyz - offsetedStartPos.xyz, coneLocation.xyz - offsetedStartPos.xyz)
+        - pow(coneLocation.w - offsetedStartPos.w, 2);
+
+    int noOfSolutions;
+    vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+
+    t = solutions.x;	// Should be tested, whether its from the past!
+    return t * subjectsVelocity.w;
+    */
+
     float a, b, c, t;
     a = LorentzianProduct(fourVelocity, fourVelocity);
     b = 2 * (
         (locationAtZeroT.x * fourVelocity.x
-            - fourVelocity.x * cone.getObserver().x)
+            - fourVelocity.x * cone.getLocation().x)
         + (locationAtZeroT.y * fourVelocity.y
-            - fourVelocity.y * cone.getObserver().y)
+            - fourVelocity.y * cone.getLocation().y)
         + (locationAtZeroT.z * fourVelocity.z
-            - fourVelocity.z * cone.getObserver().z)
+            - fourVelocity.z * cone.getLocation().z)
         - (locationAtZeroT.w * fourVelocity.w
-            - fourVelocity.w * cone.getObserver().w)
+            - fourVelocity.w * cone.getLocation().w)
         );
 
-    c = powf(cone.getObserver().x - locationAtZeroT.x, 2)
-        + powf(cone.getObserver().y - locationAtZeroT.y, 2)
-        + powf(cone.getObserver().z - locationAtZeroT.z, 2)
-        - powf(cone.getObserver().w - locationAtZeroT.w, 2);
+    c = powf(cone.getLocation().x - locationAtZeroT.x, 2)
+        + powf(cone.getLocation().y - locationAtZeroT.y, 2)
+        + powf(cone.getLocation().z - locationAtZeroT.z, 2)
+        - powf(cone.getLocation().w - locationAtZeroT.w, 2);
 
     int noOfSolutions;
     vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
-    std::cout << "Number of solutions = " << noOfSolutions << std::endl;
     if (noOfSolutions > 0) {
         t = solutions.x;
     }
@@ -145,6 +160,11 @@ void GeodeticLine::Draw()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glLineWidth(3);
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
+}
+
+LightCone* GeodeticLine::getLigtConeAtProperTime(float tau)
+{
+    return new LightCone(getLocationAtProperTime(tau));
 }
 
 float GeodeticLine::distanceBetweenRayAndDiagram(const Ray& ray)

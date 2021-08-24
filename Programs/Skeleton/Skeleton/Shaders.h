@@ -111,9 +111,6 @@ const char* const vertexSource = R"(
 	}
 
 	vec4 lorentzTransformation(vec4 toTransform, vec3 relVelocity) {
-		if (length(relVelocity) >= speedOfLight) {
-			return toTransform;
-		}
 		vec3 v = relVelocity;
 		float vLength = length(v);
 		float gamma = lorentzFactor(vLength);
