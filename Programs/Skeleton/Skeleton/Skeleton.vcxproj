@@ -126,6 +126,21 @@
     <ClInclude Include="View.h" />
     <ClInclude Include="WorldLine.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Resources\lowRes\dice.bmp" />
+    <Image Include="..\..\..\Resources\lowRes\dice.png" />
+    <Image Include="..\..\..\Resources\lowRes\earth_daymap.bmp" />
+    <Image Include="..\..\..\Resources\lowRes\earth_normal_map.bmp" />
+    <Image Include="..\..\..\Resources\lowRes\Harold.bmp" />
+    <Image Include="..\..\..\Resources\lowRes\stars_milky_way.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Resources\geometry\cube.obj" />
+    <Object Include="..\..\..\Resources\geometry\MyCube.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

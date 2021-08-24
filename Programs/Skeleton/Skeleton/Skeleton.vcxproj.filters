@@ -162,4 +162,35 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Resources\lowRes\dice.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Resources\lowRes\dice.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Resources\lowRes\earth_daymap.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Resources\lowRes\earth_normal_map.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Resources\lowRes\Harold.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Resources\lowRes\stars_milky_way.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Resources\geometry\cube.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="..\..\..\Resources\geometry\MyCube.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
 </Project>
