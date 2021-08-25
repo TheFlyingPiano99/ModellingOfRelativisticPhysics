@@ -71,6 +71,13 @@ void Scene::Initialise()
 		objects.push_back(Object::createDice(wrdln));
 	}
 
+	// Captions:-------------------------------------------------------
+	font = new Font(Assets::getFont());
+	for (int i = 0; i < 30; i++) {
+		Caption* caption = new Caption(vec3(1, 10 * i, 1), font, 3, vec3(0.5, 1, 0.5), "Hello World!");
+		captions.push_back(caption);
+	}
+
 
 	//Background:------------------------------------------------------
 	background = new Background();
@@ -110,6 +117,7 @@ void Scene::Animate(float dt) {
 void Scene::Draw(GPUProgram& gpuProgram) {
 	if (activeObserver != nullptr || viewMode == diagram) {
 		//Prefase:
+		gpuProgram.setUniform(false, "textMode");
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
 		gpuProgram.setUniform(intersectionMode, "intersectionMode");
 		gpuProgram.setUniform(dopplerMode, "dopplerMode");
@@ -197,7 +205,6 @@ void Scene::toggleShading()
 
 void Scene::togglePause() {
 	running = !running;
-	captions.push_back(new Caption(vec2(200.0f, 200.0f), defaultFont, vec3(0.0f, 1.0f, 0.5f), "Paused"));
 }
 
 void Scene::setTime(float t) {

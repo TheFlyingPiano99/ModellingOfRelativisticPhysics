@@ -18,6 +18,8 @@ class Assets {
 	static std::string* geometryPath;
 	static std::string* texturePath;
 	static std::string* savesPath;
+	
+	static Texture* font;
 
 public:
 
@@ -141,6 +143,14 @@ public:
 		return *savesPath;
 	}
 
+	static Texture* getFont() {
+		if (font == nullptr) {
+			font = new Texture(getTexturePath().append("font.bmp"));
+		}
+		return font;
+	}
+
+
 	/*
 	* Must be called befor the application is closed!
 	*/
@@ -154,6 +164,7 @@ public:
 		delete geometryPath;
 		delete texturePath;
 		delete savesPath;
+		delete font;
 	}
 };
 

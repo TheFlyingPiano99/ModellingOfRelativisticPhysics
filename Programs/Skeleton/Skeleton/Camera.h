@@ -45,6 +45,14 @@ public:
 		return eye;
 	}
 
+	vec3 getPrefUp() {
+		return prefUp;
+	}
+
+	vec3 getLookDir() {
+		return normalize(lookat - eye);
+	}
+
 	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle);
 
 	void rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle);

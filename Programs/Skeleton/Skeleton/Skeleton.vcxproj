@@ -82,6 +82,7 @@
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Event.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="framework.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
@@ -93,7 +94,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="StringOperations.cpp" />
-    <ClCompile Include="TextOperations.cpp" />
+    <ClCompile Include="Caption.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="WorldLine.cpp" />
   </ItemGroup>
@@ -107,6 +108,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EnumTypes.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
@@ -115,7 +117,7 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="StringOperations.h" />
-    <ClInclude Include="TextOperations.h" />
+    <ClInclude Include="Caption.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="LightCone.h" />
     <ClInclude Include="Hyperplane.h" />

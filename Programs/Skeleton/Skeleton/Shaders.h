@@ -15,7 +15,7 @@ const char* const vertexSource = R"(
 	uniform mat4 MVP;
 	uniform mat4 M;
 	uniform mat4 invM;
-
+	uniform bool textMode;
 	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
@@ -218,7 +218,7 @@ const char* const vertexSource = R"(
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(vp, 1) *  MVP;		// Now the MVP should contain the translation to -eye!
+		gl_Position = vec4(vp, 1) * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void main() {
@@ -227,7 +227,7 @@ const char* const vertexSource = R"(
 				geodetic();
 			}
 		}
-		else if (viewMode == 1) {	// Diagram
+		else if (viewMode == 1 || textMode) {	// Diagram
 			diagram();
 		}
 	}
@@ -236,6 +236,9 @@ const char* const vertexSource = R"(
 const char* const fragmentSource = R"(
 	#version 330			// Shader 3.3
 	precision highp float;	// normal floats, makes no difference on desktop computers
+
+	uniform bool textMode;
+	uniform vec3 transparentColor;
 
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
@@ -255,6 +258,7 @@ const char* const fragmentSource = R"(
 	uniform sampler2D textureUnit;
 	uniform sampler2D normalMapUnit;
 	uniform sampler2D specularMapUnit;
+
 
 //Camera:
 	uniform vec3 wEye;
@@ -460,12 +464,22 @@ const char* const fragmentSource = R"(
 		outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
 	}
 
+	void text() {
+		vec4 raw = texture(textureUnit, texCoord);
+		outColor = vec4(raw.xyz * kd, (transparentColor.x == raw.x && transparentColor.y == raw.y && transparentColor.z == raw.z)? 0 : 1);
+	}
+
 	void main() {
-		if (viewMode == 0) {		// RealTime3D
-			realTime3D();
+		if (textMode) {
+			text();
 		}
-		else if (viewMode == 1) {	// Diagram
-			diagram();
+		else {
+			if (viewMode == 0) {		// RealTime3D
+				realTime3D();
+			}
+			else if (viewMode == 1) {	// Diagram
+				diagram();
+			}
 		}
 	}
 )";

@@ -7,7 +7,7 @@
 #include "Observer.h"
 #include "Object.h"
 #include "Background.h"
-#include "TextOperations.h"
+#include "Caption.h"
 #include "MenuSystem.h"
 #include "LightSource.h"
 #include "View.h"
@@ -41,7 +41,7 @@ class Scene {
 	bool doShading = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
-
+	Font* font;			// TEMP!
 public:
 
 
@@ -74,6 +74,7 @@ public:
 		}
 
 		delete background;
+		delete font;
 	}
 
 	/*

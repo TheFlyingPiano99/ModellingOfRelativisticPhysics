@@ -54,7 +54,7 @@
     <ClCompile Include="LightCone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextOperations.cpp">
+    <ClCompile Include="Caption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MenuSystem.cpp">
@@ -70,6 +70,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StringOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,7 +134,7 @@
     <ClInclude Include="Intersectable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextOperations.h">
+    <ClInclude Include="Caption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MenuSystem.h">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnumTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

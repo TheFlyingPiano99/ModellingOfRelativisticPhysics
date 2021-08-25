@@ -6,20 +6,20 @@
 void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	glDisable(GL_CULL_FACE);
 	Scene* scene = reinterpret_cast<Scene*>(owner);
-	Camera* camera = scene->getActiveCamera();
+	Camera* activeCamera = scene->getActiveCamera();
 	for each (LightSource * lt in *(scene->getLights()))
 	{
 		lt->loadOnGPU(gpuProgram);								// Load lights
 	}
 
-	scene->getBackground()->Draw(gpuProgram, *(camera));		// Background
+	scene->getBackground()->Draw(gpuProgram, *(activeCamera));		// Background
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		obj->Draw(gpuProgram, *(scene->getActiveCamera()));					// Objects
 	}
 	for each (Caption * cap in *(scene->getCaptions()))				// Captions
 	{
-		cap->Draw();
+		cap->Draw(gpuProgram, *activeCamera);
 	}
 
 	/*
@@ -54,6 +54,6 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 
 	for each (Caption * cap in *(scene->getCaptions()))						// Captions
 	{
-		cap->Draw();
+		cap->Draw(gpuProgram, *activeCamera);
 	}
 }
