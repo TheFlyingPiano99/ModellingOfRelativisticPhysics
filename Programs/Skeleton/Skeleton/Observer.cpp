@@ -3,6 +3,8 @@
 #include "Assets.h"
 #include "StringOperations.h"
 
+
+
 vec4 Observer::getLocation()
 {
     return worldLine->getLocationAtProperTime(currentProperTime);
@@ -40,6 +42,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
+	diagramCaption->Draw(gpuProgram, camera);
 }
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
@@ -81,11 +84,26 @@ void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera)
 	Assets::getObserverNodeGeometry()->Draw();
 }
 
-void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera)
+void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMode intersectionMode)
 {
-	DrawLightCone(gpuProgram, camera);
-	DrawHyperplane(gpuProgram, camera);
+	if (intersectionMode == IntersectionMode::lightCone) {
+		DrawLightCone(gpuProgram, camera);
+	}
+	else if (intersectionMode == IntersectionMode::hyperplane) {
+		DrawHyperplane(gpuProgram, camera);
+	}
 	DrawNode(gpuProgram, camera);
+	static int updateCounter = 0;
+	static float prevTau = 0.0f;
+	if (updateCounter++ > 30) {		// Reduced refresh rate.
+		prevTau = currentProperTime;
+		updateCounter = 0;
+		timerCaption->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
+			.append("t = ").append(std::to_string(worldLine->getAbsoluteTimeAtProperTime(currentProperTime))).append(" m").c_str());
+	}
+	vec4 pos = getLocation();
+	timerCaption->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 9 + camera.getPrefUp() * 1);
+	timerCaption->Draw(gpuProgram, camera);
 }
 
 void Observer::setCurrentTimeAtAbsoluteTime(float t)

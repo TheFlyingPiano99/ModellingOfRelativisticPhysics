@@ -11,7 +11,7 @@ inline void GeodeticLine::genGeometry() {
     vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
 
     for (int i = 0; i < 10; i++) {
-        vec4 pos = getLocationAtAbsoluteTime(i * 10);
+        vec4 pos = getLocationAtAbsoluteTime((i - 5) * 40);
         vds.push_back(vec3(pos.x, pos.y, pos.w));
     }
     noOfVds = vds.size();

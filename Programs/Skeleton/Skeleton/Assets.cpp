@@ -9,4 +9,5 @@ Material* Assets::selectedWorldLineMaterial = NULL;
 std::string* Assets::geometryPath = NULL;
 std::string* Assets::texturePath = NULL;
 std::string* Assets::savesPath = NULL;
-Texture* Assets::font = NULL;
+Texture* Assets::fontTexture = NULL;
+Font* Assets::defaultFont = NULL;

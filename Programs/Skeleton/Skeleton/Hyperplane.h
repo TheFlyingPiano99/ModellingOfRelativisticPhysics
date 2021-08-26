@@ -12,7 +12,7 @@ class Hyperplane : public Intersectable {
 	vec4 normal;
 
 public:
-	Hyperplane(vec4 _location, vec4 _normal): location(_location), normal(_normal) {
+	Hyperplane(vec4 _location, vec4 _normal): Intersectable(IntersectionMode::hyperplane), location(_location), normal(_normal) {
 	}
 	
 	static Hyperplane* simultaneousHyperplane(vec4 location, vec4 FVelocity) {

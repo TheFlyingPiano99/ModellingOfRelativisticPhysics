@@ -10,6 +10,7 @@
 #include "AdvancedTexture.h"
 #include "EnumTypes.h"
 #include <map>
+#include "Caption.h"
 
 
 class Object : public Entity
@@ -24,6 +25,7 @@ class Object : public Entity
 	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
 	ObjectType type = none;
 	int worldLineID = 0;
+	Caption* diagramCaption;
 
 public:
 
@@ -53,12 +55,13 @@ public:
 		diagramMaterial(_diagramMaterial),
 		texture(_texture)
 	{
+		vec4 pos = worldLine->getLocationAtAbsoluteTime(0.0f);
+		diagramCaption = Caption::createNormalCaption(vec3(pos.x, pos.y, pos.w), name.c_str());
 	}
 
 	~Object() {
-		if (worldLine != nullptr) {
-			delete worldLine;
-		}
+		delete worldLine;
+		delete diagramCaption;
 	}
 
 	void setType(ObjectType _type) {
@@ -91,7 +94,7 @@ public:
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable);
 
 	std::string genSaveString();
 

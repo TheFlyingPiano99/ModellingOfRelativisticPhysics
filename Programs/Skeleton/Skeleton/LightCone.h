@@ -11,7 +11,7 @@ class LightCone : public Intersectable {
 
 public:
 
-	LightCone(vec4 _location): location(_location) {
+	LightCone(vec4 _location): Intersectable(IntersectionMode::lightCone), location(_location) {
 	}
 
 	vec4 getLocation() {

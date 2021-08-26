@@ -41,7 +41,7 @@ class Scene {
 	bool doShading = true;
 	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
 
-	Font* font;			// TEMP!
+	Font* fontTexture;			// TEMP!
 public:
 
 
@@ -74,7 +74,7 @@ public:
 		}
 
 		delete background;
-		delete font;
+		delete fontTexture;
 	}
 
 	/*
@@ -165,6 +165,10 @@ public:
 
 	Observer* getActiveObserver() {
 		return activeObserver;
+	}
+
+	IntersectionMode getIntersectionMode() {
+		return intersectionMode;
 	}
 
 	//-----------------------------------------------------------------

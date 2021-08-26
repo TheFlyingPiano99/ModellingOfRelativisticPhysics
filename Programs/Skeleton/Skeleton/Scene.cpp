@@ -72,11 +72,7 @@ void Scene::Initialise()
 	}
 
 	// Captions:-------------------------------------------------------
-	font = new Font(Assets::getFont());
-	for (int i = 0; i < 30; i++) {
-		Caption* caption = new Caption(vec3(1, 10 * i, 1), font, 3, vec3(0.5, 1, 0.5), "Hello World!");
-		captions.push_back(caption);
-	}
+	// No global captions.
 
 
 	//Background:------------------------------------------------------

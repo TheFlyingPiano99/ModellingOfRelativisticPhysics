@@ -3,7 +3,7 @@
 #include "framework.h"
 
 /*
-* Monospace bitmap font
+* Monospace bitmap fontTexture
 */
 class Font {
 	Texture* bitmap;

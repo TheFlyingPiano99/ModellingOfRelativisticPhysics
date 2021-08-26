@@ -40,9 +40,16 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	//Actual drawing:
 	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
 	Camera* activeCamera = scene->getActiveCamera();
+	Intersectable* intersectable;
+	if (scene->getIntersectionMode() == IntersectionMode::lightCone) {
+		intersectable = scene->getActiveObserver()->getLightCone();
+	}
+	else if (scene->getIntersectionMode() == IntersectionMode::hyperplane) {
+		intersectable = scene->getActiveObserver()->getHyperplane();
+	}
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->DrawDiagram(gpuProgram, *activeCamera);			// Objects
+		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable);			// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
@@ -50,7 +57,7 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	}
 	system->Draw(gpuProgram, *activeCamera);					// Coordinate system
 
-	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera);
+	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getIntersectionMode());
 
 	for each (Caption * cap in *(scene->getCaptions()))						// Captions
 	{

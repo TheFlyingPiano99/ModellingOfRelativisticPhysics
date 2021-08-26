@@ -37,7 +37,7 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 {	
 	gpuProgram.setUniform(true, "textMode");
 	gpuProgram.setUniform(color, "kd");
-	font->loadOnGPU(gpuProgram);
+	fontTexture->loadOnGPU(gpuProgram);
 
 	vec3 normal = -camera.getLookDir();
 	mat4 M = this->M(normal, camera.getPrefUp());
@@ -59,44 +59,64 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 
 void Caption::genGeometry()
 {
-	// X front, Z up, right handed system:
+	// X front, Z vUp, vRight handed system:
 	vec3 charPos;
-	vec3 norm = vec3(-1, 0, 0);		// Normal vector
-	vec3 up = vec3(0, 0, 1);
-	vec3 right = vec3(0, -1, 0);
+	vec3 vNorm = vec3(-1, 0, 0);		// Normal vector
+	vec3 vUp = vec3(0, 0, 1);
+	vec3 vRight = vec3(0, -1, 0);
 	//UVs:	(named in viewers orientation)
 	vec2 topLeftUV, topRightUV, bottomLeftUV, bottomRightUV;	
 
 	std::vector<VertexData> vds;
 
+	
+	int firstLineLength = 0;
+	for (int i = 0; i < text.length(); i++) {
+		if (text[i] == '\n') {	// New line
+			firstLineLength = i;
+			break;
+		}
+	}
+	if (firstLineLength == 0 && text.size() > 0) {	// if no end of line char found in text. (The first line is the whole text.)
+		firstLineLength = text.size();
+	}
+
+	int line = 0;
+	int posInLine = 0;
+	float lineSpacing = 1.2f;
 	for (int i = 0; i < text.length(); i++)
 	{
-		font->getCharUVs(text[i], topLeftUV, topRightUV, bottomRightUV, bottomLeftUV);
-		charPos = right * (i - text.length() / 2.0f);		// Pos is in the center of the string.
+		if (text[i] == '\n') {	// New line
+			line++;
+			posInLine = 0;
+			continue;
+		}
+		fontTexture->getCharUVs(text[i], topLeftUV, topRightUV, bottomRightUV, bottomLeftUV);
+		charPos = vRight * (posInLine++ - firstLineLength / 2.0f) + line * vec3(0, 0, -lineSpacing);		// Pos is in the center of the string.
 
 		// (named in viewers orientation)
 		VertexData bottomLeft;
 		bottomLeft.pos = charPos + vec3(0, 0.5f, -0.5f);
-		bottomLeft.norm = norm;
+		bottomLeft.norm = vNorm;
 		bottomLeft.uv = bottomLeftUV;
 		VertexData bottomRight;
 		bottomRight.pos = charPos + vec3(0, -0.5f, -0.5f);
-		bottomRight.norm = norm;
+		bottomRight.norm = vNorm;
 		bottomRight.uv = bottomRightUV;
 		VertexData topRight;
 		topRight.pos = charPos + vec3(0, -0.5f, 0.5f);
-		topRight.norm = norm;
+		topRight.norm = vNorm;
 		topRight.uv = topRightUV;
 		VertexData topLeft;
 		topLeft.pos = charPos + vec3(0, 0.5f, 0.5f);
-		topLeft.norm = norm;
+		topLeft.norm = vNorm;
 		topLeft.uv = topLeftUV;
 
-		// Top left triangle in right handed order:
+		// Top left triangle in vRight handed order:
 		vds.push_back(bottomLeft);
 		vds.push_back(topRight);
 		vds.push_back(topLeft);
-		// Bottom right triangle in right handed order:
+		// Bottom vRight triangle in vRight handed order:
 		vds.push_back(bottomLeft);
 		vds.push_back(bottomRight);
 		vds.push_back(topRight);

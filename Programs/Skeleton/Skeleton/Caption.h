@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "Camera.h"
 #include "Geometry.h"
+#include "Assets.h"
 
 class CaptionAnimation {
 
@@ -12,7 +13,7 @@ class CaptionAnimation {
 class Caption {
 	unsigned int vao, vbo, noOfVds;
 	vec3 pos;
-	Font* font;
+	Font* fontTexture;
 	float fontSize;
 	vec3 color;
 	std::string text;
@@ -22,7 +23,7 @@ class Caption {
 public:
 
 	Caption(vec3 _pos, Font* _font, float _fontSize, vec3 _color, const char* _text)
-		: pos(_pos), font(_font), fontSize(_fontSize), color(_color), text(_text)
+		: pos(_pos), fontTexture(_font), fontSize(_fontSize), color(_color), text(_text)
 	{
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -38,9 +39,13 @@ public:
 	}
 
 	~Caption() {
-		delete font;					// Temp !!!
+		delete fontTexture;					// Temp !!!
 		glDeleteBuffers(1, &vbo);
 		glDeleteVertexArrays(1, &vao);
+	}
+
+	static Caption* createNormalCaption(vec3 pos, const char* text) {
+		return new Caption(pos, Assets::getDefaultFont(), 0.8f, vec3(0.9f,1,1), text);
 	}
 
 	mat4 M(vec3 norm, vec3 prefUp);

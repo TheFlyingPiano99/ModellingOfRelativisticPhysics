@@ -53,6 +53,10 @@ public:
 		return normalize(lookat - eye);
 	}
 
+	vec3 getRight() {
+		return vRight;
+	}
+
 	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle);
 
 	void rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle);

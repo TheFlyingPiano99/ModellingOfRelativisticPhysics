@@ -79,13 +79,15 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 	geometry->Draw();
 }
 
-void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
+void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable) {
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
 	}
 	else {
 		diagramMaterial->loadOnGPU(gpuProgram);
 	}
+
+
 
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
@@ -94,7 +96,12 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
-
+	if (selected) {
+		float t = worldLine->intersect(intersectable);
+		vec4 pos = worldLine->getLocationAtAbsoluteTime(t);
+		diagramCaption->setPos(vec3(pos.x, pos.y, pos.w));
+		diagramCaption->Draw(gpuProgram, camera);
+	}
 }
 
 std::string Object::genSaveString()

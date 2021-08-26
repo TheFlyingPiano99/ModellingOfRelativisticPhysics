@@ -3,6 +3,7 @@
 #include "Material.h"
 #include <string>
 #include <filesystem>
+#include "Font.h"
 
 
 /*
@@ -19,7 +20,8 @@ class Assets {
 	static std::string* texturePath;
 	static std::string* savesPath;
 	
-	static Texture* font;
+	static Texture* fontTexture;
+	static Font* defaultFont;
 
 public:
 
@@ -143,11 +145,18 @@ public:
 		return *savesPath;
 	}
 
-	static Texture* getFont() {
-		if (font == nullptr) {
-			font = new Texture(getTexturePath().append("font.bmp"));
+	static Texture* getFontTexture() {
+		if (fontTexture == nullptr) {
+			fontTexture = new Texture(getTexturePath().append("font.bmp"));
 		}
-		return font;
+		return fontTexture;
+	}
+
+	static Font* getDefaultFont() {
+		if (defaultFont == nullptr) {
+			defaultFont = new Font(getFontTexture());
+		}
+		return defaultFont;
 	}
 
 
@@ -164,7 +173,8 @@ public:
 		delete geometryPath;
 		delete texturePath;
 		delete savesPath;
-		delete font;
+		delete fontTexture;
+		delete defaultFont;
 	}
 };
 

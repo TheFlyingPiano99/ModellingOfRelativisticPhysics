@@ -3,6 +3,7 @@
 #include "framework.h"
 
 #include "Entity.h"
+#include "Intersectable.h"
 #include "Hyperplane.h"
 #include "LightCone.h"
 #include "RelPhysics.h"
@@ -121,6 +122,20 @@ public:
 	virtual void Draw() = 0;
 
 	virtual float distanceBetweenRayAndDiagram(const Ray& ray) = 0;
+
+	/*
+	* 
+	*/
+	float intersect(Intersectable& intersectable) {
+		float t;
+		if (intersectable.getType() == IntersectionMode::lightCone) {
+			t = intersectLightCone(reinterpret_cast<LightCone&>(intersectable));
+		}
+		else if (intersectable.getType() == IntersectionMode::hyperplane) {
+			t = intersectHyperplane(reinterpret_cast<Hyperplane&>(intersectable));
+		}
+		return t;
+	}
 };
 
 class GeodeticLine : public WorldLine
