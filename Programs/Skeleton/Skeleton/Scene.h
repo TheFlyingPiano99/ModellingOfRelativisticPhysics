@@ -171,6 +171,10 @@ public:
 		return intersectionMode;
 	}
 
+	bool getDoLorentz() {
+		return doLorentz;
+	}
+
 	//-----------------------------------------------------------------
 
 	/*

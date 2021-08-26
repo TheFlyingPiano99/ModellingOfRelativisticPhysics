@@ -13,6 +13,7 @@ struct VertexData {
 class Geometry {
 protected:
 	unsigned int vao, vbo;
+	float overallRadius = 0;
 
 public:
 	Geometry() {
@@ -29,6 +30,9 @@ public:
 
 	virtual void Draw() = 0;
 
+	float getOverallRadius() {
+		return overallRadius;
+	}
 
 };
 
@@ -48,6 +52,9 @@ public:
 		VertexData vd;
 		Eval(u, v, vd.pos, vd.norm);
 		vd.uv = vec2(u, v);
+		if (length(vd.pos) > overallRadius) {
+			overallRadius = length(vd.pos);
+		}
 		return vd;
 	}
 

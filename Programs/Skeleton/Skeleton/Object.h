@@ -92,7 +92,7 @@ public:
 
 	void Animate(float dt);
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
+	void Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, bool doLorentz);
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable);
 
@@ -125,6 +125,11 @@ public:
 	/*
 	* Returns shortest distance between center of the object in current world space with current relativistic transformations and the given ray.
 	*/
-	float rayDistanceToObject(const Ray& ray, IntersectionMode mode, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+	float rayDistanceToObject(const Ray& ray, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+
+	/*
+	* Returns 3D position perceived by the observer.
+	*/
+	vec3 perceivedPosition(Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 };
 

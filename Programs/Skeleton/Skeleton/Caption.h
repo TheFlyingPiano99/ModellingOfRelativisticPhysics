@@ -45,16 +45,18 @@ public:
 	}
 
 	static Caption* createNormalCaption(vec3 pos, const char* text) {
-		return new Caption(pos, Assets::getDefaultFont(), 0.8f, vec3(0.9f,1,1), text);
+		return new Caption(pos, Assets::getDefaultFont(), 0.03f, vec3(0.9f,1,1), text);
 	}
 
-	mat4 M(vec3 norm, vec3 prefUp);
+	mat4 M(vec3 norm, vec3 prefUp, float distance);
 
-	mat4 invM(vec3 norm, vec3 prefUp);
+	mat4 invM(vec3 norm, vec3 prefUp, float distance);
 
 	void Animate();
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
+
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
 
 	void genGeometry();
 
@@ -63,5 +65,13 @@ public:
 	void setPos(vec3 _pos) {
 		pos = _pos;
 	}
-};
 
+	void setFontSize(float size) {
+		fontSize = size;
+	}
+
+	float getFontSize() {
+		return fontSize;
+	}
+
+};

@@ -42,7 +42,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
-	diagramCaption->Draw(gpuProgram, camera);
+	diagramCaption->DrawDiagram(gpuProgram, camera);
 }
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
@@ -102,8 +102,8 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMo
 			.append("t = ").append(std::to_string(worldLine->getAbsoluteTimeAtProperTime(currentProperTime))).append(" m").c_str());
 	}
 	vec4 pos = getLocation();
-	timerCaption->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 9 + camera.getPrefUp() * 1);
-	timerCaption->Draw(gpuProgram, camera);
+	timerCaption->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
+	timerCaption->DrawDiagram(gpuProgram, camera);
 }
 
 void Observer::setCurrentTimeAtAbsoluteTime(float t)

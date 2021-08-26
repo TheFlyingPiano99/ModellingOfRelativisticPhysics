@@ -281,12 +281,12 @@ void Scene::selectByClick(float cX, float cY)
 				intersectable = activeObserver->getHyperplane();
 			}
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectionMode, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
 			if (constraint > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, intersectionMode, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+				float d = objects[i]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
 				if ( (shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;

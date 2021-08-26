@@ -59,6 +59,9 @@ void OBJGeometry::load(const char* route) {
 						vd.pos = vertices[std::stoi(vertexDescription[0]) - 1];
 						vd.uv = textureCoords[std::stoi(vertexDescription[1]) - 1];
 						vd.norm = normals[std::stoi(vertexDescription[2]) - 1];
+						if (length(vd.pos) > overallRadius) {
+							overallRadius = length(vd.pos);
+						}
 						vds.push_back(vd);
 					}
 				}

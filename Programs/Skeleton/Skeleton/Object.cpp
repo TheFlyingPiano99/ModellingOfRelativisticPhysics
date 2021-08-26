@@ -57,7 +57,7 @@ void Object::Animate(float dt) {
 	//Todo
 }
 
-void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
+void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, bool doLorentz) {
 	//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
 
 	worldLine->loadOnGPU(gpuProgram);
@@ -77,6 +77,12 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(false, "outline");
 
 	geometry->Draw();
+
+	if (selected) {		// Caption
+		vec3 pos = perceivedPosition(&intersectable, doLorentz, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
+		diagramCaption->setPos(pos	+ normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
+		diagramCaption->Draw(gpuProgram, camera);
+	}
 }
 
 void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable) {
@@ -100,7 +106,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 		float t = worldLine->intersect(intersectable);
 		vec4 pos = worldLine->getLocationAtAbsoluteTime(t);
 		diagramCaption->setPos(vec3(pos.x, pos.y, pos.w));
-		diagramCaption->Draw(gpuProgram, camera);
+		diagramCaption->DrawDiagram(gpuProgram, camera);
 	}
 }
 
@@ -176,17 +182,20 @@ Object* Object::loadFromFile(std::ifstream& file)
 	return nullptr;
 }
 
-float Object::rayDistanceToObject(const Ray& ray, IntersectionMode mode, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+float Object::rayDistanceToObject(const Ray& ray, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+{
+	vec3 locationInProperFrame = perceivedPosition(intersectable, doLorentz, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
+	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
+	float d = length(locationInProperFrame - rayPos - dot(ray.dir, locationInProperFrame - rayPos) * ray.dir);
+	return (dot(locationInProperFrame - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
+}
+
+vec3 Object::perceivedPosition(Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
 	//Intersect:
 	float t = 0;		// absolute time parametre
 
-	if (mode == IntersectionMode::lightCone) {
-		t = worldLine->intersectLightCone(*reinterpret_cast<LightCone*>(intersectable));
-	}
-	else if (mode == IntersectionMode::hyperplane) {
-		t = worldLine->intersectHyperplane(*reinterpret_cast<Hyperplane*>(intersectable));
-	}
+	t = worldLine->intersect(*intersectable);
 
 	vec3 locationInProperFrame;
 
@@ -200,8 +209,6 @@ float Object::rayDistanceToObject(const Ray& ray, IntersectionMode mode, Interse
 		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
 	}
 
-	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
-	float d = length(locationInProperFrame - rayPos - dot(ray.dir, locationInProperFrame - rayPos) * ray.dir);
-	return (dot(locationInProperFrame - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
+	return locationInProperFrame;
 }
 

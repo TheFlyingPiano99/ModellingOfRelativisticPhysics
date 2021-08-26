@@ -1,10 +1,10 @@
 #include "Caption.h"
 
-mat4 Caption::M(vec3 norm, vec3 prefUp) {
+mat4 Caption::M(vec3 norm, vec3 prefUp, float distance) {
 	vec3 right = normalize(cross(prefUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
-	return ScaleMatrix(vec3(1, fontSize, fontSize))
+	return ScaleMatrix(vec3(1, fontSize * distance, fontSize * distance))
 		* mat4(
 			-norm.x, -norm.y, -norm.z, 0,
 			-right.x, -right.y, -right.z, 0,
@@ -13,7 +13,7 @@ mat4 Caption::M(vec3 norm, vec3 prefUp) {
 		* TranslateMatrix(pos);
 }
 
-mat4 Caption::invM(vec3 norm, vec3 prefUp) {
+mat4 Caption::invM(vec3 norm, vec3 prefUp, float distance) {
 	vec3 right = normalize(cross(prefUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
@@ -23,7 +23,7 @@ mat4 Caption::invM(vec3 norm, vec3 prefUp) {
 			-norm.y, -right.y, up.y, 0,
 			-norm.z, -right.z, up.z, 0,
 			0, 0, 0, 1)
-		* ScaleMatrix(vec3(1, 1 / fontSize, 1 / fontSize));
+		* ScaleMatrix(vec3(1, 1 / fontSize / distance, 1 / fontSize / distance));
 }
 
 void Caption::Animate()
@@ -40,9 +40,33 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	fontTexture->loadOnGPU(gpuProgram);
 
 	vec3 normal = -camera.getLookDir();
-	mat4 M = this->M(normal, camera.getPrefUp());
-	mat4 invM = this->invM(normal, camera.getPrefUp());
-	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");
+	float distance = length(pos);
+	mat4 M = this->M(normal, camera.getPrefUp(), distance);
+	mat4 invM = this->invM(normal, camera.getPrefUp(), distance);
+	gpuProgram.setUniform(M * camera.V() * camera.P(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
+
+	gpuProgram.setUniform(M, "M");
+	gpuProgram.setUniform(invM, "invM");
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_VERTEX_ARRAY, vbo);
+
+	glDrawArrays(GL_TRIANGLES, 0, noOfVds);
+
+	gpuProgram.setUniform(false, "textMode");
+}
+
+void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
+{
+	gpuProgram.setUniform(true, "textMode");
+	gpuProgram.setUniform(color, "kd");
+	fontTexture->loadOnGPU(gpuProgram);
+
+	vec3 normal = -camera.getLookDir();
+	float distance = length(camera.getEye() - pos);
+	mat4 M = this->M(normal, camera.getPrefUp(), distance);
+	mat4 invM = this->invM(normal, camera.getPrefUp(), distance);
+	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");		// With camera translation matrix.
 
 
 	gpuProgram.setUniform(M, "M");

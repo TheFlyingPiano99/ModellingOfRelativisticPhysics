@@ -41,6 +41,10 @@ public:
 		return velocityFV;
 	}
 
+	vec4 getStartPosVF() {
+		return startPosFV;
+	}
+
 	vec3 getEye() {
 		return eye;
 	}
@@ -55,6 +59,9 @@ public:
 
 	vec3 getRight() {
 		return vRight;
+	}
+	vec3 getUp() {
+		return vUp;
 	}
 
 	void rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle);

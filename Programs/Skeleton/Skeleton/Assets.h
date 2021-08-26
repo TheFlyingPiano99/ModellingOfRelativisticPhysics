@@ -59,7 +59,7 @@ public:
 
 	static Material* getSelectedObjectMaterial() {
 		if (selectedObjectMaterial == nullptr) {
-			selectedObjectMaterial = new Material(vec3(3, 3, 3), vec3(8, 9, 8), vec3(2, 2, 2), 3, 1.0f);
+			selectedObjectMaterial = new Material(vec3(3, 3, 3), vec3(8, 14, 8), vec3(2, 2, 2), 3, 1.0f);
 		}
 		return selectedObjectMaterial;
 	}

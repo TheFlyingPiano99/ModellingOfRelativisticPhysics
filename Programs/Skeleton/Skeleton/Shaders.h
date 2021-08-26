@@ -222,7 +222,7 @@ const char* const vertexSource = R"(
 	}
 
 	void main() {
-		if (viewMode == 0) {	// RealTime3D
+		if (viewMode == 0 && !textMode) {	// RealTime3D
 			if (worldLineType == 0) {
 				geodetic();
 			}
