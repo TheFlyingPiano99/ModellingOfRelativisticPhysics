@@ -11,3 +11,5 @@ std::string* Assets::texturePath = NULL;
 std::string* Assets::savesPath = NULL;
 Texture* Assets::fontTexture = NULL;
 Font* Assets::defaultFont = NULL;
+Material* Assets::hoveredObjectMaterial = NULL;
+Material* Assets::hoveredWorldLineMaterial = NULL;

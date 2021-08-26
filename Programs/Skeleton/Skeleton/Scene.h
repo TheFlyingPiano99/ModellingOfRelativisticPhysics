@@ -26,6 +26,7 @@ class Scene {
 
 	Observer* activeObserver = NULL;
 	Entity* selected = NULL;
+	Entity* hovered = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
 	std::vector<LightSource*> lights;
@@ -94,9 +95,11 @@ public:
 	void toggleActiveObserver();
 
 	// Camera controls:
-	void moveCamera(float cx, float cy);
+	void panCamera(float cx, float cy);
 
 	void zoomCamera(float delta);
+
+	void moveCamera(vec3 delta);
 
 	// Symulation controls:
 	void toggleDoppler();
@@ -132,6 +135,10 @@ public:
 	* Receives X, and Y coordinates in camera space... [-1; 1]
 	*/
 	void selectByClick(float cX, float cY);
+
+	void mouseMoved(float cX, float cY);
+
+	Entity* getUnderCursor(float cX, float cY);
 
 	// Getters:--------------------------------------------------------------------
 

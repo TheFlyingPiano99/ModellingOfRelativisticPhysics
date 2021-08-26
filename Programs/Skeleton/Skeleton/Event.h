@@ -19,6 +19,8 @@ public:
 	const vec4 getLocation() const {
 		return location;
 	}
+
+	void hover();
 };
 
 

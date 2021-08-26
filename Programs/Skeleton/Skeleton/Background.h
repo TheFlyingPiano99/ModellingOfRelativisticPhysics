@@ -13,7 +13,7 @@ class Background {
 
 public:
 	Background() {
-		geometry = new SphereSurface(100);
+		geometry = new SphereSurface(80);
 		geometry->GenSurface(100, 100);
 		vec3 color = vec3(0.1,0.1, 0.1);
 		material = new Material(color, color, color, 50);

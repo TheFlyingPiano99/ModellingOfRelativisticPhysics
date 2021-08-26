@@ -64,6 +64,9 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	if (selected) {
 		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
 	}
+	else if (hovered) {
+		Assets::getHoveredObjectMaterial()->loadOnGPU(gpuProgram);
+	}
 	else {
 		material->loadOnGPU(gpuProgram);
 	}
@@ -78,7 +81,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 
 	geometry->Draw();
 
-	if (selected) {		// Caption
+	if (selected || hovered) {		// Caption
 		vec3 pos = perceivedPosition(&intersectable, doLorentz, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
 		diagramCaption->setPos(pos	+ normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		diagramCaption->Draw(gpuProgram, camera);
@@ -88,6 +91,9 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable) {
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
+	}
+	else if (hovered) {
+		Assets::getHoveredWorldLineMaterial()->loadOnGPU(gpuProgram);
 	}
 	else {
 		diagramMaterial->loadOnGPU(gpuProgram);
@@ -102,7 +108,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 	gpuProgram.setUniform(false, "outline");
 
 	worldLine->Draw();
-	if (selected) {
+	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
 		vec4 pos = worldLine->getLocationAtAbsoluteTime(t);
 		diagramCaption->setPos(vec3(pos.x, pos.y, pos.w));
@@ -210,5 +216,9 @@ vec3 Object::perceivedPosition(Intersectable* intersectable, bool doLorentz, vec
 	}
 
 	return locationInProperFrame;
+}
+
+void Object::hover()
+{
 }
 

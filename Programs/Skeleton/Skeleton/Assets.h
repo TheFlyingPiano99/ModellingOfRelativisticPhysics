@@ -15,6 +15,8 @@ class Assets {
 	static Material* observerMaterial;
 	static Material* selectedObjectMaterial;
 	static Material* selectedWorldLineMaterial;
+	static Material* hoveredObjectMaterial;
+	static Material* hoveredWorldLineMaterial;
 	static OBJGeometry* cubeGeometry;
 	static std::string* geometryPath;
 	static std::string* texturePath;
@@ -70,6 +72,21 @@ public:
 			selectedWorldLineMaterial->setGlow(true);
 		}
 		return selectedWorldLineMaterial;
+	}
+
+	static Material* getHoveredObjectMaterial() {
+		if (hoveredObjectMaterial == nullptr) {
+			hoveredObjectMaterial = new Material(vec3(3, 3, 3), vec3(7, 8, 7), vec3(2, 2, 2), 3, 1.0f);
+		}
+		return hoveredObjectMaterial;
+	}
+
+	static Material* getHoveredWorldLineMaterial() {
+		if (hoveredWorldLineMaterial == nullptr) {
+			hoveredWorldLineMaterial = new Material(vec3(3, 1.5, 1), vec3(0.7f, 0.7f, 0.7f), vec3(0.2, 0.2, 0.2), 3, 1.0f);
+			hoveredWorldLineMaterial->setGlow(true);
+		}
+		return hoveredWorldLineMaterial;
 	}
 
 	static std::string getGeometryPath() {
@@ -160,6 +177,7 @@ public:
 	}
 
 
+
 	/*
 	* Must be called befor the application is closed!
 	*/
@@ -175,6 +193,8 @@ public:
 		delete savesPath;
 		delete fontTexture;
 		delete defaultFont;
+		delete hoveredObjectMaterial;
+		delete hoveredWorldLineMaterial;
 	}
 };
 

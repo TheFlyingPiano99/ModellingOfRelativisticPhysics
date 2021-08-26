@@ -195,3 +195,7 @@ Observer* Observer::loadFromFile(std::ifstream& file)
 	}
 	return nullptr;
 }
+
+void Observer::hover()
+{
+}

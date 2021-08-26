@@ -70,6 +70,13 @@ public:
 
 	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point);
 
+	/*
+	* X...forward
+	* Y...right
+	* Z...up
+	*/
+	void move(vec3 delta);
+
 	void zoom(float delta);
 
 	Ray getRayFromCameraCoord(vec2 cPos);

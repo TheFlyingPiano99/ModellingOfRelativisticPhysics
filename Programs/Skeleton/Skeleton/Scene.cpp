@@ -16,7 +16,7 @@ void Scene::Initialise()
 	realTime3DCamera = new Camera();
 	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
 	diagramCamera = new Camera();
-	diagramCamera->initBasic(20 * vec3(1,1,1), 19 * vec3(1, 1, 1), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
+	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
 
 	if (viewMode == realTime3D) {
 		activeCamera = realTime3DCamera;
@@ -146,18 +146,25 @@ void Scene::toggleActiveObserver() {
 
 // Camera controls:
 
-void Scene::moveCamera(float cx, float cy) {
+void Scene::panCamera(float cx, float cy) {
 	static float camSpeed = 0.01f;
 	if (viewMode == realTime3D) {
 		realTime3DCamera->rotateAroundEye(cx, -cy);
 	}
 	else if (viewMode == diagram) {
-		diagramCamera->rotateAroundPoint(cx, -cy, vec3(0, 0, 0));
+		diagramCamera->rotateAroundLookat(cx, -cy);
 	}
 }
 
 void Scene::zoomCamera(float delta) {
 	activeCamera->zoom(delta);
+}
+
+void Scene::moveCamera(vec3 delta)
+{
+	if (viewMode == ViewMode::diagram) {
+		activeCamera->move(delta);
+	}
 }
 
 
@@ -247,18 +254,47 @@ void Scene::toggleSelected()
 
 void Scene::selectByClick(float cX, float cY)
 {
+	Entity* entity = getUnderCursor(cX, cY);
+	if (entity != nullptr) {
+		if (selected != nullptr) {
+			selected->deselect();
+		}
+		selected = entity;
+		selected->select();
+	}
+}
+
+void Scene::mouseMoved(float cX, float cY)
+{
+	Entity* entity = getUnderCursor(cX, cY);
+	if (entity != hovered) {
+		if (hovered != nullptr) {
+			hovered->endHover();
+		}
+		if (entity != nullptr) {
+			hovered = entity;
+			hovered->hover();
+		}
+		else {
+			hovered = nullptr;
+		}
+	}
+}
+
+Entity* Scene::getUnderCursor(float cX, float cY)
+{
 	if (!objects.empty()) {		// There are objects in the scene.
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
 
 		//For testing:
 		vec4 eye = vec4(activeCamera->getEye().x, activeCamera->getEye().y, 0, activeCamera->getEye().z);
-		WorldLine* line = new GeodeticLine(vec4(0,0,0,0), vec4(ray.dir.x, ray.dir.y, 0, ray.dir.z), "Click ray", "");
+		WorldLine* line = new GeodeticLine(vec4(0, 0, 0, 0), vec4(ray.dir.x, ray.dir.y, 0, ray.dir.z), "Click ray", "");
 		linesToDisplay.push_back(line);
 
 
 		int selectionIdx = -1;			// index of the selected object
 		if (viewMode == ViewMode::diagram) {								// Diagram view
-			float constraint = 0.5f;
+			float constraint = 0.2f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray);		// First item handled separately.
 			if (constraint > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
@@ -272,7 +308,6 @@ void Scene::selectByClick(float cX, float cY)
 			}
 		}
 		else if (viewMode == ViewMode::realTime3D) {						// RealTime3D view
-			float constraint = 1.0f;		// greater constraint
 			Intersectable* intersectable;
 			if (intersectionMode == IntersectionMode::lightCone) {
 				intersectable = activeObserver->getLightCone();
@@ -282,12 +317,12 @@ void Scene::selectByClick(float cX, float cY)
 			}
 			// First item handled separately:
 			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
-			if (constraint > shortestDistance && shortestDistance > 0) {
+			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
 				float d = objects[i]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
-				if ( (shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
+				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
 				}
@@ -296,13 +331,10 @@ void Scene::selectByClick(float cX, float cY)
 		}
 
 		if (selectionIdx >= 0) {
-			if (selected != nullptr) {
-				selected->deselect();
-			}
-			selected = objects[selectionIdx];
-			selected->select();
+			return objects[selectionIdx];
 		}
 	}
+	return nullptr;
 }
 
 void Scene::save(const char* destinationFile)

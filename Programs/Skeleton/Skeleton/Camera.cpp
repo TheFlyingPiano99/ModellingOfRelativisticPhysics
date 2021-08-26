@@ -87,6 +87,24 @@ void Camera::rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngl
 	setLookat(lookat);
 }
 
+void Camera::move(vec3 delta)
+{
+	vec3 face = cross(prefUp, vRight);
+	vec4 wDir4 = vec4(delta.x, delta.y, delta.z, 0)		// move in deltaZ = 0 plane.
+		* mat4(
+		face.x, face.y, face.z, 0,
+		vRight.x, vRight.y, vRight.z, 0,
+		prefUp.x, prefUp.y, prefUp.z, 0,
+		0, 0, 0, 1);
+
+	vec3 wDir = vec3(wDir4.x, wDir4.y, wDir4.z);
+	eye = eye + wDir;
+	lookat = lookat + wDir;
+	startPosFV = startPosFV + vec4(wDir.x, wDir.y, wDir.z, 0);
+	locationFV = locationFV + vec4(wDir.x, wDir.y, wDir.z, 0);
+	// Not correct transformation of four vectors!!! Shoud be transformed in simultaneity!
+}
+
 void Camera::zoom(float delta) {
 	fov *= delta;
 	if (fov > M_PI)

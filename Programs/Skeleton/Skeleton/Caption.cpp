@@ -145,10 +145,13 @@ void Caption::genGeometry()
 		vds.push_back(bottomRight);
 		vds.push_back(topRight);
 	}
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vds.size() * sizeof(VertexData), &vds[0], GL_STATIC_DRAW);
+
 	noOfVds = vds.size();
+	if (noOfVds > 0) {
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vds.size() * sizeof(VertexData), &vds[0], GL_STATIC_DRAW);
+	}
 }
 
 void Caption::changeText(const char* str)

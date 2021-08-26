@@ -131,5 +131,11 @@ public:
 	* Returns 3D position perceived by the observer.
 	*/
 	vec3 perceivedPosition(Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+
+	float getOverallRadius() {
+		return geometry->getOverallRadius();
+	}
+
+	void hover();
 };
 

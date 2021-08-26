@@ -15,6 +15,7 @@ class Entity
 protected:
 
 	bool selected = false;
+	bool hovered = false;
 	std::string name;
 	std::string description;
 
@@ -70,5 +71,12 @@ public:
 
 	void select();
 	void deselect();
+
+	/*
+	* The cursor is hovering over the entity.
+	*/
+	void hover();
+
+	void endHover();
 };
 

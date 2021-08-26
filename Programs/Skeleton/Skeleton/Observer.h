@@ -97,5 +97,7 @@ public:
 	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
 		worldLine = worldLines.at(worldLineID);
 	}
+
+	void hover();
 };
 

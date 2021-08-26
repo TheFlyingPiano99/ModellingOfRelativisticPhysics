@@ -70,6 +70,18 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	if (key == 'o') {
 		scene->toggleSelected();
 	}
+	if (key == '[') {	// forward
+		scene->moveCamera(vec3(1, 0, 0) * 0.3f);
+	}
+	if (key == '\'') {	// backward
+		scene->moveCamera(vec3(-1, 0, 0) * 0.3f);
+	}
+	if (key == ';') {	// left
+		scene->moveCamera(vec3(0, -1, 0) * 0.3f);
+	}
+	if (key == '\\') {	// right
+		scene->moveCamera(vec3(0, 1, 0) * 0.3f);
+	}
 
 
 }
@@ -99,9 +111,10 @@ void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the 
 
 	if (down) {
 		prevDown = true;
-		scene->moveCamera(deltaX, deltaY);
-		glutPostRedisplay();
+		scene->panCamera(deltaX, deltaY);
 	}
+
+	scene->mouseMoved(cX, cY);
 
 	prevCX = cX;
 	prevCY = cY;

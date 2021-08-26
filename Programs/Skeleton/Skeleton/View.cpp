@@ -14,13 +14,17 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	else if (scene->getIntersectionMode() == IntersectionMode::hyperplane) {
 		intersectable = scene->getActiveObserver()->getHyperplane();
 	}
-
 	for each (LightSource * lt in *(scene->getLights()))
 	{
 		lt->loadOnGPU(gpuProgram);								// Load lights
 	}
 
+	gpuProgram.setUniform(false, "doLorentz");
+	gpuProgram.setUniform(1, "intersectionMode");
 	scene->getBackground()->Draw(gpuProgram, *(activeCamera));		// Background
+	gpuProgram.setUniform(scene->getDoLorentz(), "doLorentz");
+	gpuProgram.setUniform(scene->getIntersectionMode(), "intersectionMode");
+
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *intersectable, scene->getDoLorentz());					// Objects
@@ -29,13 +33,7 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	{
 		cap->Draw(gpuProgram, *activeCamera);
 	}
-
-	/*
-	//Testing:
-	for each (WorldLine* line in scene->getLines()) {
-		line->Draw();
-	}
-	*/
+	delete intersectable;
 }
 
 void DiagramView::Draw(GPUProgram& gpuProgram) {
@@ -46,7 +44,6 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	}
 
 	//Actual drawing:
-	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
 	Camera* activeCamera = scene->getActiveCamera();
 	Intersectable* intersectable;
 	if (scene->getIntersectionMode() == IntersectionMode::lightCone) {
@@ -71,4 +68,6 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		cap->DrawDiagram(gpuProgram, *activeCamera);
 	}
+	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
+	delete intersectable;
 }
