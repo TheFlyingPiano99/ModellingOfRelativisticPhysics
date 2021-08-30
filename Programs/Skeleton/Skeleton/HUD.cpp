@@ -62,8 +62,10 @@ bool HUD::type(char c)
 	if (entry != nullptr) {
 		bool isFinished = entry->type(c);
 		if (isFinished) {
-			delete entry;
-			entry = nullptr;
+			if (entry != nullptr) {
+				delete entry;
+				entry = nullptr;
+			}
 			return true;
 		}
 	}
@@ -72,12 +74,15 @@ bool HUD::type(char c)
 
 void HUD::clearCaptions()
 {
+	messageQueue->clearQueue();
+	if (entry != nullptr) {
+		entry->deleteCaptions();
+	}
 	std::vector<Caption*> copy = captions;
 	for each (Caption * cap in copy)				// Captions
 	{
 		delete cap;
 	}
-	messageQueue->clearQueue();
 }
 
 void pushCaptionHandler(Caption* captionToPush)

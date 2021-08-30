@@ -2,8 +2,12 @@
 #include "HUD.h"
 
  TextEntry::~TextEntry() {
-	 delete tytle;
-	 delete entered;
+	 if (tytle != nullptr) {
+		 delete tytle;
+	 }
+	 if (entered != nullptr) {
+		 delete entered;
+	 }
 }
 
 bool TextEntry::type(char c)
@@ -23,4 +27,16 @@ bool TextEntry::type(char c)
 	}
 	entered->changeText(entry.c_str());
 	return false;			// Not finished
+}
+
+void TextEntry::deleteCaptions()
+{
+	if (tytle != nullptr) {
+		delete tytle;
+		tytle = NULL;
+	}
+	if (entered != nullptr) {
+		delete entered;
+		entered = NULL;
+	}
 }

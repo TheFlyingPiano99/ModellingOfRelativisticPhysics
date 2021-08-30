@@ -33,7 +33,9 @@ public:
 
 	~HUD() {
 		delete messageQueue;
-		delete entry;
+		if (entry != nullptr) {
+			delete entry;
+		}
 		for each (Caption * cap in captions)
 		{
 			delete cap;

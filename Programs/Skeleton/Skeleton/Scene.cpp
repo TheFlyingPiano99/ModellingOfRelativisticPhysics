@@ -37,7 +37,8 @@ void Scene::Initialise()
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 	diagramLights.push_back(new LightSource(vec3(-1, -1, 1), vec3(1, 1, 1), 2));
 
-	//Observers:-------------------------------------------------
+	/*
+		//Observers:-------------------------------------------------
 	//1.:
 	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
 	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
@@ -75,6 +76,8 @@ void Scene::Initialise()
 		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "");
 		objects.push_back(Object::createDice(wrdln));
 	}
+	*/
+
 
 	// Captions:-------------------------------------------------------
 
@@ -85,8 +88,11 @@ void Scene::Initialise()
 	// Coordinate system:----------------------------------------------
 	system = new CoordinateSystem();
 
+	// Load from file:-------------------------------------------------
+	load("defaultSave01.txt");
+
 	// Other:----------------------------------------------------------
-	toggleActiveObserver();
+	//toggleActiveObserver();
 }
 
 void Scene::Control(float dt) {
@@ -95,7 +101,7 @@ void Scene::Control(float dt) {
 		if (finishedLoading) {
 			finishedLoading = false;
 			loadingScene = false;
-			loadThread->join();
+			//loadThread->join();
 			delete loadThread;
 			Scene::getInstance()->getHUD()->pushMessage("Scene loaded.");
 		}
@@ -541,49 +547,6 @@ void Scene::save(const char* destinationFile)
 
 void loadThreadFunction(std::ifstream* file)
 {
-	std::map<int, WorldLine*> worldLines;	// map<ID, pointer>
-	std::string line;
-	while (getline(*file, line)) {
-		std::vector<std::string> words;
-		words = split(line, ' ');
-		if (words.empty()) {									// Empty line
-			continue;
-		}
-		else if (words.at(0).at(0) == '#') {					// Comment
-			continue;
-		}
-		else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
-			WorldLine* wrdLn = GeodeticLine::loadFromFile(*file);
-			if (wrdLn != nullptr) {
-				worldLines.insert({ wrdLn->getID(), wrdLn });
-			}
-		}
-		else if (words.at(0).compare("Observer") == 0) {		// Observer
-			Observer* obs = Observer::loadFromFile(*file);
-			if (obs != nullptr) {
-				Scene::getInstance()->getObservers()->push_back(obs);
-			}
-		}
-		else if (words.at(0).compare("Object") == 0) {		// Object
-			Object* obj = Object::loadFromFile(*file);
-			if (obj != nullptr) {
-				Scene::getInstance()->getObjects()->push_back(obj);
-			}
-		}
-	}
-
-	// Linking objects (WorldLines to Obserers and Objects):
-	for (const auto& obs : *(Scene::getInstance()->getObservers())) {
-		obs->setWorldLine(worldLines);
-	}
-	for (const auto& obj : *(Scene::getInstance()->getObjects())) {
-		obj->setWorldLine(worldLines);
-	}
-
-	Scene::getInstance()->toggleActiveObserver();
-	file->close();
-	delete file;
-	Scene::getInstance()->setFinishedLoading(true);
 }
 
 
@@ -602,8 +565,50 @@ void Scene::load(const char* sourceFileName)
 		entryMode = false;
 		loadingScene = true;
 		finishedLoading = false;
-		loadThread = new std::thread(loadThreadFunction, file);
+		//loadThread = new std::thread(loadThreadFunction, file);
+		std::map<int, WorldLine*> worldLines;	// map<ID, pointer>
+		std::string line;
+		while (getline(*file, line)) {
+			std::vector<std::string> words;
+			words = split(line, ' ');
+			if (words.empty()) {									// Empty line
+				continue;
+			}
+			else if (words.at(0).at(0) == '#') {					// Comment
+				continue;
+			}
+			else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
+				WorldLine* wrdLn = GeodeticLine::loadFromFile(*file);
+				if (wrdLn != nullptr) {
+					worldLines.insert({ wrdLn->getID(), wrdLn });
+				}
+			}
+			else if (words.at(0).compare("Observer") == 0) {		// Observer
+				Observer* obs = Observer::loadFromFile(*file);
+				if (obs != nullptr) {
+					Scene::getInstance()->getObservers()->push_back(obs);
+				}
+			}
+			else if (words.at(0).compare("Object") == 0) {		// Object
+				Object* obj = Object::loadFromFile(*file);
+				if (obj != nullptr) {
+					Scene::getInstance()->getObjects()->push_back(obj);
+				}
+			}
+		}
 
+		// Linking objects (WorldLines to Obserers and Objects):
+		for (const auto& obs : *(Scene::getInstance()->getObservers())) {
+			obs->setWorldLine(worldLines);
+		}
+		for (const auto& obj : *(Scene::getInstance()->getObjects())) {
+			obj->setWorldLine(worldLines);
+		}
+
+		Scene::getInstance()->toggleActiveObserver();
+		file->close();
+		delete file;
+		Scene::getInstance()->setFinishedLoading(true);
 	}
 	else {
 		Scene::getInstance()->getHUD()->pushMessage("Cannot load scene!");

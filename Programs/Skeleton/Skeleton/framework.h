@@ -30,7 +30,7 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = false;
+const bool fullScreenMode = true;
 
 
 //--------------------------

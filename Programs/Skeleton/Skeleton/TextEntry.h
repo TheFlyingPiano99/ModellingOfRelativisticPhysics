@@ -8,8 +8,8 @@ class TextEntry
 	void* owner;
 	vec2 pos;
 	std::string entry;
-	Caption* tytle;
-	Caption* entered;
+	Caption* tytle = NULL;
+	Caption* entered = NULL;
 	void (*handler)(const char*);
 public:
 
@@ -18,7 +18,7 @@ public:
 		pos(_pos),
 		entry(),
 		tytle(Caption::createNormalCameraSpaceCaption(_pos, _tytle)),
-		entered(Caption::createNormalCameraSpaceCaption(_pos - vec2(0, 0.3f), "")),
+		entered(Caption::createNormalCameraSpaceCaption(_pos - vec2(0, 0.1f), "")),
 		handler(_handler)
 	{
 
@@ -34,5 +34,7 @@ public:
 	std::string& getEntry() {
 		return entry;
 	}
+
+	void deleteCaptions();
 };
 
