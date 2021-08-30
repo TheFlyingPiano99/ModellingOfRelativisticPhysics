@@ -2,14 +2,15 @@
 
 #include "framework.h"
 #include "Caption.h"
+#include <memory>
 
 class TextEntry
 {
 	void* owner;
 	vec2 pos;
 	std::string entry;
-	Caption* tytle = NULL;
-	Caption* entered = NULL;
+	std::shared_ptr<Caption*> tytle;
+	std::shared_ptr<Caption*> entered;
 	void (*handler)(const char*);
 public:
 
@@ -34,7 +35,5 @@ public:
 	std::string& getEntry() {
 		return entry;
 	}
-
-	void deleteCaptions();
 };
 

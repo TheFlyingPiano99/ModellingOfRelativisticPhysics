@@ -51,7 +51,7 @@ class Scene {
 	bool allowQuit = false;
 	bool loadingScene = false;
 	bool finishedLoading = false;
-	std::thread* loadThread;
+	//std::thread* loadThread;
 
 	Scene() {}
 
@@ -91,10 +91,13 @@ public:
 		delete background;
 		delete system;
 		delete hud;
+		/*
 		if (loadThread != nullptr && loadThread->joinable()) {
 			loadThread->join();
 		}
 		delete loadThread;
+		*/
+
 	}
 
 	/*

@@ -80,11 +80,11 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	// Caption:
 	if (selected || hovered) {		
 		vec3 pos = perceivedPosition(&intersectable, doLorentz, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
-		diagramCaption->setPos(pos	+ normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
-		diagramCaption->setVisible(true);
+		(*diagramCaption)->setPos(pos	+ normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
+		(*diagramCaption)->setVisible(true);
 	}
 	else {
-		diagramCaption->setVisible(false);
+		(*diagramCaption)->setVisible(false);
 	}
 }
 
@@ -111,11 +111,11 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
 		vec4 pos = worldLine->getLocationAtAbsoluteTime(t);
-		diagramCaption->setPos(vec3(pos.x, pos.y, pos.w));
-		diagramCaption->setVisible(true);
+		(*diagramCaption)->setPos(vec3(pos.x, pos.y, pos.w));
+		(*diagramCaption)->setVisible(true);
 	}
 	else {
-		diagramCaption->setVisible(false);
+		(*diagramCaption)->setVisible(false);
 	}
 }
 

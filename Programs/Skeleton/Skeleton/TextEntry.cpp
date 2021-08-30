@@ -2,13 +2,9 @@
 #include "HUD.h"
 
  TextEntry::~TextEntry() {
-	 if (tytle != nullptr) {
-		 delete tytle;
-	 }
-	 if (entered != nullptr) {
-		 delete entered;
-	 }
-}
+	 (*tytle)->erease();
+	 (*entered)->erease();
+ }
 
 bool TextEntry::type(char c)
 {
@@ -25,18 +21,6 @@ bool TextEntry::type(char c)
 	else {
 		entry += c;
 	}
-	entered->changeText(entry.c_str());
+	(*entered)->changeText(entry.c_str());
 	return false;			// Not finished
-}
-
-void TextEntry::deleteCaptions()
-{
-	if (tytle != nullptr) {
-		delete tytle;
-		tytle = NULL;
-	}
-	if (entered != nullptr) {
-		delete entered;
-		entered = NULL;
-	}
 }

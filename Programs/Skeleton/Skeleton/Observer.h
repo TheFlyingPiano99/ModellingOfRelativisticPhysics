@@ -9,15 +9,15 @@
 #include "Caption.h"
 #include <map>
 #include "EnumTypes.h"
-
+#include <memory>
 
 class Observer : public Entity
 {
 	WorldLine* worldLine = NULL;
 	float currentProperTime = 0.0f;
 	int worldLineID = 0;
-	Caption* diagramCaption;
-	Caption* timerCaption;		// Displays the current proper time in diagram view.
+	std::shared_ptr<Caption*> diagramCaption;
+	std::shared_ptr<Caption*> timerCaption;		// Displays the current proper time in diagram view.
 
 public:
 
@@ -25,14 +25,14 @@ public:
 		: Entity(_name, _desc), worldLine(_worldLine) {
 		diagramCaption = Caption::createNormalCaption(vec3(0, 0, 0), name.c_str());
 		timerCaption = Caption::createNormalCaption(vec3(0, 0, 0), "");
-		diagramCaption->setVisible(false);
-		timerCaption->setVisible(false);
+		(*diagramCaption)->setVisible(false);
+		(*timerCaption)->setVisible(false);
 	}
 
 	~Observer() {
 		delete worldLine;
-		delete diagramCaption;
-		delete timerCaption;		// static
+		(*diagramCaption)->erease();
+		(*timerCaption)->erease();		// static
 	}
 
 	vec4 getLocation();

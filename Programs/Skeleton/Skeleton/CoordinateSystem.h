@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Caption.h"
 #include <string>
+#include <memory>
 
 class CoordinateSystem {
 	unsigned int vao[3];
@@ -14,8 +15,8 @@ class CoordinateSystem {
 	vec3 base[3];
 	vec3 color[3];
 	std::string name[3];
-	Caption* axisName[3];
-	Caption* negAxisName[3];
+	std::shared_ptr<Caption*> axisName[3];
+	std::shared_ptr<Caption*> negAxisName[3];
 
 	void drawAxis(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx, const vec3 center);
 	void drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center, const float density);
@@ -38,10 +39,10 @@ public:
 		float nameDist = 50;
 		for (int i = 0; i < 3; i++) {
 			axisName[i] = Caption::createNormalCaption(base[i] * nameDist, name[i].c_str());
-			axisName[i]->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));
+			(*axisName[i])->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));
 
 			negAxisName[i] = Caption::createNormalCaption(base[i] * -nameDist, std::string("-").append(name[i]).c_str());
-			negAxisName[i]->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));
+			(*negAxisName[i])->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));
 		}
 
 		genGeometry(base[0], &vao[0], &vbo[0]);
@@ -57,12 +58,10 @@ public:
 		glDeleteVertexArrays(1, &vao[1]);
 		glDeleteVertexArrays(1, &vao[2]);
 
-		delete axisName[0];
-		delete axisName[1];
-		delete axisName[2];
-		delete negAxisName[0];
-		delete negAxisName[1];
-		delete negAxisName[2];
+		for (int i = 0; i < 3; i++) {
+			(*axisName[i])->erease();
+			(*negAxisName[i])->erease();
+		}
 	}
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);

@@ -11,7 +11,7 @@
 #include "EnumTypes.h"
 #include <map>
 #include "Caption.h"
-
+#include <memory>
 
 class Object : public Entity
 {
@@ -25,7 +25,7 @@ class Object : public Entity
 	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
 	ObjectType type = none;
 	int worldLineID = 0;
-	Caption* diagramCaption;
+	std::shared_ptr<Caption*> diagramCaption;
 
 public:
 
@@ -60,7 +60,7 @@ public:
 
 	~Object() {
 		delete worldLine;
-		delete diagramCaption;
+		(*diagramCaption)->erease();
 	}
 
 	void setType(ObjectType _type) {

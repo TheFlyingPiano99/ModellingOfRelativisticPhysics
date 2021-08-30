@@ -1,11 +1,17 @@
 #include "Message.h"
 #include "Scene.h"
+#include "HUD.h"
 
+MessageQueue::~MessageQueue() {
+	for each (std::shared_ptr<Caption*> cap in queue) {
+		(*cap)->erease();
+	}
+}
 
 void MessageQueue::push(const char* text)
 {
 	vec3 pos = startPos + entryOffset * queue.size();
-	Caption* caption = Caption::createSmallCameraSpaceCaption(vec2(pos.x, pos.y), text);
+	std::shared_ptr<Caption*> caption = Caption::createSmallCameraSpaceCaption(vec2(pos.x, pos.y), text);
 	if (queue.empty()) {
 		timeLeft = displayTime;
 		transitPhase = false;
@@ -27,15 +33,15 @@ void MessageQueue::Animate(float dt) {
 		}
 		else {					// Change state to transit
 			transitPhase = true;
-			Caption* caption = queue.front();			// Pop queue
-			delete caption;
+			std::shared_ptr<Caption*> caption = queue.front();			// Pop queue
 			queue.pop_front();
+			(*caption)->erease();
 			timeLeft = transitTime;
 		}
 	}
 	if (transitPhase) {		// Move entries
 		for (int i = 0; i < queue.size(); i++) {			// Interpolate position between prev and next pos.
-			queue[i]->setPos((startPos + entryOffset * (i + 1)) * timeLeft / transitTime
+			(*queue[i])->setPos((startPos + entryOffset * (i + 1)) * timeLeft / transitTime
 				+ (startPos + entryOffset * (i) ) * (1 - timeLeft / transitTime) );
 		}
 	}

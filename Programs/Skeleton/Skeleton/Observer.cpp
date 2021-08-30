@@ -33,8 +33,8 @@ LightCone* Observer::getLightCone()
 
 void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
 {
-	diagramCaption->setVisible(false);
-	timerCaption->setVisible(false);
+	(*diagramCaption)->setVisible(false);
+	(*timerCaption)->setVisible(false);
 }
 
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
@@ -45,8 +45,8 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "outline");	
-	diagramCaption->setVisible(false);
-	timerCaption->setVisible(false);
+	(*diagramCaption)->setVisible(false);
+	(*timerCaption)->setVisible(false);
 
 	worldLine->Draw();
 }
@@ -104,14 +104,16 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMo
 	if (updateCounter++ > 30) {		// Reduced refresh rate.
 		prevTau = currentProperTime;
 		updateCounter = 0;
-		timerCaption->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
+		(*timerCaption)->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
 			.append("t = ").append(std::to_string(worldLine->getAbsoluteTimeAtProperTime(currentProperTime))).append(" m").c_str());
 	}
 	vec4 pos = getLocation();
-	timerCaption->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
-	timerCaption->setVisible(selected);
-	diagramCaption->setVisible(true);
-	timerCaption->setVisible(true);
+	(*timerCaption)->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
+	(*timerCaption)->setVisible(selected);
+	pos = getStartPos();
+	(*diagramCaption)->setPos(vec3(pos.x, pos.y, pos.w));
+	(*diagramCaption)->setVisible(true);
+	(*timerCaption)->setVisible(true);
 }
 
 void Observer::setCurrentTimeAtAbsoluteTime(float t)

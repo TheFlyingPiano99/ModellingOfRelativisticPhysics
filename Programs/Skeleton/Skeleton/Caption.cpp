@@ -1,8 +1,8 @@
 #include "Caption.h"
 
 
-void (*Caption::pushCaption)(Caption*) = NULL;
-void (*Caption::ereaseCaption)(Caption*) = NULL;
+void (*Caption::pushCaption)(std::shared_ptr<Caption*>) = NULL;
+void (*Caption::ereaseCaption)(std::shared_ptr<Caption*>) = NULL;
 
 mat4 Caption::M(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
 	vec3 right = normalize(cross(prefUp, norm));

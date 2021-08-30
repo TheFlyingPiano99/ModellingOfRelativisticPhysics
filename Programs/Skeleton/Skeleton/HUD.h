@@ -3,15 +3,16 @@
 #include "Camera.h"
 #include "Message.h"
 #include "TextEntry.h"
+#include <memory>
 
-void pushCaptionHandler(Caption* captionToPush);
-void ereaseCaptionHandler(Caption* captionToRemove);
+void pushCaptionHandler(std::shared_ptr<Caption*> captionToPush);
+void ereaseCaptionHandler(std::shared_ptr<Caption*> captionToRemove);
 
 class HUD
 {
 	static HUD* instance;
 	void* owner;
-	std::vector<Caption*> captions;
+	std::vector<std::shared_ptr<Caption*>> captions;
 	MessageQueue* messageQueue = NULL;
 	TextEntry* entry = NULL;
 
@@ -36,10 +37,6 @@ public:
 		if (entry != nullptr) {
 			delete entry;
 		}
-		for each (Caption * cap in captions)
-		{
-			delete cap;
-		}
 	}
 
 	void Animate(float dt);
@@ -50,8 +47,8 @@ public:
 
 	void pushMessage(const char* text);
 
-	void pushCaption(Caption* captionToPush);
-	void ereaseCaption(Caption* captionToRemove);
+	void pushCaption(std::shared_ptr<Caption*> captionToPush);
+	void ereaseCaption(std::shared_ptr<Caption*> captionToRemove);
 
 	void createTextEntry(const char* tytle, void (*handler)(const char*));
 

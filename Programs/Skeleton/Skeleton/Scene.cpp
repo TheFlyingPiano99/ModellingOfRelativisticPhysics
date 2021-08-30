@@ -102,7 +102,7 @@ void Scene::Control(float dt) {
 			finishedLoading = false;
 			loadingScene = false;
 			//loadThread->join();
-			delete loadThread;
+			//delete loadThread;
 			Scene::getInstance()->getHUD()->pushMessage("Scene loaded.");
 		}
 		return;
