@@ -54,15 +54,23 @@ public:
 	/*
 	* Creates a new Caption object. Registers the objects to the scene and returns a pointer to the object.
 	*/
-	static Caption* createNormalCaption(vec3 pos, const char* text) {
-		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.03f, vec3(1,1,1), text);
+	static Caption* createNormalCaption(vec3 pos, const char* text, vec3 _color = vec3(1, 1, 1)) {
+		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.03f, _color, text);
 		sceneCaptions->push_back(caption);
 		return caption;
 	}
 
 	static Caption* createNormalCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
 
-		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, vec3(0.9f, 1, 1), text);
+		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, _color, text);
+		caption->setCameraSpace(true);
+		sceneCaptions->push_back(caption);
+		return caption;
+	}
+
+	static Caption* createSmallCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
+
+		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.023f, _color, text);
 		caption->setCameraSpace(true);
 		sceneCaptions->push_back(caption);
 		return caption;

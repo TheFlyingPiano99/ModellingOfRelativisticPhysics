@@ -5,7 +5,7 @@
 void MessageQueue::push(const char* text)
 {
 	vec3 pos = startPos + entryOffset * queue.size();
-	Caption* caption = Caption::createNormalCameraSpaceCaption(vec2(pos.x, pos.y), text);
+	Caption* caption = Caption::createSmallCameraSpaceCaption(vec2(pos.x, pos.y), text);
 	if (queue.empty()) {
 		timeLeft = displayTime;
 		transitPhase = false;

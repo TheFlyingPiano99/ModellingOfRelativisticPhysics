@@ -2,16 +2,18 @@
 #include "framework.h"
 #include "Camera.h"
 #include "Message.h"
+#include "TextEntry.h"
 
 class HUD
 {
 	void* owner;
 	std::vector<Caption*> captions;
 	MessageQueue* messageQueue = NULL;
+	TextEntry* entry;
 
 public:
 
-	HUD(void* _owner) : owner(_owner), messageQueue(new MessageQueue(this, vec3(0.5f, 0.8f, 0))) {
+	HUD(void* _owner) : owner(_owner), messageQueue(new MessageQueue(this, vec3(0.6f, 0.95f, 0))) {
 		Caption::setCaptionVectorReference(&captions);
 	}
 
@@ -34,5 +36,8 @@ public:
 
 	void removeCaption(Caption* captionToRemove);
 
+	void createTextEntry(const char* tytle);
+
+	void type(char c);
 };
 

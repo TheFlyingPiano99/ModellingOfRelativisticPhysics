@@ -50,6 +50,10 @@ public:
 		return eye;
 	}
 
+	float getAspectRatio() {
+		return asp;
+	}
+
 	vec3 getPrefUp() {
 		return prefUp;
 	}

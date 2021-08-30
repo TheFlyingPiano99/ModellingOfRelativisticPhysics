@@ -89,10 +89,11 @@ void Scene::Initialise()
 
 void Scene::Control(float dt) {
 	
-	while (!controlEvents.empty()) {
-		ControlEvent event = controlEvents.back();
-		controlEvents.pop_back();
-		switch (event) {
+	if (!entryMode) {
+		while (!controlEvents.empty()) {
+			ControlEvent event = controlEvents.back();
+			controlEvents.pop_back();
+			switch (event) {
 			case ControlEvent::toggleObserver:
 				toggleActiveObserver();
 				break;
@@ -141,7 +142,12 @@ void Scene::Control(float dt) {
 			case ControlEvent::moveCameraRight:
 				moveCamera(vec3(0, 1, 0) * cameraVelocity * dt);
 				break;
+			case ControlEvent::save:		// Test
+				entryMode = true;
+				hud->createTextEntry("Text entry: enter text!");
+				break;
 			defualt: break;
+			}
 		}
 	}
 
@@ -203,15 +209,20 @@ void Scene::toggleActiveObserver() {
 	}
 }
 
+void Scene::type(char c)
+{
+	hud->type(c);
+}
+
 // Camera controls:
 
 void Scene::panCamera(float cx, float cy) {
 	static float camSpeed = 0.01f;
 	if (viewMode == realTime3D) {
-		realTime3DCamera->rotateAroundEye(cx, -cy);
+		realTime3DCamera->rotateAroundEye(cx * realTime3DCamera->getAspectRatio(), -cy);
 	}
 	else if (viewMode == diagram) {
-		diagramCamera->rotateAroundLookat(cx, -cy);
+		diagramCamera->rotateAroundLookat(cx * diagramCamera->getAspectRatio(), -cy);
 	}
 }
 
@@ -372,7 +383,11 @@ void Scene::toggleSelected()
 		}
 		selected = objects[currentIdx];
 		selected->select();
-		hud->pushMessage(std::string("Selected object: ").append(selected->getName()).c_str());
+		hud->pushMessage(std::string("Selected object: ")
+			.append(selected->getName())
+			.append(" ")
+			.append(std::to_string(selected->getID()))
+			.c_str());
 	}
 }
 

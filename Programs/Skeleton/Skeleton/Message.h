@@ -12,7 +12,7 @@ class MessageQueue
 	bool transitPhase = false;
 	void* owner;
 	vec3 startPos;
-	vec3 entryOffset = vec3(0, -0.05f, 0);
+	vec3 entryOffset = vec3(0, -0.03f, 0);
 
 public:
 	MessageQueue(void* _owner, vec3 pos): owner(_owner), startPos(pos) {

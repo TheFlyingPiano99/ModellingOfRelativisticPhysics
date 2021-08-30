@@ -29,7 +29,8 @@
 #endif
 
 // Resolution of screen
-const unsigned int windowWidth = 1024, windowHeight = 768;
+const unsigned int windowWidth = 1920, windowHeight = 1080;
+const bool fullScreenMode = true;
 
 //--------------------------
 struct vec2 {

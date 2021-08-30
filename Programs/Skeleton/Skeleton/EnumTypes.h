@@ -39,5 +39,7 @@ enum ControlEvent {
 	zoomOut,
 	windTime,
 	rewindTime,
-	toggleLorentz
+	toggleLorentz,
+	save,
+	load
 };

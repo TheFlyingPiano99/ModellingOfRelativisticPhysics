@@ -32,6 +32,7 @@ void onIdle();
 
 // Entry point of the application
 int main(int argc, char * argv[]) {
+
 	// Initialize GLUT, Glew and OpenGL 
 	glutInit(&argc, argv);
 
@@ -48,6 +49,9 @@ int main(int argc, char * argv[]) {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
 	glutCreateWindow(argv[0]);
+	if (fullScreenMode) {
+		glutFullScreen();							// Full screen
+	}
 
 #if !defined(__APPLE__)
 	glewExperimental = true;	// magic
@@ -63,7 +67,6 @@ int main(int argc, char * argv[]) {
 
 	// Initialize this program and create shaders
 	onInitialization();
-
 	glutDisplayFunc(onDisplay);                // Register event handlers
 	glutMouseFunc(onMouse);
 	glutIdleFunc(onIdle);
@@ -71,6 +74,8 @@ int main(int argc, char * argv[]) {
 	glutKeyboardUpFunc(onKeyboardUp);
 	glutMotionFunc(onMouseMotion);
 	glutPassiveMotionFunc(onMouseMotion);
+	HWND hWnd = GetConsoleWindow();
+	ShowWindow(hWnd, SW_HIDE);
 
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 	glutMainLoop();

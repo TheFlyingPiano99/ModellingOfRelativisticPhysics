@@ -45,6 +45,8 @@ class Scene {
 	bool running = false;
 	bool doLorentz = true;
 	bool doShading = true;
+	bool entryMode = false;
+
 public:
 
 
@@ -92,6 +94,9 @@ public:
 	void Draw(GPUProgram& gpuProgram);
 
 	void toggleActiveObserver();
+
+	// Typing
+	void type(char c);
 
 	// Camera controls:
 	void panCamera(float cx, float cy);

@@ -43,3 +43,15 @@ void HUD::removeCaption(Caption* captionToRemove)
 		captions.erase(captions.begin() + index);
 	}
 }
+
+void HUD::createTextEntry(const char* tytle)
+{
+	entry = new TextEntry(this, vec2(0,0), tytle);
+}
+
+void HUD::type(char c)
+{
+	if (entry != nullptr) {
+		entry->type(c);
+	}
+}

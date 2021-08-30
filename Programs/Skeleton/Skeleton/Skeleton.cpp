@@ -4,6 +4,9 @@
 #include "EnumTypes.h"
 
 // Initialization, create an OpenGL context
+
+int windowID = 0;
+
 void onInitialization() {
 
 	glViewport(0, 0, windowWidth, windowHeight);
@@ -13,7 +16,8 @@ void onInitialization() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	gpuProgram.create(vertexSource, fragmentSource, "outColor");
-
+	windowID = glutGetWindow();
+	
 	scene = new Scene();
 	scene->Initialise();
 }
@@ -30,6 +34,8 @@ void onDisplay() {
 
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
+
+	scene->type(key);
 
 	if (key == 'c') {
 		scene->pushBackControlEvent(toggleObserver);
@@ -80,6 +86,12 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	}
 	else if (key == '\\') {	// right
 		scene->pushBackControlEvent(moveCameraRight);
+	}
+	else if (key == 27) {		// Escape
+		glutDestroyWindow(windowID);
+	}
+	else if (key == 'w') {
+		scene->pushBackControlEvent(save);
 	}
 
 }
