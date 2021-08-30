@@ -43,11 +43,11 @@ public:
 		return ID;
 	}
 
-	std::string getTytle() {
+	std::string getName() {
 		return name;
 	}
 
-	const std::string getTytle() const {
+	const std::string getName() const {
 		return name;
 	}
 

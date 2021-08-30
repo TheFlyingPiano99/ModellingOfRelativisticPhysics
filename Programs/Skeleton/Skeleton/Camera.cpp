@@ -51,6 +51,15 @@ mat4 Camera::P() {
 		0, 0, b, 0);
 }
 
+vec3 Camera::cameraSpaceToWorldSpace(vec2 cPos)
+{
+	float l = length(lookat - eye);
+	return 
+		lookat
+		+ vRight * cPos.x * tanf(fov / 2.0f) * asp * l
+		+ vUp * cPos.y * tanf(fov / 2.0f) * l;
+}
+
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
 	gpuProgram.setUniform(eye, "wEye");
 }
@@ -114,12 +123,8 @@ void Camera::zoom(float delta) {
 }
 
 Ray Camera::getRayFromCameraCoord(vec2 cPos) {
-
-	float l = length(lookat - eye);
-	vec3 wPos =
-		lookat
-		+ vRight * cPos.x * tanf(fov / 2.0f) * asp * l
-		+ vUp * cPos.y * tanf(fov / 2.0f) * l;
+	
+	vec3 wPos = cameraSpaceToWorldSpace(cPos);
 
 	return Ray(eye, normalize(wPos - eye));
 }

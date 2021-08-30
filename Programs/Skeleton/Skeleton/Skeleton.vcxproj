@@ -85,9 +85,11 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="framework.cpp" />
     <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
     <ClCompile Include="LightCone.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
@@ -112,8 +114,10 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="StringOperations.h" />

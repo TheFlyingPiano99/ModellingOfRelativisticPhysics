@@ -182,7 +182,7 @@ public:
 	*/
 
 
-	//virtual void Draw(GPUProgram& gpuProgram) {
+	//virtual void DrawDiagram(GPUProgram& gpuProgram) {
 	//	glBindVertexArray(vao);
 	//	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//	//gpuProgram.setUniform(depthShading, "depthShading");

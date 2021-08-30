@@ -44,6 +44,14 @@ void CoordinateSystem::genGeometry(vec3 base, unsigned int* vao, unsigned int* v
 
 void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
 {
+    for (int i = 0; i < 3; i++) {
+        axisName[i]->setVisible(false);
+        negAxisName[i]->setVisible(false);
+    }
+}
+
+void CoordinateSystem::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
+{
     gpuProgram.setUniform(UnitMatrix(), "M");
     gpuProgram.setUniform(UnitMatrix(), "invM");
     gpuProgram.setUniform(true, "glow");
@@ -57,4 +65,9 @@ void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
     gpuProgram.setUniform(color[2], "kd");
     drawAxis(gpuProgram, camera, 2, origo);
     drawGrid(gpuProgram, camera, 0, 1, origo, 0.9);
+    for (int i = 0; i < 3; i++) {
+        axisName[i]->setVisible(true);
+        negAxisName[i]->setVisible(true);
+    }
 }
+

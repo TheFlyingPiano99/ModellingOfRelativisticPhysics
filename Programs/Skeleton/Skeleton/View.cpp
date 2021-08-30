@@ -29,11 +29,23 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	{
 		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *intersectable, scene->getDoLorentz());					// Objects
 	}
-	for each (Caption * cap in *(scene->getCaptions()))				// Captions
+	for each (Observer * obs in *(scene->getObservers()))
 	{
-		cap->Draw(gpuProgram, *activeCamera);
+		obs->Draw(gpuProgram, *activeCamera);			// Observers
 	}
+	scene->getCoordinateSystem()->Draw(gpuProgram, *activeCamera);					// Coordinate system
+	
+	scene->getHUD()->Draw(gpuProgram, *activeCamera);				// HUD
+
 	delete intersectable;
+}
+
+void RealTime3DView::transitionFrom()
+{
+}
+
+void RealTime3DView::transitionTo()
+{
 }
 
 void DiagramView::Draw(GPUProgram& gpuProgram) {
@@ -46,6 +58,7 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	//Actual drawing:
 	Camera* activeCamera = scene->getActiveCamera();
 	Intersectable* intersectable;
+	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
 	if (scene->getIntersectionMode() == IntersectionMode::lightCone) {
 		intersectable = scene->getActiveObserver()->getLightCone();
 	}
@@ -60,14 +73,18 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		obs->DrawDiagram(gpuProgram, *activeCamera);			// Observers
 	}
-	system->Draw(gpuProgram, *activeCamera);					// Coordinate system
+	((Scene*)owner)->getCoordinateSystem()->DrawDiagram(gpuProgram, *activeCamera);					// Coordinate system
 
 	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getIntersectionMode());
 
-	for each (Caption * cap in *(scene->getCaptions()))						// Captions
-	{
-		cap->DrawDiagram(gpuProgram, *activeCamera);
-	}
-	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
+	scene->getHUD()->DrawDiagram(gpuProgram, *activeCamera);			// HUD
 	delete intersectable;
+}
+
+void DiagramView::transitionFrom()
+{
+}
+
+void DiagramView::transitionTo()
+{
 }

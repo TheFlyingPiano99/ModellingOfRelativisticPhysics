@@ -1,6 +1,10 @@
 #include "Caption.h"
 
-mat4 Caption::M(vec3 norm, vec3 prefUp, float distance) {
+
+std::vector<Caption*>* Caption::sceneCaptions = NULL;
+
+
+mat4 Caption::M(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
 	vec3 right = normalize(cross(prefUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
@@ -13,7 +17,7 @@ mat4 Caption::M(vec3 norm, vec3 prefUp, float distance) {
 		* TranslateMatrix(pos);
 }
 
-mat4 Caption::invM(vec3 norm, vec3 prefUp, float distance) {
+mat4 Caption::invM(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
 	vec3 right = normalize(cross(prefUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
@@ -35,48 +39,62 @@ void Caption::Animate()
 
 void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 {	
+	if (!visible) {
+		return;
+	}
 	gpuProgram.setUniform(true, "textMode");
 	gpuProgram.setUniform(color, "kd");
 	fontTexture->loadOnGPU(gpuProgram);
 
+	vec3 wPos = (cameraSpace)? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) - camera.getEye() : pos;
 	vec3 normal = -camera.getLookDir();
-	float distance = length(pos);
-	mat4 M = this->M(normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(normal, camera.getPrefUp(), distance);
+	float distance = length(dot(wPos, normal) * normal);
+	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
+	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
 	gpuProgram.setUniform(M * camera.V() * camera.P(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
 
 	gpuProgram.setUniform(M, "M");
 	gpuProgram.setUniform(invM, "invM");
 
+	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(vao);
 	glBindBuffer(GL_VERTEX_ARRAY, vbo);
 
-	glDrawArrays(GL_TRIANGLES, 0, noOfVds);
+	glDrawArrays(GL_TRIANGLES, 0, noOfVds);			// <- DrawDiagram call
 
+	//Reset to "normal":
+	glDepthFunc(GL_LESS);
 	gpuProgram.setUniform(false, "textMode");
 }
 
 void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 {
+	if (!visible) {
+		return;
+	}
 	gpuProgram.setUniform(true, "textMode");
 	gpuProgram.setUniform(color, "kd");
 	fontTexture->loadOnGPU(gpuProgram);
 
+	vec3 wPos = (cameraSpace) ? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) : pos;
 	vec3 normal = -camera.getLookDir();
-	float distance = length(camera.getEye() - pos);
-	mat4 M = this->M(normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(normal, camera.getPrefUp(), distance);
+	float distance = length(dot(camera.getEye() - wPos, normal) * normal);
+	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
+	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
 	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");		// With camera translation matrix.
 
 
 	gpuProgram.setUniform(M, "M");
 	gpuProgram.setUniform(invM, "invM");
 
+	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(vao);
 	glBindBuffer(GL_VERTEX_ARRAY, vbo);
 
-	glDrawArrays(GL_TRIANGLES, 0, noOfVds);
-
+	glDrawArrays(GL_TRIANGLES, 0, noOfVds);			// <- DrawDiagram call
+	
+	//Reset to "normal":
+	glDepthFunc(GL_LESS);
 	gpuProgram.setUniform(false, "textMode");
 }
 
@@ -159,3 +177,4 @@ void Caption::changeText(const char* str)
 	text = std::string(str);
 	genGeometry();
 }
+

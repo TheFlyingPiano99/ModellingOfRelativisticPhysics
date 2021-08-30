@@ -9,14 +9,16 @@
 
 void Scene::Initialise()
 {
+	hud = new HUD(this);
+
 	//View:
 	view = new RealTime3DView(this);
 
 	//Camera:
 	realTime3DCamera = new Camera();
-	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
+	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
 	diagramCamera = new Camera();
-	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 100.0f);
+	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
 
 	if (viewMode == realTime3D) {
 		activeCamera = realTime3DCamera;
@@ -29,8 +31,9 @@ void Scene::Initialise()
 	lights.push_back(new LightSource(vec3(70, 50, 50), vec3(1000, 1000, 1000), 0));
 	lights.push_back(new LightSource(vec3(-60, -10, 10), vec3(500, 500, 500), 1));
 	lights.push_back(new LightSource(vec3(-1, 1, 1), vec3(0.01, 0.01, 0.01), 2));
-	diagramLights.push_back(new LightSource(vec3(10, 10, 10), vec3(0, 0, 0), 0));
+	//diagramLights.push_back(new LightSource(vec3(-100, -100, -100), vec3(100000, 100000, 100000), 0));
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
+	diagramLights.push_back(new LightSource(vec3(-1, -1, 1), vec3(1, 1, 1), 2));
 
 	//Observers:-------------------------------------------------
 	//1.:
@@ -72,19 +75,78 @@ void Scene::Initialise()
 	}
 
 	// Captions:-------------------------------------------------------
-	// No global captions.
 
 
-	//Background:------------------------------------------------------
+	// Background:-----------------------------------------------------
 	background = new Background();
 	
-	//Other:
+	// Coordinate system:----------------------------------------------
+	system = new CoordinateSystem();
+
+	// Other:----------------------------------------------------------
 	toggleActiveObserver();
 }
 
 void Scene::Control(float dt) {
+	
+	while (!controlEvents.empty()) {
+		ControlEvent event = controlEvents.back();
+		controlEvents.pop_back();
+		switch (event) {
+			case ControlEvent::toggleObserver:
+				toggleActiveObserver();
+				break;
+			case ControlEvent::togglePause:
+				togglePause();
+				break;
+			case ControlEvent::zoomIn:
+				zoomCamera(1 - 0.01f * dt);
+				break;
+			case ControlEvent::zoomOut:
+				zoomCamera(1 + 0.01f * dt);
+				break;
+			case ControlEvent::toggleDopplerEffect:
+				toggleDoppler();
+				break;
+			case ControlEvent::rewindTime:
+				windTime(-5);
+				break;
+			case ControlEvent::windTime:
+				windTime(5);
+				break;
+			case ControlEvent::toggleIntersectionMode:
+				toggleIntersectionMode();
+				break;
+			case ControlEvent::toggleLorentz:
+				toggleLorentzTransformation();
+				break;
+			case ControlEvent::toggleViewMode:
+				toggleViewMode();
+				break;
+			case ControlEvent::toggleShading:
+				toggleShading();
+				break;
+			case ControlEvent::toggleSelection:
+				toggleSelected();
+				break;
+			case ControlEvent::moveCameraForward:
+				moveCamera(vec3(1, 0, 0) * cameraVelocity * dt);
+				break;
+			case ControlEvent::moveCameraBackward:
+				moveCamera(vec3(-1, 0, 0) * cameraVelocity * dt);
+				break;
+			case ControlEvent::moveCameraLeft:
+				moveCamera(vec3(0, -1, 0) * cameraVelocity * dt);
+				break;
+			case ControlEvent::moveCameraRight:
+				moveCamera(vec3(0, 1, 0) * cameraVelocity * dt);
+				break;
+			defualt: break;
+		}
+	}
+
 	if (running) {
-		dt *= timeScale;
+		dt *= timeScale;	// Scale time to sym speed.
 		if (activeObserver != nullptr) {
 			activeObserver->increaseTimeByDelta(dt);
 		}
@@ -93,8 +155,9 @@ void Scene::Control(float dt) {
 }
 
 void Scene::Animate(float dt) {
+	hud->Animate(dt);						// Always animate!
 	if (running) {
-		dt *= timeScale;
+		dt *= timeScale;					// Scale time to symulation speed.
 		if (activeObserver != nullptr) {
 			activeObserver->syncCamera(realTime3DCamera);
 		}
@@ -102,11 +165,6 @@ void Scene::Animate(float dt) {
 		{
 			obj->Animate(dt);
 		}
-		for each (Caption * cap in captions)
-		{
-			cap->Animate();
-		}
-
 	}
 }
 
@@ -141,6 +199,7 @@ void Scene::toggleActiveObserver() {
 			activeObserver = observers.at(currentIdx);
 		}
 		activeObserver->syncCamera(realTime3DCamera);
+		hud->pushMessage(std::string("Active observer: ").append(activeObserver->getName()).c_str());
 	}
 }
 
@@ -172,42 +231,103 @@ void Scene::moveCamera(vec3 delta)
 
 void Scene::toggleDoppler() {
 	dopplerMode = (DopplerMode)((3 > dopplerMode + 1) ? (dopplerMode + 1) : 0);
-}
-
-void Scene::toggleLorentzTransformation() {
-	doLorentz = !doLorentz;
-}
-
-void Scene::toggleIntersectionType() {
-	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
-}
-
-void Scene::toggleViewMode() {
-	viewMode = (ViewMode)((2 > viewMode + 1) ? (viewMode + 1) : 0);
-	switch (viewMode)
+	std::string str("Doppler mode: ");
+	switch (dopplerMode)
 	{
-	case ViewMode::realTime3D:
-		activeCamera = realTime3DCamera;
-		delete view;
-		view = new RealTime3DView(this);
+	case DopplerMode::full:
+		str.append("full");
 		break;
-	case ViewMode::diagram:
-		activeCamera = diagramCamera;
-		delete view;
-		view = new DiagramView(this);
+	case DopplerMode::mild:
+		str.append("mild");
+		break;
+	case DopplerMode::off:
+		str.append("off");
 		break;
 	default:
 		break;
 	}
+	hud->pushMessage(str.c_str());
+}
+
+void Scene::toggleLorentzTransformation() {
+	doLorentz = !doLorentz;
+	std::string str;
+	if (doLorentz) {
+		str = std::string("Lorentz transformation enabled");
+	}
+	else {
+		str = std::string("Lorentz transformation disabled");
+	}
+	hud->pushMessage(str.c_str());
+}
+
+void Scene::toggleIntersectionMode() {
+	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
+	std::string str("Intersection mode: ");
+	switch (intersectionMode)
+	{
+	case IntersectionMode::lightCone:
+		str.append("light cone");
+		break;
+	case IntersectionMode::hyperplane:
+		str.append("simultaneous hyperplane");
+		break;
+	default:
+		break;
+	}
+	hud->pushMessage(str.c_str());
+}
+
+void Scene::toggleViewMode() {
+	viewMode = (ViewMode)((2 > viewMode + 1) ? (viewMode + 1) : 0);
+	std::string str;
+	switch (viewMode)
+	{
+	case ViewMode::realTime3D:
+		activeCamera = realTime3DCamera;
+		view->transitionFrom();
+		delete view;
+		view = new RealTime3DView(this);
+		view->transitionTo();
+		str = std::string("View mode: real time 3D");
+		break;
+	case ViewMode::diagram:
+		activeCamera = diagramCamera;
+		view->transitionFrom();
+		delete view;
+		view = new DiagramView(this);
+		view->transitionTo();
+		str = std::string("View mode: diagram (x, y, t)");
+		break;
+	default:
+		break;
+	}
+	hud->pushMessage(str.c_str());
 }
 
 void Scene::toggleShading()
 {
 	doShading = !doShading;
+	std::string str;
+	if (doShading) {
+		str = std::string("Shading enabled");
+	}
+	else {
+		str = std::string("Shading disabled");
+	}
+	hud->pushMessage(str.c_str());
 }
 
 void Scene::togglePause() {
 	running = !running;
+	std::string str;
+	if (running) {
+		str = std::string("Resumed");
+	}
+	else {
+		str = std::string("Paused");
+	}
+	hud->pushMessage(str.c_str());
 }
 
 void Scene::setTime(float t) {
@@ -226,14 +346,17 @@ void Scene::reset() {
 	running = true;
 	Animate(0.0f);
 	running = prevState;
+	hud->pushMessage("Reset");
 }
 
-void Scene::windTime(float deltaT) {
-	activeObserver->increaseTimeByDelta(deltaT);
+void Scene::windTime(float deltaTau) {
+	activeObserver->increaseTimeByDelta(deltaTau);
 	bool prevState = running;
 	running = true;
 	Animate(0.0f);
 	running = prevState;
+	std::string str("Time shifted by tau = ");
+	hud->pushMessage(str.append(std::to_string(deltaTau)).append(" m").c_str());
 }
 
 void Scene::toggleSelected()
@@ -249,6 +372,7 @@ void Scene::toggleSelected()
 		}
 		selected = objects[currentIdx];
 		selected->select();
+		hud->pushMessage(std::string("Selected object: ").append(selected->getName()).c_str());
 	}
 }
 
@@ -436,9 +560,12 @@ void Scene::clearScene()
 void Scene::pause()
 {
 	running = false;
+	hud->pushMessage("Paused");
 }
 
 void Scene::resume()
 {
 	running = true;
+	hud->pushMessage("Resumed");
 }
+

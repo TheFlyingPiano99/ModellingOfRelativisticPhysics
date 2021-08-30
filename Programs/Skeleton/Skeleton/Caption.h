@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Geometry.h"
 #include "Assets.h"
+#include <vector>
 
 class CaptionAnimation {
 
@@ -19,8 +20,9 @@ class Caption {
 	std::string text;
 	CaptionAnimation* animation = NULL;
 	bool faceCamera = true;
-
-public:
+	bool visible = true;
+	bool cameraSpace = false;		// Whether the position should be interpereted in camera space.
+	static std::vector<Caption*>* sceneCaptions;
 
 	Caption(vec3 _pos, Font* _font, float _fontSize, vec3 _color, const char* _text)
 		: pos(_pos), fontTexture(_font), fontSize(_fontSize), color(_color), text(_text)
@@ -38,19 +40,37 @@ public:
 		genGeometry();
 	}
 
+public:
+
+	static void setCaptionVectorReference(std::vector<Caption*>* v) {
+		sceneCaptions = v;
+	}
+
 	~Caption() {
-		delete fontTexture;					// Temp !!!
 		glDeleteBuffers(1, &vbo);
 		glDeleteVertexArrays(1, &vao);
 	}
 
+	/*
+	* Creates a new Caption object. Registers the objects to the scene and returns a pointer to the object.
+	*/
 	static Caption* createNormalCaption(vec3 pos, const char* text) {
-		return new Caption(pos, Assets::getDefaultFont(), 0.03f, vec3(0.9f,1,1), text);
+		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.03f, vec3(1,1,1), text);
+		sceneCaptions->push_back(caption);
+		return caption;
 	}
 
-	mat4 M(vec3 norm, vec3 prefUp, float distance);
+	static Caption* createNormalCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
 
-	mat4 invM(vec3 norm, vec3 prefUp, float distance);
+		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, vec3(0.9f, 1, 1), text);
+		caption->setCameraSpace(true);
+		sceneCaptions->push_back(caption);
+		return caption;
+	}
+
+	mat4 M(vec3 pos, vec3 norm, vec3 prefUp, float distance);
+
+	mat4 invM(vec3 pos, vec3 norm, vec3 prefUp, float distance);
 
 	void Animate();
 
@@ -61,6 +81,10 @@ public:
 	void genGeometry();
 
 	void changeText(const char* str);
+
+	vec3 getPos() {
+		return pos;
+	}
 
 	void setPos(vec3 _pos) {
 		pos = _pos;
@@ -74,4 +98,19 @@ public:
 		return fontSize;
 	}
 
+	void setVisible(bool b) {
+		visible = b;
+	}
+
+	void setColor(vec3 _color) {
+		color = _color;
+	}
+
+	vec3 getColor() {
+		return color;
+	}
+
+	void setCameraSpace(bool b) {
+		cameraSpace = b;
+	}
 };

@@ -13,7 +13,7 @@ class Background {
 
 public:
 	Background() {
-		geometry = new SphereSurface(80);
+		geometry = new SphereSurface(120);
 		geometry->GenSurface(100, 100);
 		vec3 color = vec3(0.1,0.1, 0.1);
 		material = new Material(color, color, color, 50);
@@ -51,12 +51,13 @@ public:
 		glDisable(GL_CULL_FACE);
 		geometry->Draw();
 		glEnable(GL_CULL_FACE);
+		glClearDepth(1);
 	}
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 		material->loadOnGPU(gpuProgram);
 		gpuProgram.setUniform(*texture, "textureUnit");
-		gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");

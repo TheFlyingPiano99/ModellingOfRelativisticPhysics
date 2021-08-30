@@ -1,12 +1,14 @@
 #include "Skeleton.h"
+#include <map>
 
-
+#include "EnumTypes.h"
 
 // Initialization, create an OpenGL context
 void onInitialization() {
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -28,61 +30,57 @@ void onDisplay() {
 
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
-	if (key == 'c') {
-		scene->toggleActiveObserver();
-		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
-	}
-	if (key == ' ') {
-		scene->togglePause();
-		glutPostRedisplay();         // if d, invalidate display, i.e. redraw
-	}
-	if (key == '=') {
-		scene->zoomCamera(1.5f);
-	}
-	if (key == '-') {
-		scene->zoomCamera(0.75f);
-	}
-	if (key == 'd') {
-		scene->toggleDoppler();
-	}
-	if (key == 'r') {
-		scene->windTime(-5);
-	}
-	if (key == 'f') {
-		scene->windTime(5);
-	}
-	if (key == 'i') {
-		scene->toggleIntersectionType();
-	}
-	if (key == 'l') {
-		scene->toggleLorentzTransformation();
-	}
-	if (key == 'v') {
-		scene->toggleViewMode();
-	}
-	if (key == 's') {
-		scene->toggleShading();
-	}
-	if (key == 'q') {
-		//scene->save("../../../Saves/defaultSave01.txt");
-		scene->load("defaultSave01.txt");
-	}
-	if (key == 'o') {
-		scene->toggleSelected();
-	}
-	if (key == '[') {	// forward
-		scene->moveCamera(vec3(1, 0, 0) * 0.3f);
-	}
-	if (key == '\'') {	// backward
-		scene->moveCamera(vec3(-1, 0, 0) * 0.3f);
-	}
-	if (key == ';') {	// left
-		scene->moveCamera(vec3(0, -1, 0) * 0.3f);
-	}
-	if (key == '\\') {	// right
-		scene->moveCamera(vec3(0, 1, 0) * 0.3f);
-	}
 
+	if (key == 'c') {
+		scene->pushBackControlEvent(toggleObserver);
+	}
+	else if (key == ' ') {
+		scene->pushBackControlEvent(togglePause);
+	}
+	else if (key == '=') {
+		scene->pushBackControlEvent(zoomIn);
+	}
+	else if (key == '-') {
+		scene->pushBackControlEvent(zoomOut);
+	}
+	else if (key == 'd') {
+		scene->pushBackControlEvent(toggleDopplerEffect);
+	}
+	else if (key == 'r') {
+		scene->pushBackControlEvent(rewindTime);
+	}
+	else if (key == 'f') {
+		scene->pushBackControlEvent(windTime);
+	}
+	else if (key == 'i') {
+		scene->pushBackControlEvent(toggleIntersectionMode);
+	}
+	else if (key == 'l') {
+		scene->pushBackControlEvent(toggleLorentz);
+	}
+	else if (key == 'v') {
+		scene->pushBackControlEvent(toggleViewMode);
+	}
+	else if (key == 's') {
+		scene->pushBackControlEvent(toggleShading);
+	}
+	else if (key == 'q') {
+	}
+	else if (key == 'o') {
+		scene->pushBackControlEvent(toggleSelection);
+	}
+	else if (key == '[') {	// forward
+		scene->pushBackControlEvent(moveCameraForward);
+	}
+	else if (key == '\'') {	// backward
+		scene->pushBackControlEvent(moveCameraBackward);
+	}
+	else if (key == ';') {	// left
+		scene->pushBackControlEvent(moveCameraLeft);
+	}
+	else if (key == '\\') {	// right
+		scene->pushBackControlEvent(moveCameraRight);
+	}
 
 }
 
@@ -155,13 +153,13 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 }
 
 
-static float dt = 0.001;
+static float dt = 1;
 
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
 	static float tEnd = 0;
 	float tStart = tEnd;
-	tEnd = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+	tEnd = glutGet(GLUT_ELAPSED_TIME);
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;
 		scene->Control(DT);

@@ -461,7 +461,12 @@ const char* const fragmentSource = R"(
 	void diagram() {
 		vec4 rawColor = texture(textureUnit, texCoord);		
 		vec3 shaded = shading(rawColor);
-		outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
+		if (transparency < 1.0) {
+			outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
+		}
+		else {
+			outColor = vec4(shaded, 1);
+		}
 	}
 
 	void text() {

@@ -25,6 +25,8 @@ public:
 		: Entity(_name, _desc), worldLine(_worldLine) {
 		diagramCaption = Caption::createNormalCaption(vec3(getStartPos().x, getStartPos().y, getStartPos().w), name.c_str());
 		timerCaption = Caption::createNormalCaption(vec3(0,0,0), "");
+		diagramCaption->setVisible(false);
+		timerCaption->setVisible(false);
 	}
 
 	~Observer() {
@@ -49,6 +51,7 @@ public:
 	*/
 	LightCone* getLightCone();
 
+	void Draw(GPUProgram& gpuProgram, Camera& camera);
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
 	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera);
 	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera);

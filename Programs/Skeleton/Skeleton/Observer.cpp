@@ -32,6 +32,12 @@ LightCone* Observer::getLightCone()
 	return worldLine->getLigtConeAtProperTime(currentProperTime);
 }
 
+void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
+{
+	diagramCaption->setVisible(false);
+	timerCaption->setVisible(false);
+}
+
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
@@ -39,10 +45,11 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
-	gpuProgram.setUniform(false, "outline");
+	gpuProgram.setUniform(false, "outline");	
+	diagramCaption->setVisible(false);
+	timerCaption->setVisible(false);
 
 	worldLine->Draw();
-	diagramCaption->DrawDiagram(gpuProgram, camera);
 }
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
@@ -103,7 +110,9 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMo
 	}
 	vec4 pos = getLocation();
 	timerCaption->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
-	timerCaption->DrawDiagram(gpuProgram, camera);
+	timerCaption->setVisible(selected);
+	diagramCaption->setVisible(true);
+	timerCaption->setVisible(true);
 }
 
 void Observer::setCurrentTimeAtAbsoluteTime(float t)

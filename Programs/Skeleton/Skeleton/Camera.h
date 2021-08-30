@@ -30,6 +30,7 @@ public:
 
 	mat4 P();
 
+	vec3 cameraSpaceToWorldSpace(vec2 cPos);
 
 	void loadOnGPU(GPUProgram& gpuProgram);
 

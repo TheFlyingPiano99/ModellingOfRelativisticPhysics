@@ -54,7 +54,7 @@ public:
 
 	static Material* getObserverMaterial() {
 		if (observerMaterial == nullptr) {
-			observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(0.2, 0.2, 0.2), 3, 0.4f);
+			observerMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 0, 0.5), vec3(0.2, 0.2, 0.2), 3, 0.6f);
 		}
 		return observerMaterial;
 	}

@@ -12,10 +12,13 @@
 #include "LightSource.h"
 #include "View.h"
 #include "EnumTypes.h"
+#include "CoordinateSystem.h"
+#include "HUD.h"
 #include <map>
 
 class Scene {
-	float timeScale = 2; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
+	float timeScale = 0.002f; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
+	float cameraVelocity = 1;
 	View* view;
 	Camera* realTime3DCamera = NULL;
 	Camera* diagramCamera = NULL;
@@ -23,6 +26,8 @@ class Scene {
 	IntersectionMode intersectionMode = lightCone;
 	DopplerMode dopplerMode = full;
 	ViewMode viewMode = realTime3D;
+	CoordinateSystem* system = NULL;
+	HUD* hud = NULL;
 
 	Observer* activeObserver = NULL;
 	Entity* selected = NULL;
@@ -31,8 +36,8 @@ class Scene {
 	std::vector<Object*> objects;
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
-	std::vector<Caption*> captions;
 	std::vector<WorldLine*> linesToDisplay;				// For testing only!!!
+	std::vector<ControlEvent> controlEvents;
 
 	Background* background;
 
@@ -40,9 +45,6 @@ class Scene {
 	bool running = false;
 	bool doLorentz = true;
 	bool doShading = true;
-	void* defaultFont = GLUT_BITMAP_HELVETICA_18;
-
-	Font* fontTexture;			// TEMP!
 public:
 
 
@@ -55,10 +57,6 @@ public:
 		for each (Object * obj in objects)
 		{
 			delete obj;
-		}
-		for each (Caption * cap in captions)
-		{
-			delete cap;
 		}
 		for each (LightSource * lt in lights)
 		{
@@ -75,7 +73,8 @@ public:
 		}
 
 		delete background;
-		delete fontTexture;
+		delete system;
+		delete hud;
 	}
 
 	/*
@@ -109,7 +108,7 @@ public:
 	/*
 	* Switches between simultaneous hyperplane intersection and light cone intersection.
 	*/
-	void toggleIntersectionType();
+	void toggleIntersectionMode();
 
 	void toggleViewMode();
 
@@ -124,7 +123,7 @@ public:
 
 	void reset();
 
-	void windTime(float deltaT);
+	void windTime(float deltaTau);
 
 	// Selection:
 
@@ -158,10 +157,6 @@ public:
 		return &objects;
 	}
 
-	std::vector<Caption*>* getCaptions() {
-		return &captions;
-	}
-
 	std::vector<LightSource*>* getDiagramLights() {
 		return &diagramLights;
 	}
@@ -180,6 +175,14 @@ public:
 
 	bool getDoLorentz() {
 		return doLorentz;
+	}
+
+	CoordinateSystem* getCoordinateSystem() {
+		return system;
+	}
+
+	HUD* getHUD() {
+		return hud;
 	}
 
 	//-----------------------------------------------------------------
@@ -206,6 +209,10 @@ public:
 	//For testing:
 	std::vector<WorldLine*>& getLines() {
 		return linesToDisplay;
+	}
+
+	void pushBackControlEvent(ControlEvent e) {
+		controlEvents.push_back(e);
 	}
 
 };
