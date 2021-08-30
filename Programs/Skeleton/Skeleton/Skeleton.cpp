@@ -3,8 +3,9 @@
 
 #include "EnumTypes.h"
 
-// Initialization, create an OpenGL context
+// Initialization, getInstance an OpenGL context
 
+static GPUProgram gpuProgram; // vertex and fragment shaders
 int windowID = 0;
 
 void onInitialization() {
@@ -18,13 +19,13 @@ void onInitialization() {
 	gpuProgram.create(vertexSource, fragmentSource, "outColor");
 	windowID = glutGetWindow();
 	
-	scene = new Scene();
+	scene = Scene::getInstance();
 	scene->Initialise();
 }
 
 // Window has become invalid: Redraw
 void onDisplay() {
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0, 0, 0.5f, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	scene->Draw(gpuProgram);
 
@@ -37,63 +38,75 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 
 	scene->type(key);
 
-	if (key == 'c') {
-		scene->pushBackControlEvent(toggleObserver);
+	//Modifiers:
+	int modifiers = glutGetModifiers();
+	int ctrl = modifiers & GLUT_ACTIVE_CTRL;
+	int alt = modifiers & GLUT_ACTIVE_ALT;
+	int shift = modifiers & GLUT_ACTIVE_SHIFT;
+	if (!(ctrl || shift || alt)) {
+		if (key == 'c') {
+			scene->pushBackControlEvent(toggleObserver);
+		}
+		else if (key == ' ') {
+			scene->pushBackControlEvent(togglePause);
+		}
+		else if (key == '=') {
+			scene->pushBackControlEvent(zoomIn);
+		}
+		else if (key == '-') {
+			scene->pushBackControlEvent(zoomOut);
+		}
+		else if (key == 'd') {
+			scene->pushBackControlEvent(toggleDopplerEffect);
+		}
+		else if (key == 'r') {
+			scene->pushBackControlEvent(rewindTime);
+		}
+		else if (key == 'f') {
+			scene->pushBackControlEvent(windTime);
+		}
+		else if (key == 'i') {
+			scene->pushBackControlEvent(toggleIntersectionMode);
+		}
+		else if (key == 'l') {
+			scene->pushBackControlEvent(toggleLorentz);
+		}
+		else if (key == 'v') {
+			scene->pushBackControlEvent(toggleViewMode);
+		}
+		else if (key == 's') {
+			scene->pushBackControlEvent(toggleShading);
+		}
+		else if (key == 'q') {
+		}
+		else if (key == 'o') {
+			scene->pushBackControlEvent(toggleSelection);
+		}
+		else if (key == '[') {	// forward
+			scene->pushBackControlEvent(moveCameraForward);
+		}
+		else if (key == '\'') {	// backward
+			scene->pushBackControlEvent(moveCameraBackward);
+		}
+		else if (key == ';') {	// left
+			scene->pushBackControlEvent(moveCameraLeft);
+		}
+		else if (key == '\\') {	// right
+			scene->pushBackControlEvent(moveCameraRight);
+		}
+		else if (key == 27) {		// Escape
+			if (scene->askToQuit())
+				glutDestroyWindow(windowID);
+		}
 	}
-	else if (key == ' ') {
-		scene->pushBackControlEvent(togglePause);
+	else if (ctrl) {		// Ctrl only
+		if (key == '\x13') {	// ctrl^s
+			scene->pushBackControlEvent(save);
+		}
+		if (key == '\xf') {	// ctrl^o
+			scene->pushBackControlEvent(load);
+		}
 	}
-	else if (key == '=') {
-		scene->pushBackControlEvent(zoomIn);
-	}
-	else if (key == '-') {
-		scene->pushBackControlEvent(zoomOut);
-	}
-	else if (key == 'd') {
-		scene->pushBackControlEvent(toggleDopplerEffect);
-	}
-	else if (key == 'r') {
-		scene->pushBackControlEvent(rewindTime);
-	}
-	else if (key == 'f') {
-		scene->pushBackControlEvent(windTime);
-	}
-	else if (key == 'i') {
-		scene->pushBackControlEvent(toggleIntersectionMode);
-	}
-	else if (key == 'l') {
-		scene->pushBackControlEvent(toggleLorentz);
-	}
-	else if (key == 'v') {
-		scene->pushBackControlEvent(toggleViewMode);
-	}
-	else if (key == 's') {
-		scene->pushBackControlEvent(toggleShading);
-	}
-	else if (key == 'q') {
-	}
-	else if (key == 'o') {
-		scene->pushBackControlEvent(toggleSelection);
-	}
-	else if (key == '[') {	// forward
-		scene->pushBackControlEvent(moveCameraForward);
-	}
-	else if (key == '\'') {	// backward
-		scene->pushBackControlEvent(moveCameraBackward);
-	}
-	else if (key == ';') {	// left
-		scene->pushBackControlEvent(moveCameraLeft);
-	}
-	else if (key == '\\') {	// right
-		scene->pushBackControlEvent(moveCameraRight);
-	}
-	else if (key == 27) {		// Escape
-		glutDestroyWindow(windowID);
-	}
-	else if (key == 'w') {
-		scene->pushBackControlEvent(save);
-	}
-
 }
 
 // Key of ASCII code released

@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdvancedTexture.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CoordinateSystem.cpp" />
     <ClCompile Include="Assets.cpp" />

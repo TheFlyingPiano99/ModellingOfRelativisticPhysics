@@ -4,7 +4,6 @@
 #include "StringOperations.h"
 
 
-
 vec4 Observer::getLocation()
 {
     return worldLine->getLocationAtProperTime(currentProperTime);

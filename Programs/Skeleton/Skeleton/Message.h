@@ -16,12 +16,19 @@ class MessageQueue
 
 public:
 	MessageQueue(void* _owner, vec3 pos): owner(_owner), startPos(pos) {
+	}
 
+	~MessageQueue() {
+		for each (Caption * cap in queue) {
+			delete cap;
+		}
 	}
 
 	void push(const char* text);
 
 	void Animate(float dt);
+
+	void clearQueue();
 
 };
 

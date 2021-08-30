@@ -6,12 +6,8 @@
 /*
 * Factory for Earth-like object.
 */
-
 Object* Object::createEarth(WorldLine* wrdln) {
 	AdvancedTexture* texture = new AdvancedTexture(Assets::getTexturePath().append("earth_daymap.bmp").c_str(), Assets::getTexturePath().append("earth_normal_map.bmp").c_str() , "");
-	if (texture->getTextureId() == 0) {
-		texture = NULL;
-	}
 	Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(0, 0.3, 0.6), vec3(5, 6, 20), 50);
 	diagramM->setGlow(true);
 	ParamSurface* pSurface = new SphereSurface(0.5f);

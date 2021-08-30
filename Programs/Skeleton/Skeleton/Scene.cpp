@@ -6,9 +6,11 @@
 #include "Exceptions.h"
 #include "Assets.h"
 
+Scene* Scene::instance = NULL;
 
 void Scene::Initialise()
 {
+
 	hud = new HUD(this);
 
 	//View:
@@ -88,8 +90,19 @@ void Scene::Initialise()
 }
 
 void Scene::Control(float dt) {
-	
-	if (!entryMode) {
+	if (loadingScene) {
+		controlEvents.clear();
+		if (finishedLoading) {
+			finishedLoading = false;
+			loadingScene = false;
+			loadThread->join();
+			delete loadThread;
+			Scene::getInstance()->getHUD()->pushMessage("Scene loaded.");
+		}
+		return;
+	}
+	else if (!entryMode) {
+		allowQuit = true;
 		while (!controlEvents.empty()) {
 			ControlEvent event = controlEvents.back();
 			controlEvents.pop_back();
@@ -142,13 +155,21 @@ void Scene::Control(float dt) {
 			case ControlEvent::moveCameraRight:
 				moveCamera(vec3(0, 1, 0) * cameraVelocity * dt);
 				break;
-			case ControlEvent::save:		// Test
+			case ControlEvent::save:
 				entryMode = true;
-				hud->createTextEntry("Text entry: enter text!");
+				hud->createTextEntry("Enter save file's name!", saveHandler);
+				break;
+			case ControlEvent::load:
+				entryMode = true;
+				hud->createTextEntry("Enter file name to load!", loadHandler);
 				break;
 			defualt: break;
 			}
 		}
+	}
+	else {
+		controlEvents.clear();		// Discard control events.
+		allowQuit = false;
 	}
 
 	if (running) {
@@ -161,6 +182,9 @@ void Scene::Control(float dt) {
 }
 
 void Scene::Animate(float dt) {
+	if (loadingScene) {
+		return;
+	}
 	hud->Animate(dt);						// Always animate!
 	if (running) {
 		dt *= timeScale;					// Scale time to symulation speed.
@@ -175,6 +199,9 @@ void Scene::Animate(float dt) {
 }
 
 void Scene::Draw(GPUProgram& gpuProgram) {
+	if (loadingScene) {
+		return;
+	}
 	if (activeObserver != nullptr || viewMode == diagram) {
 		//Prefase:
 		gpuProgram.setUniform(false, "textMode");
@@ -211,7 +238,13 @@ void Scene::toggleActiveObserver() {
 
 void Scene::type(char c)
 {
-	hud->type(c);
+	bool result;
+	if (entryMode) {
+		result = hud->type(c);
+		if (result) {
+			entryMode = false;
+		}
+	}
 }
 
 // Camera controls:
@@ -478,6 +511,8 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 
 void Scene::save(const char* destinationFile)
 {
+	entryMode = false;
+
 	std::ofstream file;
 	file.open(Assets::getSavesPath().append(destinationFile));
 	if (file.is_open()) {
@@ -497,64 +532,81 @@ void Scene::save(const char* destinationFile)
 			file << obj->genSaveString() << std::endl;
 		}
 		file.close();
+		hud->pushMessage("Scene saved.");
+	}
+	else {
+		hud->pushMessage("Cannot save scene!");
 	}
 }
 
-void Scene::load(const char* sourceFile)
+void loadThreadFunction(std::ifstream* file)
 {
+	std::map<int, WorldLine*> worldLines;	// map<ID, pointer>
+	std::string line;
+	while (getline(*file, line)) {
+		std::vector<std::string> words;
+		words = split(line, ' ');
+		if (words.empty()) {									// Empty line
+			continue;
+		}
+		else if (words.at(0).at(0) == '#') {					// Comment
+			continue;
+		}
+		else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
+			WorldLine* wrdLn = GeodeticLine::loadFromFile(*file);
+			if (wrdLn != nullptr) {
+				worldLines.insert({ wrdLn->getID(), wrdLn });
+			}
+		}
+		else if (words.at(0).compare("Observer") == 0) {		// Observer
+			Observer* obs = Observer::loadFromFile(*file);
+			if (obs != nullptr) {
+				Scene::getInstance()->getObservers()->push_back(obs);
+			}
+		}
+		else if (words.at(0).compare("Object") == 0) {		// Object
+			Object* obj = Object::loadFromFile(*file);
+			if (obj != nullptr) {
+				Scene::getInstance()->getObjects()->push_back(obj);
+			}
+		}
+	}
 
-	std::ifstream file;
-	file.open(Assets::getSavesPath().append(sourceFile));
-	if (file.is_open()) {
+	// Linking objects (WorldLines to Obserers and Objects):
+	for (const auto& obs : *(Scene::getInstance()->getObservers())) {
+		obs->setWorldLine(worldLines);
+	}
+	for (const auto& obj : *(Scene::getInstance()->getObjects())) {
+		obj->setWorldLine(worldLines);
+	}
+
+	Scene::getInstance()->toggleActiveObserver();
+	file->close();
+	delete file;
+	Scene::getInstance()->setFinishedLoading(true);
+}
+
+
+std::ifstream* file = NULL;	// Param for thread function.
+
+void Scene::load(const char* sourceFileName)
+{
+	file = new std::ifstream();		// Deleted in thread function!
+	file->open(Assets::getSavesPath().append(sourceFileName));
+	if (file->is_open()) {
 		// Clear everything, what will be loaded:
-		
-		pause();
-		clearScene();
 
-		std::map<int, WorldLine*> worldLines;	// map<ID, pointer>
-		std::string line;
-		while (getline(file, line)) {
-			std::vector<std::string> words;
-			words = split(line, ' ');
-			if (words.empty()) {									// Empty line
-				continue;
-			}
-			else if (words.at(0).at(0) == '#') {					// Comment
-				continue;
-			}
-			else if (words.at(0).compare("GeodeticLine") == 0) {	// GeodeticLine
-				 WorldLine* wrdLn = GeodeticLine::loadFromFile(file);
-				 if (wrdLn != nullptr) {
-					 worldLines.insert({ wrdLn->getID(), wrdLn });
-				 }
-			}
-			else if (words.at(0).compare("Observer") == 0) {		// Observer
-				Observer* obs = Observer::loadFromFile(file);
-				if (obs != nullptr) {
-					observers.push_back(obs);
-				}
-			}
-			else if (words.at(0).compare("Object") == 0) {		// Object
-				Object* obj = Object::loadFromFile(file);
-				if (obj != nullptr) {
-					objects.push_back(obj);
-				}
-			}
-		}
+		//Scene::getInstance()->pause();
+		Scene::getInstance()->clearScene();
 
-		// Linking objects (WorldLines to Obserers and Objects):
-		for (const auto& obs : observers) {
-			obs->setWorldLine(worldLines);
-		}
-		for (const auto& obj : objects) {
-			obj->setWorldLine(worldLines);
-		}
+		entryMode = false;
+		loadingScene = true;
+		finishedLoading = false;
+		loadThread = new std::thread(loadThreadFunction, file);
 
-		toggleActiveObserver();
-		file.close();
 	}
 	else {
-		throw CannotLoadScene();
+		Scene::getInstance()->getHUD()->pushMessage("Cannot load scene!");
 	}
 }
 
@@ -570,6 +622,7 @@ void Scene::clearScene()
 	objects.clear();
 	activeObserver = NULL;
 	selected = NULL;
+	hud->clearCaptions();
 }
 
 void Scene::pause()
@@ -584,3 +637,15 @@ void Scene::resume()
 	hud->pushMessage("Resumed");
 }
 
+
+//Handlers:--------------------------------------------------------------
+
+void saveHandler(const char* str)
+{
+	Scene::getInstance()->save(str);
+}
+
+void loadHandler(const char* str)
+{
+	Scene::getInstance()->load(str);
+}

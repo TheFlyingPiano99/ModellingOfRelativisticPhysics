@@ -30,7 +30,8 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = true;
+const bool fullScreenMode = false;
+
 
 //--------------------------
 struct vec2 {
@@ -248,6 +249,10 @@ public:
 
 	~Texture() {
 		if (textureId > 0) glDeleteTextures(1, &textureId);
+	}
+
+	unsigned int getID() {
+		return textureId;
 	}
 };
 

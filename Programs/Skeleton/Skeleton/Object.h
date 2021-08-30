@@ -55,8 +55,7 @@ public:
 		diagramMaterial(_diagramMaterial),
 		texture(_texture)
 	{
-		vec4 pos = worldLine->getLocationAtAbsoluteTime(0.0f);
-		diagramCaption = Caption::createNormalCaption(vec3(pos.x, pos.y, pos.w), name.c_str());
+		diagramCaption = Caption::createNormalCaption(vec3(0, 0, 0), name.c_str());
 	}
 
 	~Object() {

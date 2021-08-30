@@ -1,18 +1,26 @@
 #include "TextEntry.h"
 #include "HUD.h"
 
-inline TextEntry::~TextEntry() {
-	((HUD*)owner)->removeCaption(tytle);
-	((HUD*)owner)->removeCaption(entered);
+ TextEntry::~TextEntry() {
+	 delete tytle;
+	 delete entered;
 }
 
-void TextEntry::type(char c)
+bool TextEntry::type(char c)
 {
-	if ((int)c == 8) {
-		entry.substr(0, entry.size() - 1);
+	if (c == 8) {
+		entry = entry.substr(0, entry.size() - 1);
+	}
+	else if (c == 13) {		// Enter
+		handler(entry.c_str());
+		return true;		// Submited entry
+	}
+	else if (c == 27) {		// Escape
+		return true;		// Canceled entry
 	}
 	else {
 		entry += c;
 	}
 	entered->changeText(entry.c_str());
+	return false;			// Not finished
 }

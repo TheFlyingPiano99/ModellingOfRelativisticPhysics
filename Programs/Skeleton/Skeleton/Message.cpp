@@ -28,7 +28,7 @@ void MessageQueue::Animate(float dt) {
 		else {					// Change state to transit
 			transitPhase = true;
 			Caption* caption = queue.front();			// Pop queue
-			((HUD*)owner)->removeCaption(caption);
+			delete caption;
 			queue.pop_front();
 			timeLeft = transitTime;
 		}
@@ -39,4 +39,9 @@ void MessageQueue::Animate(float dt) {
 				+ (startPos + entryOffset * (i) ) * (1 - timeLeft / transitTime) );
 		}
 	}
+}
+
+void MessageQueue::clearQueue()
+{
+	queue.clear();
 }

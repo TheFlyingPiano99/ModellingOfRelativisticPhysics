@@ -6,5 +6,4 @@
 
 
 static Scene* scene = NULL;
-static GPUProgram gpuProgram; // vertex and fragment shaders
 static unsigned int vao;	   // virtual world on the GPU

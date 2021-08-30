@@ -4,22 +4,36 @@
 #include "Message.h"
 #include "TextEntry.h"
 
+void pushCaptionHandler(Caption* captionToPush);
+void ereaseCaptionHandler(Caption* captionToRemove);
+
 class HUD
 {
+	static HUD* instance;
 	void* owner;
 	std::vector<Caption*> captions;
 	MessageQueue* messageQueue = NULL;
-	TextEntry* entry;
+	TextEntry* entry = NULL;
+
 
 public:
 
 	HUD(void* _owner) : owner(_owner), messageQueue(new MessageQueue(this, vec3(0.6f, 0.95f, 0))) {
-		Caption::setCaptionVectorReference(&captions);
+		if (instance != nullptr) {
+			delete instance;
+		}
+		instance = this;
+		Caption::setPushCaptionFunction(pushCaptionHandler);
+		Caption::setEreaseCaptionFunction(ereaseCaptionHandler);
+	}
+
+	static HUD* getInstance() {
+		return instance;
 	}
 
 	~HUD() {
 		delete messageQueue;
-
+		delete entry;
 		for each (Caption * cap in captions)
 		{
 			delete cap;
@@ -34,10 +48,13 @@ public:
 
 	void pushMessage(const char* text);
 
-	void removeCaption(Caption* captionToRemove);
+	void pushCaption(Caption* captionToPush);
+	void ereaseCaption(Caption* captionToRemove);
 
-	void createTextEntry(const char* tytle);
+	void createTextEntry(const char* tytle, void (*handler)(const char*));
 
-	void type(char c);
+	bool type(char c);
+
+	void clearCaptions();
 };
 

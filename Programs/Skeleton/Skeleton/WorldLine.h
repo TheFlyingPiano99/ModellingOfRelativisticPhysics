@@ -38,6 +38,7 @@ public:
 		glDeleteVertexArrays(1, &vao);
 	}
 
+
 	/*
 	* The time measured by the absolute observer at the hyperplane,
 	* where the "observer of this world line" is at a point,
@@ -162,7 +163,7 @@ public:
 	GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name = "", std::string _desc = "")
 		: locationAtZeroT(_posAtZeroT), fourVelocity(_velocity), WorldLine(_name, _desc) {
 		type = WorldLineType::geodetic;
-		genGeometry();
+        genGeometry();
 	}
 
 	float getAbsoluteTimeAtProperTime(float tau);

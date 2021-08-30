@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
 	printf("GL Version (integer) : %d.%d\n", majorVersion, minorVersion);
 	printf("GLSL Version : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	// Initialize this program and create shaders
+	// Initialize this program and getInstance shaders
 	onInitialization();
 	glutDisplayFunc(onDisplay);                // Register event handlers
 	glutMouseFunc(onMouse);

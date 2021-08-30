@@ -23,8 +23,8 @@ public:
 
 	Observer(WorldLine* _worldLine, std::string _name = "", std::string _desc = "")
 		: Entity(_name, _desc), worldLine(_worldLine) {
-		diagramCaption = Caption::createNormalCaption(vec3(getStartPos().x, getStartPos().y, getStartPos().w), name.c_str());
-		timerCaption = Caption::createNormalCaption(vec3(0,0,0), "");
+		diagramCaption = Caption::createNormalCaption(vec3(0, 0, 0), name.c_str());
+		timerCaption = Caption::createNormalCaption(vec3(0, 0, 0), "");
 		diagramCaption->setVisible(false);
 		timerCaption->setVisible(false);
 	}

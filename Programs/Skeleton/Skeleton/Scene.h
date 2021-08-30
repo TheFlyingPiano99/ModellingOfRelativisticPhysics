@@ -15,8 +15,10 @@
 #include "CoordinateSystem.h"
 #include "HUD.h"
 #include <map>
+#include <thread>
 
 class Scene {
+	static Scene* instance;
 	float timeScale = 0.002f; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float cameraVelocity = 1;
 	View* view;
@@ -46,9 +48,21 @@ class Scene {
 	bool doLorentz = true;
 	bool doShading = true;
 	bool entryMode = false;
+	bool allowQuit = false;
+	bool loadingScene = false;
+	bool finishedLoading = false;
+	std::thread* loadThread;
+
+	Scene() {}
 
 public:
 
+	static Scene* getInstance() {
+		if (instance == nullptr) {
+			instance = new Scene();
+		}
+		return instance;
+	}
 
 	~Scene() {
 		delete view;
@@ -77,6 +91,10 @@ public:
 		delete background;
 		delete system;
 		delete hud;
+		if (loadThread != nullptr && loadThread->joinable()) {
+			loadThread->join();
+		}
+		delete loadThread;
 	}
 
 	/*
@@ -211,6 +229,14 @@ public:
 	void resume();
 
 
+
+	/*
+	* Returns true if quiting is permitted.
+	*/
+	bool askToQuit() {
+		return allowQuit;
+	}
+
 	//For testing:
 	std::vector<WorldLine*>& getLines() {
 		return linesToDisplay;
@@ -220,4 +246,13 @@ public:
 		controlEvents.push_back(e);
 	}
 
+	void setFinishedLoading(bool b) {
+		finishedLoading = b;
+	}
+
 };
+
+
+void saveHandler(const char* str);
+
+void loadHandler(const char* str);
