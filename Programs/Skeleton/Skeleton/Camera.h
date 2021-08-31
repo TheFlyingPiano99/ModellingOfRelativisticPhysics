@@ -15,29 +15,59 @@ class Camera {
 
 public:
 
-
+	/*
+	* Must be called after construction, to set the necessary variables.
+	*/
 	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp);
 
+	/*
+	* Update camera to allignt with the observer.
+	*/
 	void syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos);
 
+	/*
+	* Creates an orthogonal system, used for the View, Projection transformations.
+	*/
 	void setLookat(const vec3 lat);
 
+	/*
+	* Return translate matrix.
+	*/
 	mat4 Translate() {
 		return TranslateMatrix(-eye);
 	}
 
+	/*
+	* Return view matrix (because of practical reasons: without the translate transformation).
+	* In diagram view mode the translate matrix must be multiplied with the MVP matrix: M * Translate * V * P
+	*/
 	mat4 V();
-
+	
+	/*
+	* Returns projection matrix.
+	*/
 	mat4 P();
 
+	/*
+	* Transforms a camera space vector to world space so, that the world space position represented by the vector is in the "lookat plane".
+	*/
 	vec3 cameraSpaceToWorldSpace(vec2 cPos);
 
+	/*
+	* Load camera on GPU.
+	*/
 	void loadOnGPU(GPUProgram& gpuProgram);
 
+	/*
+	* Return spacetime location of the camera / observer at the given moment.
+	*/
 	vec4 getLocationFV() {
 		return locationFV;
 	}
 
+	/*
+	* Return spacetime four-velocity of the camera / observer at the given moment.
+	*/
 	vec4 getVelocityFV() {
 		return velocityFV;
 	}
