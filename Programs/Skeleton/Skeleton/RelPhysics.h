@@ -42,6 +42,14 @@ namespace RelPhysics
 	}
 
 	/*
+	* Returns velocity 4-vector of geodetic world line intersecting both events.
+	*/
+	static vec4 tangentFourVelocity(vec4 event1, vec4 event2) {
+		vec4 dir = event2 - event1;
+		return normalize(dir) * speedOfLight * ((dir.w > 0.0f)? 1 : -1);
+	}
+
+	/*
 	* Takes relative velocity as argument.
 	* Returns the Lorentz factor, used to tranform observed length and time between two frames.
 	*/

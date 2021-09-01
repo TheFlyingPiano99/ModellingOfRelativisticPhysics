@@ -8,6 +8,9 @@ const char* const vertexSource = R"(
 	layout(location = 1) in vec3 vn;
 	layout(location = 2) in vec2 uv;
 	
+	uniform	vec4 worldLineNodes[1000];
+	uniform int noOfWorldLineNodes;
+
 	uniform float speedOfLight;
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
@@ -62,17 +65,12 @@ const char* const vertexSource = R"(
 		return results;
 	}
 
-
-	//if Geodetic:-----------------------------------------------------------
-	uniform vec4 subjectsStartPos;
-	uniform vec4 subjectsVelocity;
-
-	float GeodeticIntersectLightCone(vec4 offsetedStartPos, vec4 coneLocation)
+	float GeodeticIntersectLightCone(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 coneLocation)
 	{
 		float a, b, c, t;
-		a = dot(subjectsVelocity.xyz, subjectsVelocity.xyz) - subjectsVelocity.w * subjectsVelocity.w;
-		vec3 temp = (offsetedStartPos.xyz * subjectsVelocity.xyz - subjectsVelocity.xyz * coneLocation.xyz);
-		b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * subjectsVelocity.w - subjectsVelocity.w * coneLocation.w));
+		a = dot(tangentVelocity.xyz, tangentVelocity.xyz) - tangentVelocity.w * tangentVelocity.w;
+		vec3 temp = (offsetedStartPos.xyz * tangentVelocity.xyz - tangentVelocity.xyz * coneLocation.xyz);
+		b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * tangentVelocity.w - tangentVelocity.w * coneLocation.w));
 		c = dot(coneLocation.xyz - offsetedStartPos.xyz, coneLocation.xyz - offsetedStartPos.xyz)
 			- pow(coneLocation.w - offsetedStartPos.w, 2);
 
@@ -80,21 +78,21 @@ const char* const vertexSource = R"(
 		vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
 
 		t = solutions.x;	// Should be tested, whether its from the past!
-		return t * subjectsVelocity.w;
+		return t * tangentVelocity.w;
 	}
 
 
-	float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 planeLocation, vec4 planeNormal) {
+	float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 planeLocation, vec4 planeNormal) {
 		return dot(planeLocation - offsetedStartPos, planeNormal)
-				/ dot(subjectsVelocity, planeNormal) * subjectsVelocity.w;
+				/ dot(tangentVelocity, planeNormal) * tangentVelocity.w;
 	}
 
-	vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, float t) {
-		return offsetedStartPos + subjectsVelocity / subjectsVelocity.w * t;
+	vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, vec4 tangentVelocity, float t) {
+		return offsetedStartPos + tangentVelocity / tangentVelocity.w * t;
 	}
 
-	vec4 GeodeticVelocityAtAbsoluteTime(vec4 offsetedStartPos, float t) {
-		return subjectsVelocity;
+	vec4 GeodeticVelocityAtAbsoluteTime(vec4 offsetedStartPos, vec4 tangentVelocity, float t) {
+		return tangentVelocity;
 	}
 	//-----------------------------------------------------------------------
 
@@ -150,47 +148,55 @@ const char* const vertexSource = R"(
 		Also calculates the Doppler shift for this vertex.
 	*/
 	void geodetic() {
-
-        // Start position of the world line of this vertex in absolute frame:
+		float t = 0;		// absolute time parametre
 		vec4 offsetedStartPos;
-		if (doLorentz) {			// (Length contraction is applied)
-			vec3 v = To3DVelocity(subjectsVelocity);
-			float gamma = lorentzFactor(length(v));
-			vec3 n = normalize(v);
-			vec3 pParalel = dot(vp, n) * n;
-			vec3 pPerpend = vp - pParalel;
-			offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + subjectsStartPos;
-		}
-		else {
-			offsetedStartPos = vec4(vp, 0) + subjectsStartPos;
-		}
+		vec4 tangentVelocity;
+		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
+			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
+			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
+			if (doLorentz) {			// (Length contraction is applied)
+				vec3 v = To3DVelocity(tangentVelocity);
+				float gamma = lorentzFactor(length(v));
+				vec3 n = normalize(v);
+				vec3 pParalel = dot(vp, n) * n;
+				vec3 pPerpend = vp - pParalel;
+				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
+			}
+			else {		// Don't do Lorentz
+				offsetedStartPos = vec4(vp, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
+			}
 
-		//Intersect:
-		float t = 0;	// absolute time parametre
-		if (intersectionMode == 0) {
-			//Light cone:
-			vec4 coneLocation = observersLocation;
-			t = GeodeticIntersectLightCone(offsetedStartPos, coneLocation);
-		}
-		else if (intersectionMode == 1) {
-			//Simultaneous hyperplane of the observer:
-			vec4 planeLocation = observersLocation;
-			vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
-			t = GeodeticIntersectHyperplane(offsetedStartPos, planeLocation, planeNormal);		
-		}
+			//Intersect:
+			if (intersectionMode == 0) {					// Light cone
+				vec4 coneLocation = observersLocation;
+				t = GeodeticIntersectLightCone(offsetedStartPos, tangentVelocity, coneLocation);
+			}
+			else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
+				vec4 planeLocation = observersLocation;
+				vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
+				t = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);		
+			}
 
+			if (
+            (i == 0 && t < worldLineNodes[1].w)															// First section
+            || (i < noOfWorldLineNodes - 2 && t < worldLineNodes[i + 1].w && t >= worldLineNodes[i].w)		// Middle section
+            || (i == noOfWorldLineNodes - 2 && t >= worldLineNodes[i].w)											// Last section
+            ) {
+	            break;
+		    }
+		}
 		
 		vec3 vertexLocationProperFrame;
 		vec3 vertexVelocityProperFrame;
 		vec3 observersLocationProperFrame;
 		if (doLorentz) {
-			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
+			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
 			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
-			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)), To3DVelocity(observersVelocity));
+			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)), To3DVelocity(observersVelocity));
 		}
 		else {
-			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, t).xyz - observersLocation.xyz;	// Euclidean transformation
-			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, t)) - To3DVelocity(observersVelocity);	// Euclidean transformation
+			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t).xyz - observersLocation.xyz;	// Euclidean transformation
+			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)) - To3DVelocity(observersVelocity);	// Euclidean transformation
 		}
 		
 		if (dopplerMode == 0) {	// Full

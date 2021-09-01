@@ -16,7 +16,6 @@ void Font::getCharUVs(const char c, vec2& topLeft, vec2& topRight, vec2& bottomR
 
 void Font::loadOnGPU(GPUProgram& gpuProgram)
 {
-    std::cout << "Loading font on GPU." << std::endl;
     int id = bitmap->getID();
     gpuProgram.setUniform(true, "doLorentz");
     gpuProgram.setUniform(*bitmap, "textureUnit");

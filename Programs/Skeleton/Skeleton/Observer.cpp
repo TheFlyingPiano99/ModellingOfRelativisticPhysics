@@ -126,9 +126,17 @@ float Observer::getAbsoluteTimeAtCurrentTime()
 	return worldLine->getAbsoluteTimeAtProperTime(currentProperTime);
 }
 
-void Observer::increaseTimeByDelta(float deltaTau)
+float Observer::increaseTimeByDelta(float deltaTau)
 {
-	currentProperTime += deltaTau;
+	if (currentProperTime + deltaTau < 0.0f) {		// Crop delta
+		float realDelta = -currentProperTime;
+		currentProperTime = 0.0f;
+		return realDelta;
+	}
+	else {
+		currentProperTime += deltaTau;
+		return deltaTau;
+	}
 }
 
 void Observer::syncCamera(Camera* camera)

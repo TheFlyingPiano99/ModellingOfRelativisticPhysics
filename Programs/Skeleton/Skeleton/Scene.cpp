@@ -400,13 +400,13 @@ void Scene::reset() {
 }
 
 void Scene::windTime(float deltaTau) {
-	activeObserver->increaseTimeByDelta(deltaTau);
+	float realDelta = activeObserver->increaseTimeByDelta(deltaTau);
 	bool prevState = running;
 	running = true;
 	Animate(0.0f);
 	running = prevState;
 	std::string str("Time shifted by tau = ");
-	hud->pushMessage(str.append(std::to_string(deltaTau)).append(" m").c_str());
+	hud->pushMessage(str.append(std::to_string(realDelta)).append(" m").c_str());
 }
 
 void Scene::toggleSelected()

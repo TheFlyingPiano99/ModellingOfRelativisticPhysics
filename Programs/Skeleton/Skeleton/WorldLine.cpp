@@ -8,13 +8,14 @@
 using namespace RelPhysics;
 
 inline void GeodeticLine::genGeometry() {
-    vds.push_back(vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w));
-
-    for (int i = 0; i < 10; i++) {
-        vec4 pos = getLocationAtAbsoluteTime((i - 5) * 40);
+    vds4D.resize(1000);     // Size give in shader.
+    for (int i = 0; i < 2; i++) {
+        vec4 pos = getLocationAtAbsoluteTime((i - 50) * 10);
         vds.push_back(vec3(pos.x, pos.y, pos.w));
+        vds4D[i] = pos;
     }
     noOfVds = vds.size();
+    noOfVds4D = noOfVds;
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -23,28 +24,95 @@ inline void GeodeticLine::genGeometry() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
+
 float GeodeticLine::getAbsoluteTimeAtProperTime(float tau)
 {
-    float gamma = 1.0f;
-    try {
-        gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, fourVelocity));
+    if (tau == 0.0f) {
+        return 0.0f;
     }
-    catch (LightspeedExceededException e) {
-        std::cerr << e.what() << std::endl;
+
+    // Find the "nearest to zero" absolute time coordinate:
+    int startIdx = 0;
+    float distToZero = (vds4D[0].w >= 0)? vds4D[0].w : -1;
+    if (distToZero > 0 || distToZero == -1) {
+        for (int i = 1; i < noOfVds4D - 1; i++) {       // Linear search <- should be changed to binary search
+            float w = vds4D[i].w;
+            if (w >= 0.0f) {
+                if (w == 0.0f) {
+                    startIdx = i;
+                    distToZero = 0.0f;
+                    break;
+                }
+                if (w < distToZero || distToZero == -1) {
+                    distToZero = w;
+                    startIdx = i;
+                }
+            }
+        }
     }
-    return tau * gamma;
+    
+    float spentT = distToZero;
+    float spentTau = distToZero / lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[startIdx], vds4D[startIdx + 1])));
+    for (int i = startIdx; i < noOfVds4D - 1; i++) {
+        float gamma = 1.0f;
+        try {
+            gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[i + 1], vds4D[i])));
+        }
+        catch (LightspeedExceededException e) {
+            std::cerr << e.what() << std::endl;
+        }
+        if (i == noOfVds4D - 2 || (spentTau + (vds4D[i + 1].w - vds4D[i].w) / gamma) >= tau) {                                      // Tau is reached in this section!
+            float leftOverTau = tau - spentTau;
+            return spentT + gamma * leftOverTau;        
+        }
+        spentT += vds4D[i + 1].w - vds4D[i].w;
+        spentTau += (vds4D[i + 1].w - vds4D[i].w) / gamma;
+    }
 }
 
 float GeodeticLine::getProperTimeAtAbsoluteTime(float t)
 {
-    float gamma = 1.0f;
-    try {
-        gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, fourVelocity));
+    if (t == 0.0f) {
+        return 0.0f;
     }
-    catch (LightspeedExceededException e) {
-        std::cerr << e.what() << std::endl;
+
+    // Find the "nearest to zero" absolute time coordinate:
+    int startIdx = 0;
+    float distToZero = (vds4D[0].w >= 0) ? vds4D[0].w : -1;
+    if (distToZero > 0 || distToZero == -1) {
+        for (int i = 1; i < noOfVds4D - 1; i++) {       // Linear search <- should be changed to binary search
+            float w = vds4D[i].w;
+            if (w >= 0.0f) {
+                if (w == 0.0f) {
+                    startIdx = i;
+                    distToZero = 0.0f;
+                    break;
+                }
+                if (w < distToZero || distToZero == -1) {
+                    distToZero = w;
+                    startIdx = i;
+                }
+            }
+        }
     }
-    return t / gamma;
+
+    float spentT = distToZero;
+    float spentTau = distToZero / lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[startIdx], vds4D[startIdx + 1])));
+    for (int i = startIdx; i < noOfVds4D - 1; i++) {
+        float gamma = 1.0f;
+        try {
+            gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[i], vds4D[i + 1])));
+        }
+        catch (LightspeedExceededException e) {
+            std::cerr << e.what() << std::endl;
+        }
+        if (i == noOfVds4D - 2 || (spentT + (vds4D[i + 1].w - vds4D[i].w)) >= t) {                                      // Tau is reached in this section!
+            float leftOverT = t - spentT;
+            return spentTau + leftOverT / gamma;
+        }
+        spentT += vds4D[i + 1].w - vds4D[i].w;
+        spentTau += (vds4D[i + 1].w - vds4D[i].w) / gamma;
+    }
 }
 
 vec4 GeodeticLine::getLocationAtProperTime(float tau)
@@ -89,53 +157,64 @@ LightCone* GeodeticLine::getLigtConeAtAbsoluteTime(float t) {
 
 float GeodeticLine::intersectHyperplane(Hyperplane& plane)
 {
-    return (dot(plane.getLocation() - locationAtZeroT, plane.getNormal())) / dot(fourVelocity, plane.getNormal()) * fourVelocity.w;
+    float t = 0;
+    for (int i = 0; i < noOfVds4D - 1; i++) {
+        vec4 tangentVelocity = tangentFourVelocity(vds4D[i], vds4D[i + 1]);
+        vec4 offsettedStartPos = vds4D[i] - tangentVelocity / tangentVelocity.w * vds4D[i].w;
+        t = (dot(plane.getLocation() - offsettedStartPos, plane.getNormal())) / dot(tangentVelocity, plane.getNormal()) * tangentVelocity.w;
+        if (
+            (i == 0 && t < vds4D[1].w)                                          // First section
+            || (i < noOfVds4D - 2 && t < vds4D[i + 1].w && t >= vds4D[i].w)     // Middle section
+            || (i == noOfVds4D - 2 && t >= vds4D[i].w)                          // Last section
+            ) {
+            break;
+        }
+    }
+
+    return t;
 }
 
 float GeodeticLine::intersectLightCone(LightCone& cone)
 {
-    /*
-    float a, b, c, t;
-    a = dot(subjectsVelocity.xyz, subjectsVelocity.xyz) - subjectsVelocity.w * subjectsVelocity.w;
-    vec3 temp = (offsetedStartPos.xyz * subjectsVelocity.xyz - subjectsVelocity.xyz * coneLocation.xyz);
-    b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * subjectsVelocity.w - subjectsVelocity.w * coneLocation.w));
-    c = dot(coneLocation.xyz - offsetedStartPos.xyz, coneLocation.xyz - offsetedStartPos.xyz)
-        - pow(coneLocation.w - offsetedStartPos.w, 2);
+    float t = 0;
+    for (int i = 0; i < noOfVds4D - 1; i++) {
+        vec4 tangentVelocity = tangentFourVelocity(vds4D[i], vds4D[i + 1]);
+        vec4 offsettedStartPos = vds4D[i] - tangentVelocity / tangentVelocity.w * vds4D[i].w;
+        float a, b, c;
+        a = LorentzianProduct(tangentVelocity, tangentVelocity);
+        b = 2 * (
+            (offsettedStartPos.x * tangentVelocity.x
+                - tangentVelocity.x * cone.getLocation().x)
+            + (offsettedStartPos.y * tangentVelocity.y
+                - tangentVelocity.y * cone.getLocation().y)
+            + (offsettedStartPos.z * tangentVelocity.z
+                - tangentVelocity.z * cone.getLocation().z)
+            - (offsettedStartPos.w * tangentVelocity.w
+                - tangentVelocity.w * cone.getLocation().w)
+            );
 
-    int noOfSolutions;
-    vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+        c = powf(cone.getLocation().x - locationAtZeroT.x, 2)
+            + powf(cone.getLocation().y - locationAtZeroT.y, 2)
+            + powf(cone.getLocation().z - locationAtZeroT.z, 2)
+            - powf(cone.getLocation().w - locationAtZeroT.w, 2);
 
-    t = solutions.x;	// Should be tested, whether its from the past!
-    return t * subjectsVelocity.w;
-    */
-
-    float a, b, c, t;
-    a = LorentzianProduct(fourVelocity, fourVelocity);
-    b = 2 * (
-        (locationAtZeroT.x * fourVelocity.x
-            - fourVelocity.x * cone.getLocation().x)
-        + (locationAtZeroT.y * fourVelocity.y
-            - fourVelocity.y * cone.getLocation().y)
-        + (locationAtZeroT.z * fourVelocity.z
-            - fourVelocity.z * cone.getLocation().z)
-        - (locationAtZeroT.w * fourVelocity.w
-            - fourVelocity.w * cone.getLocation().w)
-        );
-
-    c = powf(cone.getLocation().x - locationAtZeroT.x, 2)
-        + powf(cone.getLocation().y - locationAtZeroT.y, 2)
-        + powf(cone.getLocation().z - locationAtZeroT.z, 2)
-        - powf(cone.getLocation().w - locationAtZeroT.w, 2);
-
-    int noOfSolutions;
-    vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
-    if (noOfSolutions > 0) {
-        t = solutions.x;
+        int noOfSolutions;
+        vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+        if (noOfSolutions > 0) {
+            t = solutions.x * tangentVelocity.w;
+        }
+        else {
+            throw DoesNotIntersectException();
+        }
+        if (
+            (i == 0 && t < vds4D[1].w)                                          // First section
+            || (i < noOfVds4D - 2 && t < vds4D[i + 1].w && t >= vds4D[i].w)     // Middle section
+            || (i == noOfVds4D - 2 && t >= vds4D[i].w)                          // Last section
+            ) {
+            break;
+        }
     }
-    else {
-        throw DoesNotIntersectException();
-    }
-    return t * fourVelocity.w;
+    return t;
 }
 
 WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
@@ -152,6 +231,11 @@ void GeodeticLine::loadOnGPU(GPUProgram& gpuProgram)
     //gpuProgram.setUniform(type, "worldLineType");
     gpuProgram.setUniform(locationAtZeroT, "subjectsStartPos");
     gpuProgram.setUniform(fourVelocity, "subjectsVelocity");
+
+    //New part:
+    gpuProgram.setUniform(vds4D, "worldLineNodes");
+    gpuProgram.setUniform((int)noOfVds4D, "noOfWorldLineNodes");
+
 }
 
 void GeodeticLine::Draw()

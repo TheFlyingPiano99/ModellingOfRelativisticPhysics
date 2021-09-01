@@ -146,6 +146,10 @@ class GeodeticLine : public WorldLine
 	int noOfVds;
 	std::vector<vec3> vds;
 
+	//New part:
+	std::vector<vec4> vds4D;
+	unsigned int noOfVds4D;
+
 	void genGeometry();
 public:
 

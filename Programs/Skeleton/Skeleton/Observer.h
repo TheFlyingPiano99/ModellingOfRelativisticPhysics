@@ -69,9 +69,10 @@ public:
 	float getAbsoluteTimeAtCurrentTime();
 
 	/*
-	* Receives delta time in proper frame.
+	* Receives delta time in proper frame if it does not sinc below zero.
+	* Returns actually applied delta tau.
 	*/
-	void increaseTimeByDelta(float deltaTau);
+	float increaseTimeByDelta(float deltaTau);
 
 	void syncCamera(Camera* camera);
 	void syncTimeToObserversSimultaneity(Observer& observer);

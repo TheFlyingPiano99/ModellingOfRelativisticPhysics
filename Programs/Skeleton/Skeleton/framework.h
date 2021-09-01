@@ -30,7 +30,7 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = true;
+const bool fullScreenMode = false;
 
 
 //--------------------------
@@ -405,6 +405,11 @@ public:
 	void setUniform(const mat4& mat, const std::string& name) {
 		int location = getLocation(name);
 		if (location >= 0) glUniformMatrix4fv(location, 1, GL_TRUE, mat);
+	}
+
+	void setUniform(const std::vector<vec4>& vds, const std::string& name) {
+		int location = getLocation(name);
+		if (location >= 0) glUniform4fv(location, vds.size(), &(vds[0].x));
 	}
 
 	void setUniform(const Texture& texture, const std::string& samplerName, unsigned int textureUnit = 0) {
