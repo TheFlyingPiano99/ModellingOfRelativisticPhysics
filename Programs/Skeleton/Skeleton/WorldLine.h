@@ -113,7 +113,7 @@ public:
 	* Used, when a vertex is offseted from the center of an object.
 	* Returned object must be deleted by caller!
 	*/
-	virtual WorldLine* getWorldLineWithOffset(vec3 offset) = 0;
+	//virtual WorldLine* getWorldLineWithOffset(vec3 offset) = 0;
 
 	virtual void loadOnGPU(GPUProgram& gpuProgram) = 0;
 
@@ -122,7 +122,7 @@ public:
 	*/
 	virtual void Draw() = 0;
 
-	virtual float distanceBetweenRayAndDiagram(const Ray& ray) = 0;
+	virtual float distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ) = 0;
 
 	/*
 	* 
@@ -182,11 +182,11 @@ public:
 	LightCone* getLigtConeAtAbsoluteTime(float t);
 	float intersectHyperplane(Hyperplane& plane);
 	float intersectLightCone(LightCone& cone);
-	WorldLine* getWorldLineWithOffset(vec3 offset);
+	//WorldLine* getWorldLineWithOffset(vec3 offset);
 	void loadOnGPU(GPUProgram& gpuProgram);
 	void Draw();
 	std::string genSaveString();
-	virtual float distanceBetweenRayAndDiagram(const Ray& ray);
+	virtual float distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ);
 
 	/*
 	* Returns the loaded object.

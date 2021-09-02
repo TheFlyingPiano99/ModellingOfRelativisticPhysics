@@ -4,12 +4,16 @@ const char* const vertexSource = R"(
 	#version 330				// Shader 3.3
 	precision highp float;		// normal floats, makes no difference on desktop computers
 
-	layout(location = 0) in vec3 vp;
+	layout(location = 0) in vec4 vp;
 	layout(location = 1) in vec3 vn;
 	layout(location = 2) in vec2 uv;
-	
+
 	uniform	vec4 worldLineNodes[1000];
 	uniform int noOfWorldLineNodes;
+	
+	uniform int diagramX;
+	uniform int diagramY;
+	uniform int diagramZ;
 
 	uniform float speedOfLight;
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
@@ -19,6 +23,7 @@ const char* const vertexSource = R"(
 	uniform mat4 M;
 	uniform mat4 invM;
 	uniform bool textMode;
+	uniform bool directRenderMode;
 	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
@@ -158,12 +163,12 @@ const char* const vertexSource = R"(
 				vec3 v = To3DVelocity(tangentVelocity);
 				float gamma = lorentzFactor(length(v));
 				vec3 n = normalize(v);
-				vec3 pParalel = dot(vp, n) * n;
-				vec3 pPerpend = vp - pParalel;
+				vec3 pParalel = dot(vp.xyz, n) * n;
+				vec3 pPerpend = vp.xyz - pParalel;
 				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
 			}
 			else {		// Don't do Lorentz
-				offsetedStartPos = vec4(vp, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
+				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
 			}
 
 			//Intersect:
@@ -188,7 +193,6 @@ const char* const vertexSource = R"(
 		
 		vec3 vertexLocationProperFrame;
 		vec3 vertexVelocityProperFrame;
-		vec3 observersLocationProperFrame;
 		if (doLorentz) {
 			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
 			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
@@ -220,21 +224,41 @@ const char* const vertexSource = R"(
 	}
 
 	void diagram() {
-		wPos = (vec4(vp, 1) * M).xyz;
+		vec4 transformed;
+		if (doLorentz) {
+			vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
+			transformed = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+		}
+		else {
+			transformed = vp - observersLocation;	// Euclidean transformation
+		}
+
+		wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(vp, 1) * MVP;		// Now the MVP should contain the translation to -eye!
+		gl_Position = vec4(wPos, 1) * MVP;		// Now the MVP should contain the translation to -eye!
+	}
+
+	void directRender() {
+		wPos = (vec4(vp.xyz, 1) * M).xyz;
+		texCoord = vec2(uv.x, 1 - uv.y);
+		norm = (invM * vec4(vn, 0)).xyz;
+		dopplerShift = 1.0f;			
+		gl_Position = vec4(vp.xyz, 1) * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void main() {
-		if (viewMode == 0 && !textMode) {	// RealTime3D
+		if (viewMode == 0 && !directRenderMode) {	// RealTime3D
 			if (worldLineType == 0) {
 				geodetic();
 			}
 		}
-		else if (viewMode == 1 || textMode) {	// Diagram
+		else if (viewMode == 1 && !directRenderMode) {	// Diagram
 			diagram();
+		}
+		else if (directRenderMode) {
+			directRender();
 		}
 	}
 )";

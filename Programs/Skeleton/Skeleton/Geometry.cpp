@@ -56,7 +56,8 @@ void OBJGeometry::load(const char* route) {
 				for (int i = 1; i <= 3; i++) {				// 3 vertex triangles
 					vertexDescription = split(words.at(i), '/');
 					if (vertexDescription.size() == 3) {		// vertex / texture / normal
-						vd.pos = vertices[std::stoi(vertexDescription[0]) - 1];
+						vec3 pos3 = vertices[std::stoi(vertexDescription[0]) - 1];
+						vd.pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 						vd.uv = textureCoords[std::stoi(vertexDescription[1]) - 1];
 						vd.norm = normals[std::stoi(vertexDescription[2]) - 1];
 						if (length(vd.pos) > overallRadius) {
@@ -84,7 +85,7 @@ void OBJGeometry::load(const char* route) {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, pos));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, pos));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, norm));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));
 }

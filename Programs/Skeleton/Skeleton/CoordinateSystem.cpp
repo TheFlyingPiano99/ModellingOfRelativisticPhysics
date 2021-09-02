@@ -57,6 +57,7 @@ void CoordinateSystem::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
     gpuProgram.setUniform(true, "glow");
     gpuProgram.setUniform(true, "noTexture");
     gpuProgram.setUniform(false, "outline");
+    gpuProgram.setUniform(true, "directRenderMode");
     glLineWidth(2);
     gpuProgram.setUniform(color[0], "kd");
     drawAxis(gpuProgram, camera, 0, origo);

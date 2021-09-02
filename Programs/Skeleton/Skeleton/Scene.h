@@ -51,6 +51,10 @@ class Scene {
 	bool allowQuit = false;
 	bool loadingScene = false;
 	bool finishedLoading = false;
+	int diagramX = 0;
+	int diagramY = 1;
+	int diagramZ = 3;
+
 	//std::thread* loadThread;
 
 	Scene() {}
@@ -209,6 +213,17 @@ public:
 
 	HUD* getHUD() {
 		return hud;
+	}
+
+	int getDiagramX() {
+		return diagramX;
+	}
+
+	int getDiagramY() {
+		return diagramY;
+	}
+	int getDiagramZ() {
+		return diagramZ;
 	}
 
 	//-----------------------------------------------------------------

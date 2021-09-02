@@ -11,7 +11,7 @@
 */
 class Assets {
 	static SphereSurface* observerNodeGeometry;
-	static ConeSurface* lightConeGeometry;
+	static LightConeSurface* lightConeGeometry;
 	static Material* observerMaterial;
 	static Material* selectedObjectMaterial;
 	static Material* selectedWorldLineMaterial;
@@ -37,7 +37,7 @@ public:
 
 	static Geometry* getLightConeGeomtry() {
 		if (lightConeGeometry == nullptr) {
-			lightConeGeometry = new ConeSurface();
+			lightConeGeometry = new LightConeSurface();
 			lightConeGeometry->GenSurface(50, 50);
 		}
 		return lightConeGeometry;

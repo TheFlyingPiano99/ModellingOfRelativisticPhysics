@@ -6,7 +6,8 @@
 #include <fstream>
 
 struct VertexData {
-	vec3 pos, norm;
+	vec4 pos;
+	vec3 norm;
 	vec2 uv;
 };
 
@@ -45,7 +46,7 @@ class ParamSurface : public Geometry {
 
 public:
 
-	virtual void Eval(float u, float v, vec3& pos, vec3& norm) = 0;
+	virtual void Eval(float u, float v, vec4& pos, vec3& norm) = 0;
 
 
 	virtual VertexData getVertexData(float u, float v) {
@@ -74,7 +75,7 @@ public:
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, pos));
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, pos));
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, norm));
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));		
 	}
@@ -98,14 +99,14 @@ public:
 		R = Dnum<vec2>(r, vec2(0, 0));
 	}
 
-	void Eval(float u, float v, vec3& pos, vec3& norm) {
+	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
 		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
 		Dnum<vec2> X = R * Cos(U) * Sin(V);
 		Dnum<vec2> Y = R * Sin(U) * Sin(V);
 		Dnum<vec2> Z = R * Cos(V);
 
-		pos = vec3(X.f, Y.f, Z.f);
+		pos = vec4(X.f, Y.f, Z.f, 0);
 		norm = -normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
 	}
 };
@@ -117,7 +118,7 @@ public:
 	PlaneSurface(vec3 _n, float _width, float _height) :normal(_n), width(_width), height(_height) {
 	}
 
-	void Eval(float u, float v, vec3& pos, vec3& norm) {
+	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		norm = normal;
 		vec3 prefX;
 		if (normal.x != 1 && normal.y != 0 && normal.z != 0) {
@@ -129,15 +130,16 @@ public:
 		vec3 yBase = cross(normal, prefX);
 		vec3 xBase = cross(yBase, normal);
 
-		pos = xBase * (width * u - width / 2.0f) + yBase * (height * v - height / 2.0f);
+		vec3 pos3 = xBase * (width * u - width / 2.0f) + yBase * (height * v - height / 2.0f);
+		pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 	}
 };
 
-class ConeSurface : public ParamSurface {
+class LightConeSurface : public ParamSurface {
 	float height = 50;
 public:
 
-	void Eval(float u, float v, vec3& pos, vec3& norm) {
+	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		Dnum<vec2> Height = Dnum<vec2>(height, vec2(0, 0));
 		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
 		Dnum<vec2> V = Dnum<vec2>(v * 2 * height - height, vec2(0, 1));
@@ -145,7 +147,7 @@ public:
 		Dnum<vec2> Y = V * Sin(U);
 		Dnum<vec2> Z = V;
 
-		pos = vec3(X.f, Y.f, Z.f);
+		pos = vec4(X.f, Y.f, Z.f, 0);
 		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
 	}
 };
@@ -159,14 +161,14 @@ public:
 		R = Dnum<vec2>(1000, vec2(0, 0));
 	}
 
-	void Eval(float u, float v, vec3& pos, vec3& norm) {
+	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
 		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
 		Dnum<vec2> X = R * Cos(U) * Sin(V);
 		Dnum<vec2> Y = R * Sin(U) * Sin(V);
 		Dnum<vec2> Z = R * Cos(V);
 
-		pos = vec3(X.f, Y.f, Z.f);
+		pos = vec4(X.f, Y.f, Z.f, 0);
 		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
 	}
 

@@ -62,6 +62,7 @@ public:
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");
 		gpuProgram.setUniform(false, "outline");
+		gpuProgram.setUniform(true, "directRenderMode");
 
 		glDisable(GL_CULL_FACE);
 		geometry->Draw();

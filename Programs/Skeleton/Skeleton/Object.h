@@ -93,7 +93,7 @@ public:
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, bool doLorentz);
 
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable);
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, vec4 observersStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ);
 
 	std::string genSaveString();
 
@@ -117,8 +117,8 @@ public:
 	/*
 	* Returns shortest distance between given ray and the object's world line's diagram representation.
 	*/
-	float rayDistanceToDiagram(const Ray& ray) {
-		return worldLine->distanceBetweenRayAndDiagram(ray);
+	float rayDistanceToDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ) {
+		return worldLine->distanceBetweenRayAndDiagram(ray, observerStartPos, observerVelocity, diagramX, diagramY, diagramZ);
 	}
 
 	/*

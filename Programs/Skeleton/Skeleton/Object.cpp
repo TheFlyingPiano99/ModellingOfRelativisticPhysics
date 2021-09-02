@@ -74,6 +74,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
 	gpuProgram.setUniform(false, "outline");
+	gpuProgram.setUniform(false, "directRenderMode");
 
 	geometry->Draw();
 
@@ -88,7 +89,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	}
 }
 
-void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable) {
+void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, vec4 observersStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
@@ -107,12 +108,13 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "outline");
+	gpuProgram.setUniform(false, "directRenderMode");
 
 	worldLine->Draw();
 	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
-		vec4 pos = worldLine->getLocationAtAbsoluteTime(t);
-		(*diagramCaption)->setPos(vec3(pos.x, pos.y, pos.w));
+		vec4 pos = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observersStartPos, RelPhysics::To3DVelocity(observerVelocity));
+		(*diagramCaption)->setPos(vec3(pos[diagramX], pos[diagramY], pos[diagramZ]));
 		(*diagramCaption)->setVisible(true);
 	}
 	else {

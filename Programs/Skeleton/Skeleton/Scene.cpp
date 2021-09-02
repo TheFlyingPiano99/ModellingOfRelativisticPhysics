@@ -464,21 +464,21 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 	if (!objects.empty()) {		// There are objects in the scene.
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
 
-		//For testing:
-		vec4 eye = vec4(activeCamera->getEye().x, activeCamera->getEye().y, 0, activeCamera->getEye().z);
-		WorldLine* line = new GeodeticLine(vec4(0, 0, 0, 0), vec4(ray.dir.x, ray.dir.y, 0, ray.dir.z), "Click ray", "");
-		linesToDisplay.push_back(line);
-
-
 		int selectionIdx = -1;			// index of the selected object
 		if (viewMode == ViewMode::diagram) {								// Diagram view
 			float constraint = 0.2f;
-			float shortestDistance = objects[0]->rayDistanceToDiagram(ray);		// First item handled separately.
+			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
+				activeObserver->getStartPos(),
+				activeObserver->getVelocity(),
+				diagramX, diagramY, diagramZ);		// First item handled separately.
 			if (constraint > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToDiagram(ray);
+				float d = objects[i]->rayDistanceToDiagram(ray,
+					activeObserver->getStartPos(),
+					activeObserver->getVelocity(),
+					diagramX, diagramY, diagramZ);
 				if ((shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;

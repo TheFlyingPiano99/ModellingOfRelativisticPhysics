@@ -54,6 +54,9 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		lt->loadOnGPU(gpuProgram);									// Load lights
 	}
+	gpuProgram.setUniform(scene->getDiagramX(), "diagramX");
+	gpuProgram.setUniform(scene->getDiagramY(), "diagramY");
+	gpuProgram.setUniform(scene->getDiagramZ(), "diagramZ");
 
 	//Actual drawing:
 	Camera* activeCamera = scene->getActiveCamera();
@@ -67,7 +70,12 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	}
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable);			// Objects
+		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable,
+			scene->getActiveObserver()->getVelocity(),
+			scene->getActiveObserver()->getStartPos(),
+			scene->getDiagramX(),
+			scene->getDiagramY(),
+			scene->getDiagramZ());			// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{

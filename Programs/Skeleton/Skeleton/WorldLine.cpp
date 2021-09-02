@@ -10,7 +10,7 @@ using namespace RelPhysics;
 inline void GeodeticLine::genGeometry() {
     vds4D.resize(1000);     // Size give in shader.
     for (int i = 0; i < 2; i++) {
-        vec4 pos = getLocationAtAbsoluteTime((i - 50) * 10);
+        vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * i * 50;
         vds.push_back(vec3(pos.x, pos.y, pos.w));
         vds4D[i] = pos;
     }
@@ -19,9 +19,9 @@ inline void GeodeticLine::genGeometry() {
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, noOfVds4D * sizeof(vec4), &vds4D[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 
@@ -135,12 +135,35 @@ Hyperplane* GeodeticLine::getSimultaneousHyperplaneAtProperTime(float tau)
 
 vec4 GeodeticLine::getLocationAtAbsoluteTime(float t)
 {
-    return locationAtZeroT + fourVelocity / fourVelocity.w * t;
+    vec4 tangentVelocity;
+    vec4 offsettedStartPos;
+    for (int i = 0; i < noOfVds4D - 1; i++) {
+        if (
+            (i == 0 && t < vds4D[1].w)                                          // First section
+            || (i < noOfVds4D - 2 && t < vds4D[i + 1].w && t >= vds4D[i].w)     // Middle section
+            || (i == noOfVds4D - 2 && t >= vds4D[i].w)                          // Last section
+            ) {
+            tangentVelocity = tangentFourVelocity(vds4D[i], vds4D[i + 1]);
+            offsettedStartPos = vds4D[i] - tangentVelocity / tangentVelocity.w * vds4D[i].w;
+            break;
+        }
+    }
+    return offsettedStartPos + tangentVelocity / tangentVelocity.w * t;
 }
 
 vec4 GeodeticLine::getVelocityAtAbsoluteTime(float t)
 {
-    return fourVelocity;
+    vec4 tangentVelocity;
+    for (int i = 0; i < noOfVds4D - 1; i++) {
+        if (
+            (i == 0 && t < vds4D[1].w)                                          // First section
+            || (i < noOfVds4D - 2 && t < vds4D[i + 1].w && t >= vds4D[i].w)     // Middle section
+            || (i == noOfVds4D - 2 && t >= vds4D[i].w)                          // Last section
+            ) {
+            tangentVelocity = tangentFourVelocity(vds4D[i], vds4D[i + 1]);
+        }
+    }
+    return tangentVelocity;
 }
 
 Hyperplane* GeodeticLine::getSimultaneousHyperplaneAtAbsoluteTime(float t)
@@ -217,6 +240,7 @@ float GeodeticLine::intersectLightCone(LightCone& cone)
     return t;
 }
 
+/*
 WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
 {
     return new GeodeticLine(
@@ -225,6 +249,7 @@ WorldLine* GeodeticLine::getWorldLineWithOffset(vec3 offset)
         name,
         description);
 }
+*/
 
 void GeodeticLine::loadOnGPU(GPUProgram& gpuProgram)
 {
@@ -251,11 +276,30 @@ LightCone* GeodeticLine::getLigtConeAtProperTime(float tau)
     return new LightCone(getLocationAtProperTime(tau));
 }
 
-float GeodeticLine::distanceBetweenRayAndDiagram(const Ray& ray)
+float GeodeticLine::distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ)
 {
-    vec3 wlPos = vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.w);
-    vec3 wlDir = normalize(vec3(fourVelocity.x, fourVelocity.y, fourVelocity.w));
-    return abs(dot(ray.pos - wlPos, cross(wlDir, ray.dir)));
+    float distance = -1;
+    vec3 closestPoint;      // Todo
+    for (int i = 0; i < noOfVds4D - 1; i++) {
+        vec4 pos1 = lorentzTransformation(vds4D[i] - observerStartPos, To3DVelocity(observerVelocity));
+        vec4 pos2 = lorentzTransformation(vds4D[i + 1] - observerStartPos, To3DVelocity(observerVelocity));
+        vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);
+        vec4 offsettedStartPos = pos1 - tangentVelocity / tangentVelocity.w * pos1.w;
+        vec3 diagramPos = vec3(offsettedStartPos[diagramX], offsettedStartPos[diagramY], offsettedStartPos[diagramZ]);
+        vec3 diagramDir = normalize(vec3(tangentVelocity[diagramX], tangentVelocity[diagramY], tangentVelocity[diagramZ]));
+        float temp = abs(dot(ray.pos - diagramPos, cross(diagramDir, ray.dir)));
+        vec3 cn = normalize(cross(diagramDir, ray.dir));
+        vec3 projected = dot(diagramPos - ray.pos, ray.dir) * ray.dir;
+        vec3 rejected = diagramPos - ray.pos - projected - dot(diagramPos - ray.pos, cn) * cn;
+        closestPoint = diagramPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
+        vec3 endPoint1 = vec3(pos1[diagramX], pos1[diagramY], pos1[diagramZ]);
+        vec3 endPoint2 = vec3(pos2[diagramX], pos2[diagramY], pos2[diagramZ]);
+        if (/*dot(endPoint2 - endPoint1, closestPoint - endPoint1) > 0.0f && dot(endPoint1 - endPoint2, closestPoint - endPoint2) > 0.0f && */
+            (distance == -1 || temp < diagram)) {
+            distance = temp;
+        }
+    }
+    return distance;
 }
 
 GeodeticLine* GeodeticLine::loadFromFile(std::ifstream& file)

@@ -44,6 +44,7 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	}
 	gpuProgram.setUniform(true, "textMode");
 	gpuProgram.setUniform(color, "kd");
+	gpuProgram.setUniform(true, "directRenderMode");
 	fontTexture->loadOnGPU(gpuProgram);
 
 	vec3 wPos = (cameraSpace)? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) - camera.getEye() : pos;
@@ -74,6 +75,7 @@ void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 	}
 	gpuProgram.setUniform(true, "textMode");
 	gpuProgram.setUniform(color, "kd");
+	gpuProgram.setUniform(true, "directRenderMode");
 	fontTexture->loadOnGPU(gpuProgram);
 
 	vec3 wPos = (cameraSpace) ? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) : pos;
@@ -138,19 +140,23 @@ void Caption::genGeometry()
 
 		// (named in viewers orientation)
 		VertexData bottomLeft;
-		bottomLeft.pos = charPos + vec3(0, 0.5f, -0.5f);
+		vec3 pos3 = charPos + vec3(0, 0.5f, -0.5f);
+		bottomLeft.pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 		bottomLeft.norm = vNorm;
 		bottomLeft.uv = bottomLeftUV;
 		VertexData bottomRight;
-		bottomRight.pos = charPos + vec3(0, -0.5f, -0.5f);
+		pos3 = charPos + vec3(0, -0.5f, -0.5f);
+		bottomRight.pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 		bottomRight.norm = vNorm;
 		bottomRight.uv = bottomRightUV;
 		VertexData topRight;
-		topRight.pos = charPos + vec3(0, -0.5f, 0.5f);
+		pos3 = charPos + vec3(0, -0.5f, 0.5f);
+		topRight.pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 		topRight.norm = vNorm;
 		topRight.uv = topRightUV;
 		VertexData topLeft;
-		topLeft.pos = charPos + vec3(0, 0.5f, 0.5f);
+		pos3 = charPos + vec3(0, 0.5f, 0.5f);
+		topLeft.pos = vec4(pos3.x, pos3.y, pos3.z, 0);
 		topLeft.norm = vNorm;
 		topLeft.uv = topLeftUV;
 
