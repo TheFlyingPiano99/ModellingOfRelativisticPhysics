@@ -19,24 +19,25 @@ class WorldLine : public Entity
 {
 protected:
 	unsigned int vao, vbo;
+	int noOfVds;
+	std::vector<vec3> vds;
+
+	//New part:
+	std::vector<vec4> vds4D;
+	unsigned int noOfVds4D;
+
 	enum WorldLineType {
 		geodetic,
 		other
 	} type;
 
-	WorldLine(std::string _name = "", std::string _desc = ""): Entity(_name, _desc) {
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	}
+	WorldLine(std::string _name = "", std::string _desc = "");
+
+	virtual void genGeometry() = 0;
 
 public:
 
-	~WorldLine() {
-		glDeleteBuffers(1, &vbo);
-		glDeleteVertexArrays(1, &vao);
-	}
+	~WorldLine();
 
 
 	/*
@@ -44,70 +45,70 @@ public:
 	* where the "observer of this world line" is at a point,
 	* where it measures tau proper time since it crossed the hyper plane of absolute observers t0 = 0;
 	*/
-	virtual float getAbsoluteTimeAtProperTime(float tau) = 0;
+	float getAbsoluteTimeAtProperTime(float tau);
 
 	/*
 	* The proper time measured by the "line's observer" since it crossed the hyperplane of absolute observers t0 = 0,
 	* and reached a hyperplane, where the absolute observer measures t time;
 	*/
-	virtual float getProperTimeAtAbsoluteTime(float t) = 0;
+	float getProperTimeAtAbsoluteTime(float t);
 
 	/*
 	* The space-time location on the world line according to the absolute observer, when the observer
 	* of the line's proper time is tau since it crossed the hyperplane of absolute observers t = 0;
 	*/
-	virtual vec4 getLocationAtProperTime(float tau) = 0;
+	vec4 getLocationAtProperTime(float tau);
 	/*
 	* The velocity four-vector of the world line according to the absolute observer, when the "observer
 	* of the line"'s proper time is tau since it crossed the hyperplane of absolute observers t = 0;
 	*/
-	virtual vec4 getVelocityAtProperTime(float tau) = 0;
+	vec4 getVelocityAtProperTime(float tau);
 
 	/*
 	* Simultaneous hyperplane according the the line's observer,
 	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
 	*/
-	virtual Hyperplane* getSimultaneousHyperplaneAtProperTime(float tau) = 0;
+	Hyperplane* getSimultaneousHyperplaneAtProperTime(float tau);
 
 	/*
 	* Light cone according the the line's observer,
 	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
 	*/
-	virtual LightCone* getLigtConeAtProperTime(float tau) = 0;
+	LightCone* getLigtConeAtProperTime(float tau);
 
 	/*
 	* The space-time location on the world line according to the absolute observer,
 	* when the absolute observers time is t.
 	*/
-	virtual vec4 getLocationAtAbsoluteTime(float t) = 0;
-	
+	vec4 getLocationAtAbsoluteTime(float t);
+
 	/*
 	* The velocity four-vector of the world line according to the absolute observer,
 	* when the absolute observers time is t.
 	*/
-	virtual vec4 getVelocityAtAbsoluteTime(float t) = 0;
+	vec4 getVelocityAtAbsoluteTime(float t);
 
 	/*
 	* Simultaneous hyperplane according the the line's observer,
 	* when it crosses the hyperplane, where absolute observer measures t absolute time.
 	*/
-	virtual Hyperplane* getSimultaneousHyperplaneAtAbsoluteTime(float t) = 0;
+	Hyperplane* getSimultaneousHyperplaneAtAbsoluteTime(float t);
 
 	/*
 	* Light cone according the the line's observer,
 	* when it measures tau proper time since it crossed the hyperplane of absolute observers t = 0
 	*/
-	virtual LightCone* getLigtConeAtAbsoluteTime(float t) = 0;
+	LightCone* getLigtConeAtAbsoluteTime(float t);
 
 	/*
 	* Returns the absolute time spent, where the world line intersects the hyperplane.
 	*/
-	virtual float intersectHyperplane(Hyperplane& plane) = 0;
+	float intersectHyperplane(Hyperplane& plane);
 
 	/*
 	* Returns the absolute time spent, where the world line intersects the light cone.
 	*/
-	virtual float intersectLightCone(LightCone& cone) = 0;
+	float intersectLightCone(LightCone& cone);
 
 	/*
 	* Used, when a vertex is offseted from the center of an object.
@@ -115,40 +116,25 @@ public:
 	*/
 	//virtual WorldLine* getWorldLineWithOffset(vec3 offset) = 0;
 
-	virtual void loadOnGPU(GPUProgram& gpuProgram) = 0;
+	void loadOnGPU(GPUProgram& gpuProgram);
 
 	/*
 	* Used to draw in diagram view.
 	*/
-	virtual void Draw() = 0;
+	void DrawDiagram();
 
-	virtual float distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ) = 0;
+	float distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ);
 
 	/*
 	* 
 	*/
-	float intersect(Intersectable& intersectable) {
-		float t;
-		if (intersectable.getType() == IntersectionMode::lightCone) {
-			t = intersectLightCone(reinterpret_cast<LightCone&>(intersectable));
-		}
-		else if (intersectable.getType() == IntersectionMode::hyperplane) {
-			t = intersectHyperplane(reinterpret_cast<Hyperplane&>(intersectable));
-		}
-		return t;
-	}
+	float intersect(Intersectable& intersectable);
 };
 
 class GeodeticLine : public WorldLine
 {
 	vec4 locationAtZeroT;	//When tau = 0
 	vec4 fourVelocity;
-	int noOfVds;
-	std::vector<vec3> vds;
-
-	//New part:
-	std::vector<vec4> vds4D;
-	unsigned int noOfVds4D;
 
 	void genGeometry();
 public:
@@ -170,23 +156,8 @@ public:
         genGeometry();
 	}
 
-	float getAbsoluteTimeAtProperTime(float tau);
-	float getProperTimeAtAbsoluteTime(float t);
-	vec4 getLocationAtProperTime(float tau);
-	vec4 getVelocityAtProperTime(float tau);
-	Hyperplane* getSimultaneousHyperplaneAtProperTime(float tau);
-	LightCone* getLigtConeAtProperTime(float tau);
-	vec4 getLocationAtAbsoluteTime(float t);
-	vec4 getVelocityAtAbsoluteTime(float t);
-	Hyperplane* getSimultaneousHyperplaneAtAbsoluteTime(float t);
-	LightCone* getLigtConeAtAbsoluteTime(float t);
-	float intersectHyperplane(Hyperplane& plane);
-	float intersectLightCone(LightCone& cone);
 	//WorldLine* getWorldLineWithOffset(vec3 offset);
-	void loadOnGPU(GPUProgram& gpuProgram);
-	void Draw();
 	std::string genSaveString();
-	virtual float distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ);
 
 	/*
 	* Returns the loaded object.

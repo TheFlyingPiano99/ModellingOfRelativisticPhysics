@@ -36,7 +36,7 @@ public:
 		name[1] = "y";
 		name[2] = "t";
 
-		float nameDist = 10;
+		float nameDist = 50;
 		for (int i = 0; i < 3; i++) {
 			axisName[i] = Caption::createNormalCaption(base[i] * nameDist, name[i].c_str());
 			(*axisName[i])->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));

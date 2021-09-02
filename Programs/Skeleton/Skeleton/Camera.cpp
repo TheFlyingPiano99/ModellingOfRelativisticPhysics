@@ -4,7 +4,7 @@
 void Camera::initBasic(const vec3 _eye, const vec3 _lookat, const vec3 _prefUp, const float _fov, const float _asp, const float _fp, const float _bp) {
 	eye = _eye;
 	lookat = _lookat;
-	prefUp = _prefUp;
+	prefUp = normalize(_prefUp);
 	fov = _fov;
 	asp = _asp;
 	fp = _fp;
@@ -70,7 +70,12 @@ void Camera::rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle)
 
 	vec3 centered = lookat - eye;
 	vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
-	setLookat(vec3(rotated.x, rotated.y, rotated.z) + eye);
+	vec3 rotated3 = vec3(rotated.x, rotated.y, rotated.z);
+	float l = length(rotated3);
+	if (dot(rotated3, prefUp) / l > 0.999f || dot(rotated3, prefUp) / l < -0.999f) {
+		return;
+	}
+	setLookat(rotated3 + eye);
 }
 
 void Camera::rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle) {
@@ -79,7 +84,12 @@ void Camera::rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAng
 
 	vec3 centered = eye - lookat;
 	vec4 rotated = vec4(centered.x, centered.y, centered.z, 1) * hRotationM * vRotationM;
-	eye = vec3(rotated.x, rotated.y, rotated.z) + lookat;
+	vec3 rotated3 = vec3(rotated.x, rotated.y, rotated.z);
+	float l = length(rotated3);
+		if (dot(rotated3, prefUp) / l > 0.999f || dot(rotated3, prefUp) / l < -0.999f) {
+		return;
+	}
+	eye = rotated3 + lookat;
 	setLookat(lookat);
 }
 
@@ -91,6 +101,11 @@ void Camera::rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngl
 	vec3 centeredLookat = lookat - point;
 	vec4 rotatedEye = vec4(centeredEye.x, centeredEye.y, centeredEye.z, 1) * hRotationM * vRotationM;
 	vec4 rotatedLookat = vec4(centeredLookat.x, centeredLookat.y, centeredLookat.z, 1) * hRotationM * vRotationM;
+	vec4 w4 = vec4(rotatedLookat - rotatedEye);
+	vec3 w = normalize(vec3(w4.x, w4.y, w4.z));
+	if (dot(w, prefUp) > 0.999f || dot(w, prefUp) < -0.999f) {
+		return;
+	}
 	eye = vec3(rotatedEye.x, rotatedEye.y, rotatedEye.z) + point;
 	lookat = vec3(rotatedLookat.x, rotatedLookat.y, rotatedLookat.z) + point;
 	setLookat(lookat);

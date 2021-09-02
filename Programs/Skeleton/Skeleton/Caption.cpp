@@ -70,6 +70,7 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 
 void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 {
+	this;
 	if (!visible) {
 		return;
 	}

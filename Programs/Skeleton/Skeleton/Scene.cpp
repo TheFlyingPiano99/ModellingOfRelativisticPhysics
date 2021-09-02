@@ -81,15 +81,12 @@ void Scene::Initialise()
 
 	// Captions:-------------------------------------------------------
 
+	// Load from file:-------------------------------------------------
+	load("defaultSave01.txt");
+
 
 	// Background:-----------------------------------------------------
 	background = new Background();
-	
-	// Coordinate system:----------------------------------------------
-	system = new CoordinateSystem();
-
-	// Load from file:-------------------------------------------------
-	load("defaultSave01.txt");
 
 	// Other:----------------------------------------------------------
 	//toggleActiveObserver();
@@ -609,6 +606,9 @@ void Scene::load(const char* sourceFileName)
 		file->close();
 		delete file;
 		Scene::getInstance()->setFinishedLoading(true);
+
+		delete system;
+		system = new CoordinateSystem();
 	}
 	else {
 		Scene::getInstance()->getHUD()->pushMessage("Cannot load scene!");

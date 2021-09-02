@@ -1,6 +1,13 @@
-#include "Message.h"
+#include "MessageQueue.h"
 #include "Scene.h"
 #include "HUD.h"
+
+void MessageQueue::pop()
+{
+	std::shared_ptr<Caption*> caption = queue.front();
+	queue.pop_front();
+	(*caption)->erease();
+}
 
 MessageQueue::~MessageQueue() {
 	for each (std::shared_ptr<Caption*> cap in queue) {
@@ -17,6 +24,9 @@ void MessageQueue::push(const char* text)
 		transitPhase = false;
 	}
 	queue.push_back(caption);
+	if (queue.size() > maxSize) {
+		pop();
+	}
 }
 
 void MessageQueue::Animate(float dt) {
@@ -33,9 +43,7 @@ void MessageQueue::Animate(float dt) {
 		}
 		else {					// Change state to transit
 			transitPhase = true;
-			std::shared_ptr<Caption*> caption = queue.front();			// Pop queue
-			queue.pop_front();
-			(*caption)->erease();
+			pop();				// Pop queue
 			timeLeft = transitTime;
 		}
 	}

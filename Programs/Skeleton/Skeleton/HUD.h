@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "Camera.h"
-#include "Message.h"
+#include "MessageQueue.h"
 #include "TextEntry.h"
 #include <memory>
 
@@ -56,12 +56,12 @@ public:
 	void Animate(float dt);
 
 	/*
-	* Draw every caption and other in RealTime3D view mode.
+	* DrawDiagram every caption and other in RealTime3D view mode.
 	*/
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 
 	/*
-	* Draw every caption and other in Diagram view mode.
+	* DrawDiagram every caption and other in Diagram view mode.
 	*/
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
 

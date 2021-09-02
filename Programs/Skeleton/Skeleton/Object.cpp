@@ -110,7 +110,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");
 
-	worldLine->Draw();
+	worldLine->DrawDiagram();
 	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
 		vec4 pos = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observersStartPos, RelPhysics::To3DVelocity(observerVelocity));

@@ -49,7 +49,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);
 
-	worldLine->Draw();
+	worldLine->DrawDiagram();
 }
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
@@ -116,8 +116,7 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMo
 	vec4 pos = vec4(0,0, currentProperTime, 0);
 	(*timerCaption)->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
 	(*timerCaption)->setVisible(selected);
-	pos = getStartPos();
-	(*diagramCaption)->setPos(vec3(pos.x, pos.y, pos.w));
+	(*diagramCaption)->setPos(vec3(0 , 0, 0));
 	(*diagramCaption)->setVisible(true);
 	(*timerCaption)->setVisible(true);
 }

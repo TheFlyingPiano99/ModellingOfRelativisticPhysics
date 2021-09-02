@@ -91,7 +91,7 @@
     <ClCompile Include="Hyperplane.cpp" />
     <ClCompile Include="LightCone.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
-    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
@@ -120,7 +120,7 @@
     <ClInclude Include="HUD.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
-    <ClInclude Include="Message.h" />
+    <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="StringOperations.h" />

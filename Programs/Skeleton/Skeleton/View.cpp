@@ -71,8 +71,8 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable,
-			scene->getActiveObserver()->getVelocity(),
 			scene->getActiveObserver()->getStartPos(),
+			scene->getActiveObserver()->getVelocity(),
 			scene->getDiagramX(),
 			scene->getDiagramY(),
 			scene->getDiagramZ());			// Objects
