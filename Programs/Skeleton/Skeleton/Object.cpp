@@ -81,7 +81,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	// Caption:
 	if (selected || hovered) {		
 		vec3 pos = perceivedPosition(&intersectable, doLorentz, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
-		(*diagramCaption)->setPos(pos	+ normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
+		(*diagramCaption)->setPos(pos + normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		(*diagramCaption)->setVisible(true);
 	}
 	else {
@@ -101,8 +101,6 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 		diagramMaterial->loadOnGPU(gpuProgram);
 	}
 
-
-
 	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
@@ -113,9 +111,22 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 	worldLine->DrawDiagram();
 	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
-		vec4 pos = RelPhysics::lorentzTransformation(
-			worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
-			RelPhysics::To3DVelocity(observerProperties.velocity));
+		vec4 pos;
+		if (settings.transformToProperFrame) {
+			if (settings.doLorentz) {
+				pos = RelPhysics::lorentzTransformation(
+					worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
+					RelPhysics::To3DVelocity(observerProperties.velocity));
+			}
+			else {
+				RelPhysics::galileanTransformation(
+					worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
+					RelPhysics::To3DVelocity(observerProperties.velocity));
+			}
+		}
+		else {
+			pos = worldLine->getLocationAtAbsoluteTime(t);
+		}
 		(*diagramCaption)->setPos(vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]));
 		(*diagramCaption)->setVisible(true);
 	}

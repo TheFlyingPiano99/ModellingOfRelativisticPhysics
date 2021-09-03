@@ -4,31 +4,64 @@
 #include "StringOperations.h"
 
 
-vec4 Observer::getLocation()
+vec4 Observer::getLocation(const Settings& settings)
 {
-    return worldLine->getLocationAtProperTime(currentProperTime);
+	if (settings.doLorentz) {
+		return worldLine->getLocationAtProperTime(currentProperTime);
+	}
+	else {
+		return worldLine->getLocationAtAbsoluteTime(currentProperTime);
+	}
 }
 
-vec4 Observer::getVelocity()
+vec4 Observer::getVelocity(const Settings& settings)
 {
-    return worldLine->getVelocityAtProperTime(currentProperTime);
+	if (settings.doLorentz) {
+		return worldLine->getVelocityAtProperTime(currentProperTime);
+	}
+	else {
+		return worldLine->getVelocityAtAbsoluteTime(currentProperTime);
+	}
 }
 
 vec4 Observer::getLocationAtZero()	// Must be fixed!
 {
-	return worldLine->getLocationAtAbsoluteTime(0.0f);
+	return worldLine->getLocationAtAbsoluteTime(0.0f);	// Not cool!!! Must use projected zero pos along geodetic! Probably...
 }
 
-Hyperplane* Observer::getHyperplane()
+/*
+* Return all necessary properties.
+*/
+
+ObserverProperties Observer::getProperties(const Settings& settings) {
+	ObserverProperties properties;
+	properties.velocity = getVelocity(settings);
+	properties.location = getLocation(settings);
+	properties.locationAtZero = getLocationAtZero();
+	return properties;
+}
+
+Hyperplane* Observer::getHyperplane(const Settings& settings)
 {
-	return worldLine->getSimultaneousHyperplaneAtProperTime(currentProperTime);
+	if (settings.doLorentz) {
+		return worldLine->getSimultaneousHyperplaneAtProperTime(currentProperTime);
+	}
+	else {		// Euclidean space
+		vec4 location = worldLine->getLocationAtAbsoluteTime(currentProperTime);
+		return new Hyperplane(location, vec4(0, 0, 0, 1));
+	}
 }
 
 
 
-LightCone* Observer::getLightCone()
+LightCone* Observer::getLightCone(const Settings& settings)
 {
-	return worldLine->getLigtConeAtProperTime(currentProperTime);
+	if (settings.doLorentz) {
+		return worldLine->getLigtConeAtProperTime(currentProperTime);
+	}
+	else {
+		return worldLine->getLigtConeAtAbsoluteTime(currentProperTime);
+	}
 }
 
 void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
@@ -52,14 +85,14 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	worldLine->DrawDiagram();
 }
 
-void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings)
+void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
 	vec3 pos;
 	if (settings.transformToProperFrame) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
-		vec4 pos4 = this->getLocation();
+		vec4 pos4 = this->getLocation(settings);
 		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
 	}
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
@@ -70,12 +103,11 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Obse
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "textMode");
 	gpuProgram.setUniform(true, "directRenderMode");
-
-	vec3 planeNormal = (settings.transformToProperFrame) ?
+	
+	vec4 v = getVelocity(settings);
+	vec3 planeNormal = (settings.transformToProperFrame || !settings.doLorentz) ?
 		vec3(0, 0, 1)
-		: normalize(vec3(-observerProperties.velocity.x,
-		-observerProperties.velocity.y,
-		observerProperties.velocity.w));
+		: normalize(vec3(-v.x, -v.y, v.w));
 
 	PlaneSurface* plane = new PlaneSurface(planeNormal,	100, 100);
 	plane->GenSurface(20, 20);
@@ -92,7 +124,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Setti
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
-		vec4 pos4 = this->getLocation();
+		vec4 pos4 = this->getLocation(settings);
 		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
 	}
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
@@ -114,7 +146,7 @@ void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& 
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
-		vec4 pos4 = this->getLocation();
+		vec4 pos4 = this->getLocation(settings);
 		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
 	}
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
@@ -133,7 +165,7 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 		DrawLightCone(gpuProgram, camera, settings);
 	}
 	else if (settings.intersectionMode == IntersectionMode::hyperplane) {
-		DrawHyperplane(gpuProgram, camera, observerProperties, settings);
+		DrawHyperplane(gpuProgram, camera, settings);
 	}
 	DrawNode(gpuProgram, camera, settings);
 	static int updateCounter = 0;
@@ -142,14 +174,14 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 		prevTau = currentProperTime;
 		updateCounter = 0;
 		(*timerCaption)->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
-			.append("t = ").append(std::to_string(worldLine->getAbsoluteTimeAtProperTime(currentProperTime))).append(" m").c_str());
+			.append("t = ").append(std::to_string((settings.doLorentz) ? worldLine->getAbsoluteTimeAtProperTime(currentProperTime) : currentProperTime)).append(" m").c_str());
 	}
 	vec3 pos;
 	if (settings.transformToProperFrame) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
-		vec4 pos4 = this->getLocation();
+		vec4 pos4 = this->getLocation(settings);
 		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
 	}
 	(*timerCaption)->setPos(pos + camera.getRight() * 11 + camera.getUp() * 1);
@@ -163,17 +195,27 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 	(*timerCaption)->setVisible(true);
 }
 
-void Observer::setCurrentTimeAtAbsoluteTime(float t)
+void Observer::setCurrentTimeAtAbsoluteTime(float t, const Settings& settings)
 {
-	currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+	if (settings.doLorentz) {
+		currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+	}
+	else {
+		currentProperTime = t;
+	}
 }
 
-float Observer::getAbsoluteTimeAtCurrentTime()
+float Observer::getAbsoluteTimeAtCurrentTime(const Settings& settings)
 {
-	return worldLine->getAbsoluteTimeAtProperTime(currentProperTime);
+	if (settings.doLorentz) {
+		return worldLine->getAbsoluteTimeAtProperTime(currentProperTime);
+	}
+	else {
+		return currentProperTime;
+	}
 }
 
-float Observer::increaseTimeByDelta(float deltaTau)
+float Observer::increaseTimeByDelta(float deltaTau, const Settings& settings)
 {
 	if (currentProperTime + deltaTau < 0.0f) {		// Crop delta
 		float realDelta = -currentProperTime;
@@ -186,23 +228,28 @@ float Observer::increaseTimeByDelta(float deltaTau)
 	}
 }
 
-void Observer::syncCamera(Camera* camera)
+void Observer::syncCamera(Camera* camera, const Settings& settings)
 {
-	camera->syncToObserver(getProperties());
+	camera->syncToObserver(getProperties(settings));
 }
 
-void Observer::syncTimeToObserversSimultaneity(Observer& observer)
+void Observer::syncTimeToObserversSimultaneity(Observer& observer, const Settings& settings)
 {
-	Hyperplane* plane = observer.getHyperplane();
+	Hyperplane* plane = observer.getHyperplane(settings);
 	float t = worldLine->intersectHyperplane(*plane);
-	currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+	if (settings.doLorentz) {
+		currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
+	}
+	else {
+		currentProperTime = t;
+	}
 	delete plane;
 }
 
-void Observer::loadOnGPU(GPUProgram& gpuProgram)
+void Observer::loadOnGPU(GPUProgram& gpuProgram, const Settings& settings)
 {
-	gpuProgram.setUniform(getVelocity(), "observersVelocity");
-	gpuProgram.setUniform(getLocation(), "observersLocation");
+	gpuProgram.setUniform(getVelocity(settings), "observersVelocity");
+	gpuProgram.setUniform(getLocation(settings), "observersLocation");
 	gpuProgram.setUniform(getLocationAtZero(), "observersStartPos");
 }
 

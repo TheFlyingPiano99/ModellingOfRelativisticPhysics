@@ -92,6 +92,16 @@ namespace RelPhysics
 				+ (1 / speedOfLight / speedOfLight) * (gammaV / (gammaV + 1))
 				* dot(toTransform, relVelocity) * relVelocity);
 	}
+
+	static vec4 galileanTransformation(vec4 toTransform, vec3 relVelocity) {
+		vec3 r = vec3(toTransform.x, toTransform.y, toTransform.z);
+		float t = toTransform.w;
+		vec3 v = relVelocity;
+		vec3 rTrans = r - v * t;
+		float tTrans = t;
+		return vec4(rTrans.x, rTrans.y, rTrans.z, tTrans);
+	}
+
 };
 
 #endif /*!RELPHYSICS_H*/

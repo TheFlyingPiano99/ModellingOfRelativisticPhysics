@@ -40,6 +40,7 @@ enum ControlEvent {
 	windTime,
 	rewindTime,
 	toggleLorentz,
+	toggleTransformToProperFrame,
 	save,
 	load
 };

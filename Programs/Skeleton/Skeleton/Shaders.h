@@ -138,6 +138,15 @@ const char* const vertexSource = R"(
 			* dot(toTransform, relVelocity) * relVelocity);
 	}
 
+	vec4 galileanTransformation(vec4 toTransform, vec3 relVelocity) {
+		vec3 r = toTransform.xyz;
+		float t = toTransform.w;
+		vec3 v = relVelocity;
+		vec3 rTrans = r - v * t;
+		float tTrans = t;
+		return vec4(rTrans, tTrans);
+	}
+
 	/*
 	* Calculates coeficient for Doppler shift of perceived color. Given, that observer is positioned in (0,0,0).
 	*/
@@ -166,10 +175,10 @@ const char* const vertexSource = R"(
 				vec3 n = normalize(v);
 				vec3 pParalel = dot(vp.xyz, n) * n;
 				vec3 pPerpend = vp.xyz - pParalel;
-				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
+				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + worldLine start pos
 			}
 			else {		// Don't do Lorentz
-				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;
+				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + worldLine start pos
 			}
 
 			//Intersect:
@@ -179,7 +188,7 @@ const char* const vertexSource = R"(
 			}
 			else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
 				vec4 planeLocation = observersLocation;
-				vec4 planeNormal = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
+				vec4 planeNormal = (doLorentz) ? normalize(vec4(-(observersVelocity.xyz), observersVelocity.w)) : vec4(0, 0, 0, 1);
 				t = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);		
 			}
 
@@ -200,8 +209,9 @@ const char* const vertexSource = R"(
 			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)), To3DVelocity(observersVelocity));
 		}
 		else {
-			vertexLocationProperFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t).xyz - observersLocation.xyz;	// Euclidean transformation
-			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)) - To3DVelocity(observersVelocity);	// Euclidean transformation
+			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
+			vertexLocationProperFrame = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
+			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)) - To3DVelocity(observersVelocity);
 		}
 		
 		if (dopplerMode == 0) {	// Full
@@ -232,8 +242,9 @@ const char* const vertexSource = R"(
 				transformed = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
 			}
 			else {
-				transformed = vp - observersStartPos;	// Euclidean transformation
-			}
+				vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
+				transformed = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+}
 		}
 		else {		// "Transformed" is the original.
 			transformed = vp;

@@ -68,6 +68,9 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 		else if (key == 'i') {
 			scene->pushBackControlEvent(toggleIntersectionMode);
 		}
+		else if (key == 't') {
+			scene->pushBackControlEvent(toggleTransformToProperFrame);
+		}
 		else if (key == 'l') {
 			scene->pushBackControlEvent(toggleLorentz);
 		}

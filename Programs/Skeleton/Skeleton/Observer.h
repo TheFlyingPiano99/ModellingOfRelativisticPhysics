@@ -35,58 +35,71 @@ public:
 		(*timerCaption)->erease();		// static
 	}
 
-	vec4 getLocation();
+	/*
+	* Returns spacetime location according to absolute observer when this observer measures "current proper time".
+	*/
+	vec4 getLocation(const Settings& settings);
 
-	vec4 getVelocity();
+	/*
+	* Returns velocity 4-vector according to absolute observer when this observer measures "current proper time".
+	*/
+	vec4 getVelocity(const Settings& settings);
 
+	/*
+	* Return location in absolute observers frame, when this observer crosses absolute observers t = 0 hyperplane.
+	*/
 	vec4 getLocationAtZero();
 
-
-	ObserverProperties getProperties() {
-		ObserverProperties properties;
-		properties.velocity = getVelocity();
-		properties.location = getLocation();
-		properties.locationAtZero = getLocationAtZero();
-		return properties;
-	}
+	/*
+	* Return all necessary properties.
+	*/
+	ObserverProperties getProperties(const Settings& settings);
 
 	/*
 	* Returns simultaneous hyperplane, where the observer measures currentProperTime.
 	*/
-	Hyperplane* getHyperplane();
+	Hyperplane* getHyperplane(const Settings& settings);
 
 	/*
 	* Returns light cone, where the observer measures currentProperTime.
 	*/
-	LightCone* getLightCone();
+	LightCone* getLightCone(const Settings& settings);
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
-	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings);
+	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Settings& settings);
 	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Settings& settings);
 	void DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& settings);
+	
+	/*
+	* Draw intersectable and captions.
+	*/
 	void DrawExtras(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings);
 
 	/*
 	* Receives time in absolute frame and sets proper time accordingly.
 	*/
-	void setCurrentTimeAtAbsoluteTime(float t);
+	void setCurrentTimeAtAbsoluteTime(float t, const Settings& settings);
 
 	/*
 	* Returns time in absolute frame, where observers frame measures currentProperTime.
 	*/
-	float getAbsoluteTimeAtCurrentTime();
+	float getAbsoluteTimeAtCurrentTime(const Settings& settings);
 
 	/*
 	* Receives delta time in proper frame if it does not sinc below zero.
 	* Returns actually applied delta tau.
 	*/
-	float increaseTimeByDelta(float deltaTau);
+	float increaseTimeByDelta(float deltaTau, const Settings& settings);
 
-	void syncCamera(Camera* camera);
-	void syncTimeToObserversSimultaneity(Observer& observer);
+	void syncCamera(Camera* camera, const Settings& settings);
+	
+	/*
+	* Sync proper time of this observer so, that it matches the time measured by ths observer, when it's world line crosses the given observers simultaneous hyperplane.
+	*/
+	void syncTimeToObserversSimultaneity(Observer& observer, const Settings& settings);
 
-	void loadOnGPU(GPUProgram& gpuProgram);
+	void loadOnGPU(GPUProgram& gpuProgram, const Settings& settings);
 
 	std::string genSaveString();
 
@@ -107,10 +120,16 @@ public:
 		return worldLine;
 	}
 
+	/*
+	* Must be called after loading!
+	*/
 	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
 		worldLine = worldLines.at(worldLineID);
 	}
 
+	/*
+	* Mouse is hovered above the image of the observer.
+	*/
 	void hover();
 };
 

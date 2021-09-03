@@ -129,6 +129,8 @@ public:
 
 	void toggleLorentzTransformation();
 
+	void toggleTransformToProperFrame();
+
 	/*
 	* Switches between simultaneous hyperplane intersection and light cone intersection.
 	*/

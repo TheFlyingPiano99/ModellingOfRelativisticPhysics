@@ -134,6 +134,9 @@ void Scene::Control(float dt) {
 			case ControlEvent::toggleIntersectionMode:
 				toggleIntersectionMode();
 				break;
+			case ControlEvent::toggleTransformToProperFrame:
+				toggleTransformToProperFrame();
+				break;
 			case ControlEvent::toggleLorentz:
 				toggleLorentzTransformation();
 				break;
@@ -178,7 +181,7 @@ void Scene::Control(float dt) {
 	if (running) {
 		dt *= timeScale;	// Scale time to sym speed.
 		if (activeObserver != nullptr) {
-			activeObserver->increaseTimeByDelta(dt);
+			activeObserver->increaseTimeByDelta(dt, settings);
 		}
 		//Todo
 	}
@@ -192,7 +195,7 @@ void Scene::Animate(float dt) {
 	if (running) {
 		dt *= timeScale;					// Scale time to symulation speed.
 		if (activeObserver != nullptr) {
-			activeObserver->syncCamera(realTime3DCamera);
+			activeObserver->syncCamera(realTime3DCamera, settings);
 		}
 		for each (Object * obj in objects)
 		{
@@ -217,7 +220,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(settings.transformToProperFrame, "transformToProperFrame");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
-		activeObserver->loadOnGPU(gpuProgram);
+		activeObserver->loadOnGPU(gpuProgram, settings);
 		view->Draw(gpuProgram);
 	}
 }
@@ -229,13 +232,13 @@ void Scene::toggleActiveObserver() {
 			currentIdx = (observers.size() > currentIdx + 1) ? currentIdx + 1 : 0;	// Incrementation with overflow
 			Observer* prevObs = activeObserver;
 			activeObserver = observers.at(currentIdx);
-			activeObserver->syncTimeToObserversSimultaneity(*prevObs);
+			activeObserver->syncTimeToObserversSimultaneity(*prevObs, settings);
 		}
 		else {
 			currentIdx = 0;
 			activeObserver = observers.at(currentIdx);
 		}
-		activeObserver->syncCamera(realTime3DCamera);
+		activeObserver->syncCamera(realTime3DCamera, settings);
 		hud->pushMessage(std::string("Active observer: ").append(activeObserver->getName()).c_str());
 	}
 }
@@ -299,13 +302,25 @@ void Scene::toggleDoppler() {
 
 void Scene::toggleLorentzTransformation() {
 	settings.doLorentz = !settings.doLorentz;
-	settings.transformToProperFrame = settings.doLorentz;
 	std::string str;
 	if (settings.doLorentz) {
 		str = std::string("Lorentz transformation enabled");
 	}
 	else {
 		str = std::string("Lorentz transformation disabled");
+	}
+	hud->pushMessage(str.c_str());
+}
+
+void Scene::toggleTransformToProperFrame()
+{
+	settings.transformToProperFrame = !settings.transformToProperFrame;
+	std::string str;
+	if (settings.transformToProperFrame) {
+		str = std::string("Diagram transformed to active observers frame.");
+	}
+	else {
+		str = std::string("Diagram transformed to absolute observers frame");
 	}
 	hud->pushMessage(str.c_str());
 }
@@ -381,7 +396,7 @@ void Scene::togglePause() {
 
 void Scene::setTime(float t) {
 	if (activeObserver != nullptr) {
-		activeObserver->setCurrentTimeAtAbsoluteTime(t);
+		activeObserver->setCurrentTimeAtAbsoluteTime(t, settings);
 	}
 	bool prevState = running;
 	running = true;
@@ -399,7 +414,7 @@ void Scene::reset() {
 }
 
 void Scene::windTime(float deltaTau) {
-	float realDelta = activeObserver->increaseTimeByDelta(deltaTau);
+	float realDelta = activeObserver->increaseTimeByDelta(deltaTau, settings);
 	bool prevState = running;
 	running = true;
 	Animate(0.0f);
@@ -467,14 +482,14 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 		if (settings.viewMode == ViewMode::diagram) {								// Diagram view
 			float constraint = 0.2f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
-				activeObserver->getProperties(),
+				activeObserver->getProperties(settings),
 				settings);		// First item handled separately.
 			if (constraint > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
 				float d = objects[i]->rayDistanceToDiagram(ray,
-					activeObserver->getProperties(),
+					activeObserver->getProperties(settings),
 					settings);
 				if ((shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
 					shortestDistance = d;
@@ -485,18 +500,18 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 		else if (settings.viewMode == ViewMode::realTime3D) {						// RealTime3D view
 			Intersectable* intersectable;
 			if (settings.intersectionMode == IntersectionMode::lightCone) {
-				intersectable = activeObserver->getLightCone();
+				intersectable = activeObserver->getLightCone(settings);
 			}
 			else if (settings.intersectionMode == IntersectionMode::hyperplane) {
-				intersectable = activeObserver->getHyperplane();
+				intersectable = activeObserver->getHyperplane(settings);
 			}
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(), activeObserver->getLocationAtZero(), activeObserver->getVelocity());
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(), activeObserver->getVelocity(settings));
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(), activeObserver->getLocationAtZero(), activeObserver->getVelocity());
+				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(), activeObserver->getVelocity(settings));
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
