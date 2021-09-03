@@ -7,8 +7,8 @@
 #include "WorldLine.h"
 #include "Material.h"
 #include "Caption.h"
-#include <map>
 #include "EnumTypes.h"
+#include <map>
 #include <memory>
 
 class Observer : public Entity
@@ -39,7 +39,16 @@ public:
 
 	vec4 getVelocity();
 
-	vec4 getStartPos();
+	vec4 getLocationAtZero();
+
+
+	ObserverProperties getProperties() {
+		ObserverProperties properties;
+		properties.velocity = getVelocity();
+		properties.location = getLocation();
+		properties.locationAtZero = getLocationAtZero();
+		return properties;
+	}
 
 	/*
 	* Returns simultaneous hyperplane, where the observer measures currentProperTime.
@@ -53,10 +62,10 @@ public:
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
-	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera);
-	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera);
-	void DrawNode(GPUProgram& gpuProgram, Camera& camera);
-	void DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMode intersectionMode);
+	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings);
+	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Settings& settings);
+	void DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& settings);
+	void DrawExtras(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings);
 
 	/*
 	* Receives time in absolute frame and sets proper time accordingly.

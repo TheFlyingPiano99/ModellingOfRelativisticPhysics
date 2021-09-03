@@ -43,3 +43,25 @@ enum ControlEvent {
 	save,
 	load
 };
+
+/*
+* All important settings mainly related to rendering.
+*/
+struct Settings {
+	ViewMode viewMode = ViewMode::realTime3D;
+	IntersectionMode intersectionMode = IntersectionMode::lightCone;
+	DopplerMode dopplerMode = DopplerMode::mild;
+	bool doLorentz = true;
+	bool transformToProperFrame = true;
+	bool doShading = true;
+	int diagramX = 0;
+	int diagramY = 1;
+	int diagramZ = 3;
+
+};
+
+struct ObserverProperties {
+	vec4 velocity;
+	vec4 location;
+	vec4 locationAtZero;
+};

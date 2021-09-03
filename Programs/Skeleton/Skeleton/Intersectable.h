@@ -15,4 +15,9 @@ public:
 	IntersectionMode getType() {
 		return type;
 	}
+
+	const IntersectionMode getType() const {
+		return type;
+	}
+
 };

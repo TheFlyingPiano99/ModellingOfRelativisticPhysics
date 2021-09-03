@@ -23,7 +23,7 @@ public:
 	/*
 	* Update camera to allignt with the observer.
 	*/
-	void syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos);
+	void syncToObserver(const ObserverProperties& observerProperties);
 
 	/*
 	* Creates an orthogonal system, used for the View, Projection transformations.

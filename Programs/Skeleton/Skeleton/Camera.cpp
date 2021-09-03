@@ -12,10 +12,10 @@ void Camera::initBasic(const vec3 _eye, const vec3 _lookat, const vec3 _prefUp, 
 	setLookat(lookat);
 }
 
-void Camera::syncToObserver(const vec4 _location, const vec4 _velocity, const vec4 _startPos) {
-	locationFV = _location;
-	velocityFV = _velocity;
-	startPosFV = _startPos;
+void Camera::syncToObserver(const ObserverProperties& observerProperties) {
+	locationFV = observerProperties.location;
+	velocityFV = observerProperties.velocity;
+	startPosFV = observerProperties.locationAtZero;
 	vec3 updatedEye = vec3(locationFV.x, locationFV.y, locationFV.z);
 	vec3 delta = updatedEye - eye;
 	eye = updatedEye;

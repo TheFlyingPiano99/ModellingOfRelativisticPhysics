@@ -89,7 +89,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 	}
 }
 
-void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, vec4 observersStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ) {
+void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersectable& intersectable, const ObserverProperties& observerProperties, const Settings& settings) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
@@ -113,8 +113,10 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, Intersectable& 
 	worldLine->DrawDiagram();
 	if (selected || hovered) {
 		float t = worldLine->intersect(intersectable);
-		vec4 pos = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observersStartPos, RelPhysics::To3DVelocity(observerVelocity));
-		(*diagramCaption)->setPos(vec3(pos[diagramX], pos[diagramY], pos[diagramZ]));
+		vec4 pos = RelPhysics::lorentzTransformation(
+			worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
+			RelPhysics::To3DVelocity(observerProperties.velocity));
+		(*diagramCaption)->setPos(vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]));
 		(*diagramCaption)->setVisible(true);
 	}
 	else {

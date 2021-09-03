@@ -28,6 +28,7 @@ const char* const vertexSource = R"(
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
 	uniform vec4 observersStartPos;
+	uniform bool transformToProperFrame;
 
 	uniform int intersectionMode;	// 0 = lightCone, 1 = hyperplane
 
@@ -225,12 +226,17 @@ const char* const vertexSource = R"(
 
 	void diagram() {
 		vec4 transformed;
-		if (doLorentz) {
-			vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
-			transformed = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+		if (transformToProperFrame) {
+			if (doLorentz) {
+				vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
+				transformed = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+			}
+			else {
+				transformed = vp - observersStartPos;	// Euclidean transformation
+			}
 		}
-		else {
-			transformed = vp - observersLocation;	// Euclidean transformation
+		else {		// "Transformed" is the original.
+			transformed = vp;
 		}
 
 		wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;
@@ -240,7 +246,7 @@ const char* const vertexSource = R"(
 		gl_Position = vec4(wPos, 1) * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
-	void directRender() {
+	void directRender() {					// Classic render mode, without any relativistic transformation. Only MVP is applied.
 		wPos = (vec4(vp.xyz, 1) * M).xyz;
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;

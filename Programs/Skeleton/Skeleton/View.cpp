@@ -8,10 +8,10 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	Scene* scene = reinterpret_cast<Scene*>(owner);
 	Camera* activeCamera = scene->getActiveCamera();
 	Intersectable* intersectable;
-	if (scene->getIntersectionMode() == IntersectionMode::lightCone) {
+	if (scene->getSettings().intersectionMode == IntersectionMode::lightCone) {
 		intersectable = scene->getActiveObserver()->getLightCone();
 	}
-	else if (scene->getIntersectionMode() == IntersectionMode::hyperplane) {
+	else if (scene->getSettings().intersectionMode == IntersectionMode::hyperplane) {
 		intersectable = scene->getActiveObserver()->getHyperplane();
 	}
 	for each (LightSource * lt in *(scene->getLights()))
@@ -22,12 +22,12 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 	gpuProgram.setUniform(false, "doLorentz");
 	gpuProgram.setUniform(1, "intersectionMode");
 	scene->getBackground()->Draw(gpuProgram, *(activeCamera));		// Background
-	gpuProgram.setUniform(scene->getDoLorentz(), "doLorentz");
-	gpuProgram.setUniform(scene->getIntersectionMode(), "intersectionMode");
+	gpuProgram.setUniform(scene->getSettings().doLorentz, "doLorentz");
+	gpuProgram.setUniform(scene->getSettings().intersectionMode, "intersectionMode");
 
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *intersectable, scene->getDoLorentz());					// Objects
+		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *intersectable, scene->getSettings().doLorentz);					// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
@@ -54,28 +54,25 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		lt->loadOnGPU(gpuProgram);									// Load lights
 	}
-	gpuProgram.setUniform(scene->getDiagramX(), "diagramX");
-	gpuProgram.setUniform(scene->getDiagramY(), "diagramY");
-	gpuProgram.setUniform(scene->getDiagramZ(), "diagramZ");
+	gpuProgram.setUniform(scene->getSettings().diagramX, "diagramX");
+	gpuProgram.setUniform(scene->getSettings().diagramY, "diagramY");
+	gpuProgram.setUniform(scene->getSettings().diagramZ, "diagramZ");
 
 	//Actual drawing:
 	Camera* activeCamera = scene->getActiveCamera();
 	Intersectable* intersectable;
 	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
-	if (scene->getIntersectionMode() == IntersectionMode::lightCone) {
+	if (scene->getSettings().intersectionMode == IntersectionMode::lightCone) {
 		intersectable = scene->getActiveObserver()->getLightCone();
 	}
-	else if (scene->getIntersectionMode() == IntersectionMode::hyperplane) {
+	else if (scene->getSettings().intersectionMode == IntersectionMode::hyperplane) {
 		intersectable = scene->getActiveObserver()->getHyperplane();
 	}
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable,
-			scene->getActiveObserver()->getStartPos(),
-			scene->getActiveObserver()->getVelocity(),
-			scene->getDiagramX(),
-			scene->getDiagramY(),
-			scene->getDiagramZ());			// Objects
+			scene->getActiveObserver()->getProperties(),
+			scene->getSettings());			// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
@@ -83,7 +80,7 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	}
 	((Scene*)owner)->getCoordinateSystem()->DrawDiagram(gpuProgram, *activeCamera);					// Coordinate system
 
-	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getIntersectionMode());
+	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getActiveObserver()->getProperties(), scene->getSettings());
 
 	scene->getHUD()->DrawDiagram(gpuProgram, *activeCamera);			// HUD
 	delete intersectable;

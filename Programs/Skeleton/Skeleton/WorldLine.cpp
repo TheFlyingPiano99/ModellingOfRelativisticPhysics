@@ -9,13 +9,10 @@ using namespace RelPhysics;
 
 inline void GeodeticLine::genGeometry() {
     vds4D.resize(1000);     // Size give in shader.
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < noOfVds4D; i++) {
         vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * i * 50;
-        vds.push_back(vec3(pos.x, pos.y, pos.w));
         vds4D[i] = pos;
     }
-    noOfVds = vds.size();
-    noOfVds4D = noOfVds;
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -318,7 +315,7 @@ LightCone* WorldLine::getLigtConeAtAbsoluteTime(float t) {
 * Returns the absolute time spent, where the world line intersects the hyperplane.
 */
 
-float WorldLine::intersectHyperplane(Hyperplane& plane)
+float WorldLine::intersectHyperplane(const Hyperplane& plane)
 {
     float t = 0;
     for (int i = 0; i < noOfVds4D - 1; i++) {
@@ -341,7 +338,7 @@ float WorldLine::intersectHyperplane(Hyperplane& plane)
 * Returns the absolute time spent, where the world line intersects the light cone.
 */
 
-float WorldLine::intersectLightCone(LightCone& cone)
+float WorldLine::intersectLightCone(const LightCone& cone)
 {
     float t = 0;
     for (int i = 0; i < noOfVds4D - 1; i++) {
@@ -399,27 +396,27 @@ void WorldLine::DrawDiagram()
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glLineWidth(3);
-    glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
+    glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
 }
 
-float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStartPos, vec4 observerVelocity, const int diagramX, const int diagramY, const int diagramZ)
+float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
 {
     float distance = -1;
     vec3 closestPoint;      // Todo
     for (int i = 0; i < noOfVds4D - 1; i++) {
-        vec4 pos1 = lorentzTransformation(vds4D[i] - observerStartPos, To3DVelocity(observerVelocity));
-        vec4 pos2 = lorentzTransformation(vds4D[i + 1] - observerStartPos, To3DVelocity(observerVelocity));
+        vec4 pos1 = lorentzTransformation(vds4D[i] - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
+        vec4 pos2 = lorentzTransformation(vds4D[i + 1] - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
         vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);
         vec4 offsettedStartPos = pos1 - tangentVelocity / tangentVelocity.w * pos1.w;
-        vec3 diagramPos = vec3(offsettedStartPos[diagramX], offsettedStartPos[diagramY], offsettedStartPos[diagramZ]);
-        vec3 diagramDir = normalize(vec3(tangentVelocity[diagramX], tangentVelocity[diagramY], tangentVelocity[diagramZ]));
+        vec3 diagramPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
+        vec3 diagramDir = normalize(vec3(tangentVelocity[settings.diagramX], tangentVelocity[settings.diagramY], tangentVelocity[settings.diagramZ]));
         float temp = abs(dot(ray.pos - diagramPos, cross(diagramDir, ray.dir)));
         vec3 cn = normalize(cross(diagramDir, ray.dir));
         vec3 projected = dot(diagramPos - ray.pos, ray.dir) * ray.dir;
         vec3 rejected = diagramPos - ray.pos - projected - dot(diagramPos - ray.pos, cn) * cn;
         closestPoint = diagramPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
-        vec3 endPoint1 = vec3(pos1[diagramX], pos1[diagramY], pos1[diagramZ]);
-        vec3 endPoint2 = vec3(pos2[diagramX], pos2[diagramY], pos2[diagramZ]);
+        vec3 endPoint1 = vec3(pos1[settings.diagramX], pos1[settings.diagramY], pos1[settings.diagramZ]);
+        vec3 endPoint2 = vec3(pos2[settings.diagramX], pos2[settings.diagramY], pos2[settings.diagramZ]);
         if (/*dot(endPoint2 - endPoint1, closestPoint - endPoint1) > 0.0f && dot(endPoint1 - endPoint2, closestPoint - endPoint2) > 0.0f && */
             (distance == -1 || temp < diagram)) {
             distance = temp;
@@ -432,13 +429,13 @@ float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, vec4 observerStart
 *
 */
 
-float WorldLine::intersect(Intersectable& intersectable) {
+float WorldLine::intersect(const Intersectable& intersectable) {
     float t;
     if (intersectable.getType() == IntersectionMode::lightCone) {
-        t = intersectLightCone(reinterpret_cast<LightCone&>(intersectable));
+        t = intersectLightCone(reinterpret_cast<const LightCone&>(intersectable));
     }
     else if (intersectable.getType() == IntersectionMode::hyperplane) {
-        t = intersectHyperplane(reinterpret_cast<Hyperplane&>(intersectable));
+        t = intersectHyperplane(reinterpret_cast<const Hyperplane&>(intersectable));
     }
     return t;
 }

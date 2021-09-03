@@ -25,9 +25,6 @@ class Scene {
 	Camera* realTime3DCamera = NULL;
 	Camera* diagramCamera = NULL;
 	Camera* activeCamera = NULL;
-	IntersectionMode intersectionMode = lightCone;
-	DopplerMode dopplerMode = full;
-	ViewMode viewMode = realTime3D;
 	CoordinateSystem* system = NULL;
 	HUD* hud = NULL;
 
@@ -45,15 +42,12 @@ class Scene {
 
 	MenuSystem menu;
 	bool running = false;
-	bool doLorentz = true;
-	bool doShading = true;
 	bool entryMode = false;
 	bool allowQuit = false;
 	bool loadingScene = false;
 	bool finishedLoading = false;
-	int diagramX = 0;
-	int diagramY = 1;
-	int diagramZ = 3;
+
+	Settings settings;		// All important settings mainly related to rendering.
 
 	//std::thread* loadThread;
 
@@ -199,12 +193,8 @@ public:
 		return activeObserver;
 	}
 
-	IntersectionMode getIntersectionMode() {
-		return intersectionMode;
-	}
-
-	bool getDoLorentz() {
-		return doLorentz;
+	Settings& getSettings() {
+		return settings;
 	}
 
 	CoordinateSystem* getCoordinateSystem() {
@@ -213,17 +203,6 @@ public:
 
 	HUD* getHUD() {
 		return hud;
-	}
-
-	int getDiagramX() {
-		return diagramX;
-	}
-
-	int getDiagramY() {
-		return diagramY;
-	}
-	int getDiagramZ() {
-		return diagramZ;
 	}
 
 	//-----------------------------------------------------------------

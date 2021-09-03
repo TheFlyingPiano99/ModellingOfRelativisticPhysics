@@ -22,7 +22,7 @@ void Scene::Initialise()
 	diagramCamera = new Camera();
 	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
 
-	if (viewMode == realTime3D) {
+	if (settings.viewMode == realTime3D) {
 		activeCamera = realTime3DCamera;
 	}
 	else {
@@ -205,15 +205,16 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 	if (loadingScene) {
 		return;
 	}
-	if (activeObserver != nullptr || viewMode == diagram) {
+	if (activeObserver != nullptr || settings.viewMode == diagram) {
 		//Prefase:
 		gpuProgram.setUniform(false, "textMode");
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(intersectionMode, "intersectionMode");
-		gpuProgram.setUniform(dopplerMode, "dopplerMode");
-		gpuProgram.setUniform(doLorentz, "doLorentz");
-		gpuProgram.setUniform(doShading, "doShading");		
-		gpuProgram.setUniform(viewMode, "viewMode");
+		gpuProgram.setUniform(settings.intersectionMode, "intersectionMode");
+		gpuProgram.setUniform(settings.dopplerMode, "dopplerMode");
+		gpuProgram.setUniform(settings.doLorentz, "doLorentz");
+		gpuProgram.setUniform(settings.doShading, "doShading");
+		gpuProgram.setUniform(settings.viewMode, "viewMode");
+		gpuProgram.setUniform(settings.transformToProperFrame, "transformToProperFrame");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram);
@@ -254,10 +255,10 @@ void Scene::type(char c)
 
 void Scene::panCamera(float cx, float cy) {
 	static float camSpeed = 0.01f;
-	if (viewMode == realTime3D) {
+	if (settings.viewMode == realTime3D) {
 		realTime3DCamera->rotateAroundEye(cx * realTime3DCamera->getAspectRatio(), -cy);
 	}
-	else if (viewMode == diagram) {
+	else if (settings.viewMode == diagram) {
 		diagramCamera->rotateAroundLookat(cx * diagramCamera->getAspectRatio(), -cy);
 	}
 }
@@ -268,7 +269,7 @@ void Scene::zoomCamera(float delta) {
 
 void Scene::moveCamera(vec3 delta)
 {
-	if (viewMode == ViewMode::diagram) {
+	if (settings.viewMode == ViewMode::diagram) {
 		activeCamera->move(delta);
 	}
 }
@@ -277,9 +278,9 @@ void Scene::moveCamera(vec3 delta)
 // Symulation controls:
 
 void Scene::toggleDoppler() {
-	dopplerMode = (DopplerMode)((3 > dopplerMode + 1) ? (dopplerMode + 1) : 0);
+	settings.dopplerMode = (DopplerMode)((3 > settings.dopplerMode + 1) ? (settings.dopplerMode + 1) : 0);
 	std::string str("Doppler mode: ");
-	switch (dopplerMode)
+	switch (settings.dopplerMode)
 	{
 	case DopplerMode::full:
 		str.append("full");
@@ -297,9 +298,10 @@ void Scene::toggleDoppler() {
 }
 
 void Scene::toggleLorentzTransformation() {
-	doLorentz = !doLorentz;
+	settings.doLorentz = !settings.doLorentz;
+	settings.transformToProperFrame = settings.doLorentz;
 	std::string str;
-	if (doLorentz) {
+	if (settings.doLorentz) {
 		str = std::string("Lorentz transformation enabled");
 	}
 	else {
@@ -309,9 +311,9 @@ void Scene::toggleLorentzTransformation() {
 }
 
 void Scene::toggleIntersectionMode() {
-	intersectionMode = (IntersectionMode)((2 > intersectionMode + 1) ? (intersectionMode + 1) : 0);
+	settings.intersectionMode = (IntersectionMode)((2 > settings.intersectionMode + 1) ? (settings.intersectionMode + 1) : 0);
 	std::string str("Intersection mode: ");
-	switch (intersectionMode)
+	switch (settings.intersectionMode)
 	{
 	case IntersectionMode::lightCone:
 		str.append("light cone");
@@ -326,9 +328,9 @@ void Scene::toggleIntersectionMode() {
 }
 
 void Scene::toggleViewMode() {
-	viewMode = (ViewMode)((2 > viewMode + 1) ? (viewMode + 1) : 0);
+	settings.viewMode = (ViewMode)((2 > settings.viewMode + 1) ? (settings.viewMode + 1) : 0);
 	std::string str;
-	switch (viewMode)
+	switch (settings.viewMode)
 	{
 	case ViewMode::realTime3D:
 		activeCamera = realTime3DCamera;
@@ -354,9 +356,9 @@ void Scene::toggleViewMode() {
 
 void Scene::toggleShading()
 {
-	doShading = !doShading;
+	settings.doShading = !settings.doShading;
 	std::string str;
-	if (doShading) {
+	if (settings.doShading) {
 		str = std::string("Shading enabled");
 	}
 	else {
@@ -462,41 +464,39 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
 
 		int selectionIdx = -1;			// index of the selected object
-		if (viewMode == ViewMode::diagram) {								// Diagram view
+		if (settings.viewMode == ViewMode::diagram) {								// Diagram view
 			float constraint = 0.2f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
-				activeObserver->getStartPos(),
-				activeObserver->getVelocity(),
-				diagramX, diagramY, diagramZ);		// First item handled separately.
+				activeObserver->getProperties(),
+				settings);		// First item handled separately.
 			if (constraint > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
 				float d = objects[i]->rayDistanceToDiagram(ray,
-					activeObserver->getStartPos(),
-					activeObserver->getVelocity(),
-					diagramX, diagramY, diagramZ);
+					activeObserver->getProperties(),
+					settings);
 				if ((shortestDistance < 0 || shortestDistance > d) && d < constraint && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
 				}
 			}
 		}
-		else if (viewMode == ViewMode::realTime3D) {						// RealTime3D view
+		else if (settings.viewMode == ViewMode::realTime3D) {						// RealTime3D view
 			Intersectable* intersectable;
-			if (intersectionMode == IntersectionMode::lightCone) {
+			if (settings.intersectionMode == IntersectionMode::lightCone) {
 				intersectable = activeObserver->getLightCone();
 			}
-			else if (intersectionMode == IntersectionMode::hyperplane) {
+			else if (settings.intersectionMode == IntersectionMode::hyperplane) {
 				intersectable = activeObserver->getHyperplane();
 			}
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(), activeObserver->getLocationAtZero(), activeObserver->getVelocity());
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, intersectable, doLorentz, activeObserver->getLocation(), activeObserver->getStartPos(), activeObserver->getVelocity());
+				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(), activeObserver->getLocationAtZero(), activeObserver->getVelocity());
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;

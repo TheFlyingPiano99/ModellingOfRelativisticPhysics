@@ -14,7 +14,7 @@ vec4 Observer::getVelocity()
     return worldLine->getVelocityAtProperTime(currentProperTime);
 }
 
-vec4 Observer::getStartPos()	// Must be fixed!
+vec4 Observer::getLocationAtZero()	// Must be fixed!
 {
 	return worldLine->getLocationAtAbsoluteTime(0.0f);
 }
@@ -52,29 +52,52 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	worldLine->DrawDiagram();
 }
 
-void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera)
+void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings)
 {
+	vec3 pos;
+	if (settings.transformToProperFrame) {
+		pos = vec3(0, 0, currentProperTime);
+	}
+	else {
+		vec4 pos4 = this->getLocation();
+		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
+	}
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)) * camera.Translate() * camera.V() * camera.P(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)), "M");
-	gpuProgram.setUniform(TranslateMatrix(-vec3(0, 0, currentProperTime)), "invM");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "textMode");
 	gpuProgram.setUniform(true, "directRenderMode");
-	PlaneSurface* plane = new PlaneSurface(normalize(vec3(0, 0, 1)), 100, 100);
+
+	vec3 planeNormal = (settings.transformToProperFrame) ?
+		vec3(0, 0, 1)
+		: normalize(vec3(-observerProperties.velocity.x,
+		-observerProperties.velocity.y,
+		observerProperties.velocity.w));
+
+	PlaneSurface* plane = new PlaneSurface(planeNormal,	100, 100);
 	plane->GenSurface(20, 20);
 	glDisable(GL_CULL_FACE);
 	plane->Draw();
 	glEnable(GL_CULL_FACE);
 }
 
-void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera)
+void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)) * camera.Translate() * camera.V() * camera.P(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)), "M");
-	gpuProgram.setUniform(TranslateMatrix(-vec3(0, 0, currentProperTime)), "invM");
+	vec3 pos;
+	if (settings.transformToProperFrame) {
+		pos = vec3(0, 0, currentProperTime);
+	}
+	else {
+		vec4 pos4 = this->getLocation();
+		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
+	}
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "textMode");
@@ -84,27 +107,35 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera)
 	glEnable(GL_CULL_FACE);
 }
 
-void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera)
+void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
+	vec3 pos;
+	if (settings.transformToProperFrame) {
+		pos = vec3(0, 0, currentProperTime);
+	}
+	else {
+		vec4 pos4 = this->getLocation();
+		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
+	}
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)) * camera.Translate() * camera.V() * camera.P(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(vec3(0, 0, currentProperTime)), "M");
-	gpuProgram.setUniform(TranslateMatrix(-vec3(0, 0, currentProperTime)), "invM");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(true, "directRenderMode");
 	Assets::getObserverNodeGeometry()->Draw();
 }
 
-void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMode intersectionMode)
+void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings)
 {
-	if (intersectionMode == IntersectionMode::lightCone) {
-		DrawLightCone(gpuProgram, camera);
+	if (settings.intersectionMode == IntersectionMode::lightCone) {
+		DrawLightCone(gpuProgram, camera, settings);
 	}
-	else if (intersectionMode == IntersectionMode::hyperplane) {
-		DrawHyperplane(gpuProgram, camera);
+	else if (settings.intersectionMode == IntersectionMode::hyperplane) {
+		DrawHyperplane(gpuProgram, camera, observerProperties, settings);
 	}
-	DrawNode(gpuProgram, camera);
+	DrawNode(gpuProgram, camera, settings);
 	static int updateCounter = 0;
 	static float prevTau = 0.0f;
 	if (updateCounter++ > 30) {		// Reduced refresh rate.
@@ -113,10 +144,21 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, IntersectionMo
 		(*timerCaption)->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
 			.append("t = ").append(std::to_string(worldLine->getAbsoluteTimeAtProperTime(currentProperTime))).append(" m").c_str());
 	}
-	vec4 pos = vec4(0,0, currentProperTime, 0);
-	(*timerCaption)->setPos(vec3(pos.x, pos.y, pos.w) + camera.getRight() * 11 + camera.getPrefUp() * 1);
+	vec3 pos;
+	if (settings.transformToProperFrame) {
+		pos = vec3(0, 0, currentProperTime);
+	}
+	else {
+		vec4 pos4 = this->getLocation();
+		pos = vec3(pos4[settings.diagramX], pos4[settings.diagramY], pos4[settings.diagramZ]);
+	}
+	(*timerCaption)->setPos(pos + camera.getRight() * 11 + camera.getUp() * 1);
 	(*timerCaption)->setVisible(selected);
-	(*diagramCaption)->setPos(vec3(0 , 0, 0));
+	(*diagramCaption)->setPos((settings.transformToProperFrame)? vec3(0 , 0, 0)
+		: vec3(observerProperties.locationAtZero[settings.diagramX],
+			observerProperties.locationAtZero[settings.diagramY],
+			observerProperties.locationAtZero[settings.diagramZ]
+			));
 	(*diagramCaption)->setVisible(true);
 	(*timerCaption)->setVisible(true);
 }
@@ -146,10 +188,7 @@ float Observer::increaseTimeByDelta(float deltaTau)
 
 void Observer::syncCamera(Camera* camera)
 {
-	camera->syncToObserver(
-		getLocation(),
-		getVelocity(),
-		getStartPos());
+	camera->syncToObserver(getProperties());
 }
 
 void Observer::syncTimeToObserversSimultaneity(Observer& observer)
@@ -164,7 +203,7 @@ void Observer::loadOnGPU(GPUProgram& gpuProgram)
 {
 	gpuProgram.setUniform(getVelocity(), "observersVelocity");
 	gpuProgram.setUniform(getLocation(), "observersLocation");
-	gpuProgram.setUniform(getStartPos(), "observersStartPos");
+	gpuProgram.setUniform(getLocationAtZero(), "observersStartPos");
 }
 
 std::string Observer::genSaveString()
