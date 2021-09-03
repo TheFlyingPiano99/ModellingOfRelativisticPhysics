@@ -8,9 +8,10 @@ class MessageQueue
 {
 	std::deque<std::shared_ptr<Caption*>> queue;
 	const int maxSize = 10;
-	float timeLeft = 500;
+	float timeLeft;
 	const float displayTime = 800;
 	const float transitTime = 200;
+	const float firstDisplayTime = 2000;
 	bool transitPhase = false;
 	void* owner;
 	vec3 startPos;

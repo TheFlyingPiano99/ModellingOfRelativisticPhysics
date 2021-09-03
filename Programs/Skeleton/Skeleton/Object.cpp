@@ -119,7 +119,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 					RelPhysics::To3DVelocity(observerProperties.velocity));
 			}
 			else {
-				RelPhysics::galileanTransformation(
+				pos = RelPhysics::galileanTransformation(
 					worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
 					RelPhysics::To3DVelocity(observerProperties.velocity));
 			}
@@ -127,7 +127,16 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 		else {
 			pos = worldLine->getLocationAtAbsoluteTime(t);
 		}
-		(*diagramCaption)->setPos(vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]));
+
+		vec3 pos3 = vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]);
+		gpuProgram.setUniform(TranslateMatrix(pos3) * camera.Translate() * camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(TranslateMatrix(pos3), "M");
+		gpuProgram.setUniform(TranslateMatrix(-pos3), "invM");
+		gpuProgram.setUniform(true, "directRenderMode");
+		gpuProgram.setUniform(false, "glow");
+
+		Assets::getObserverNodeGeometry()->Draw();
+		(*diagramCaption)->setPos(pos3);
 		(*diagramCaption)->setVisible(true);
 	}
 	else {
@@ -230,7 +239,7 @@ vec3 Object::perceivedPosition(Intersectable* intersectable, bool doLorentz, vec
 		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
 	}
 	else {			// Euclidean transformation
-		vec4 location4D = worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation;
+		vec4 location4D = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
 	}
 

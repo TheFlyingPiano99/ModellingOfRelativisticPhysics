@@ -7,6 +7,8 @@ void MessageQueue::pop()
 	std::shared_ptr<Caption*> caption = queue.front();
 	queue.pop_front();
 	(*caption)->erease();
+	transitPhase = true;
+	timeLeft = transitTime;
 }
 
 MessageQueue::~MessageQueue() {
@@ -20,8 +22,11 @@ void MessageQueue::push(const char* text)
 	vec3 pos = startPos + entryOffset * queue.size();
 	std::shared_ptr<Caption*> caption = Caption::createSmallCameraSpaceCaption(vec2(pos.x, pos.y), text);
 	if (queue.empty()) {
-		timeLeft = displayTime;
+		timeLeft = firstDisplayTime;
 		transitPhase = false;
+	}
+	else {
+		timeLeft = displayTime;
 	}
 	queue.push_back(caption);
 	if (queue.size() > maxSize) {
@@ -42,9 +47,7 @@ void MessageQueue::Animate(float dt) {
 			timeLeft = displayTime;
 		}
 		else {					// Change state to transit
-			transitPhase = true;
 			pop();				// Pop queue
-			timeLeft = transitTime;
 		}
 	}
 	if (transitPhase) {		// Move entries
