@@ -149,14 +149,14 @@ public:
 		type = WorldLineType::geodetic;
 		locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
 		fourVelocity = RelPhysics::ToFourVelocity(_velocity);
-		noOfVds4D = 2;
+		noOfVds4D = 100;
 		genGeometry();
 	}
 
 	GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name = "", std::string _desc = "")
 		: locationAtZeroT(_posAtZeroT), fourVelocity(_velocity), WorldLine(_name, _desc) {
 		type = WorldLineType::geodetic;
-		noOfVds4D = 2;
+		noOfVds4D = 100;
 		genGeometry();
 	}
 

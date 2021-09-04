@@ -175,10 +175,10 @@ const char* const vertexSource = R"(
 				vec3 n = normalize(v);
 				vec3 pParalel = dot(vp.xyz, n) * n;
 				vec3 pPerpend = vp.xyz - pParalel;
-				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + worldLine start pos
+				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + tangent worldLine start pos
 			}
 			else {		// Don't do Lorentz
-				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + worldLine start pos
+				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos
 			}
 
 			//Intersect:

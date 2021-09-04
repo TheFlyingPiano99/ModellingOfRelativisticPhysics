@@ -13,16 +13,16 @@ void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, Camera& camera, const un
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
 
-void CoordinateSystem::drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center, const float density)
+void CoordinateSystem::drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center)
 {
     glLineWidth(1);
     gpuProgram.setUniform(vec3(0.4f, 0.4f, 0.4f), "kd");
-    for (int i = 0; i <= 200 * density; i++) {
-        drawAxis(gpuProgram, camera, 0, base[1] * (i / density - 100)  + center);
+    for (int i = 0; i <= 40; i++) {
+        drawAxis(gpuProgram, camera, 0, base[1] * (i * 5 - 100)  + center);
     }
 
-    for (int i = 0; i <= 200 * density; i++) {
-        drawAxis(gpuProgram, camera, 1, base[0] * (i / density - 100) + center);
+    for (int i = 0; i <= 40; i++) {
+        drawAxis(gpuProgram, camera, 1, base[0] * (i * 5 - 100) + center);
     }
 }
 
@@ -48,6 +48,11 @@ void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
         (*axisName[i])->setVisible(false);
         (*negAxisName[i])->setVisible(false);
     }
+    for (int i = 0; i < axisScale[0].size(); i++) {
+        (*axisScale[0][i].get())->setVisible(false);
+        (*axisScale[1][i].get())->setVisible(false);
+        (*axisScale[2][i].get())->setVisible(false);
+    }
 }
 
 void CoordinateSystem::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
@@ -65,10 +70,15 @@ void CoordinateSystem::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
     drawAxis(gpuProgram, camera, 1, origo);
     gpuProgram.setUniform(color[2], "kd");
     drawAxis(gpuProgram, camera, 2, origo);
-    drawGrid(gpuProgram, camera, 0, 1, origo, 0.9);
+    drawGrid(gpuProgram, camera, 0, 1, origo);
     for (int i = 0; i < 3; i++) {
         (*axisName[i])->setVisible(true);
         (*negAxisName[i])->setVisible(true);
+    }
+    for (int i = 0; i < axisScale[0].size(); i++) {
+        (*axisScale[0][i].get())->setVisible(true);
+        (*axisScale[1][i].get())->setVisible(true);
+        (*axisScale[2][i].get())->setVisible(true);
     }
 }
 

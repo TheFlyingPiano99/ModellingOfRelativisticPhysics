@@ -3,6 +3,7 @@
 SphereSurface* Assets::observerNodeGeometry = NULL;
 LightConeSurface* Assets::lightConeGeometry = NULL;
 OBJGeometry* Assets::cubeGeometry = NULL;
+OBJGeometry* Assets::spaceshipGeometry = NULL;
 Material* Assets::observerMaterial = NULL;
 Material* Assets::selectedObjectMaterial = NULL;
 Material* Assets::selectedWorldLineMaterial = NULL;

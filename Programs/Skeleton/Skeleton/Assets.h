@@ -18,6 +18,7 @@ class Assets {
 	static Material* hoveredObjectMaterial;
 	static Material* hoveredWorldLineMaterial;
 	static OBJGeometry* cubeGeometry;
+	static OBJGeometry* spaceshipGeometry;
 	static std::string* geometryPath;
 	static std::string* texturePath;
 	static std::string* savesPath;
@@ -50,6 +51,15 @@ public:
 
 		}
 		return cubeGeometry;
+	}
+
+	static Geometry* getSpaceshipGeometry() {
+		if (spaceshipGeometry == nullptr) {
+			spaceshipGeometry = new OBJGeometry();
+			spaceshipGeometry->load(getGeometryPath().append("spaceShip.obj").c_str());
+
+		}
+		return spaceshipGeometry;
 	}
 
 	static Material* getObserverMaterial() {
@@ -188,6 +198,7 @@ public:
 		delete selectedObjectMaterial;
 		delete selectedWorldLineMaterial;
 		delete cubeGeometry;
+		delete spaceshipGeometry;
 		delete geometryPath;
 		delete texturePath;
 		delete savesPath;

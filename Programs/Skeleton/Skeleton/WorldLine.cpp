@@ -10,7 +10,7 @@ using namespace RelPhysics;
 inline void GeodeticLine::genGeometry() {
     vds4D.resize(1000);     // Size give in shader.
     for (int i = 0; i < noOfVds4D; i++) {
-        vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * i * 50;
+        vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * (i - noOfVds4D / 2.0f) * 50;
         vds4D[i] = pos;
     }
 

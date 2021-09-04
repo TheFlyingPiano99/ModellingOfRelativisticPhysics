@@ -41,7 +41,6 @@ class Scene {
 	Background* background;
 
 	MenuSystem menu;
-	bool running = false;
 	bool entryMode = false;
 	bool allowQuit = false;
 	bool loadingScene = false;

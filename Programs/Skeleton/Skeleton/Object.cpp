@@ -32,7 +32,8 @@ Object* Object::createEarth(WorldLine* wrdln) {
 
 Object* Object::createDice(WorldLine* wrdln)
 {
-	 Object* obj = new Object(
+	Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(0.5, 0.3, 0.2), vec3(5, 6, 20), 50);
+	Object* obj = new Object(
 		vec3(1, 1, 1),
 		0.0f,
 		0.0f,
@@ -41,11 +42,31 @@ Object* Object::createDice(WorldLine* wrdln)
 		wrdln,
 		Assets::getCubeGeometry(),
 		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
-		new Material(vec3(0.5f, 0.5f, 0.5f), vec3(0.8f, 0.8f, 0.8f), vec3(0.5f, 0.5f, 0.5f), 40, 1.0f),		// Diagram material
+		diagramM,		// Diagram material
 		new AdvancedTexture(Assets::getTexturePath().append("dice.bmp").c_str(), "", ""),
 		"Dice",
 		"It's a cube!");
 	obj->setType(dice);
+	return obj;
+}
+
+Object* Object::createSpaceship(WorldLine* wrdln)
+{
+	Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(0.1, 0.5, 0.5), vec3(5, 6, 20), 50);
+	Object* obj = new Object(
+		vec3(1, 1, 1),
+		0.0f,
+		0.0f,
+		vec3(0, 0, 0),
+		vec3(0, 0, 1),
+		wrdln,
+		Assets::getSpaceshipGeometry(),
+		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 80),		// RealTime3D material
+		diagramM,		// Diagram material
+		new AdvancedTexture(Assets::getTexturePath().append("spaceship.bmp").c_str(), "", ""),
+		"Spaceship",
+		"Wruuuhm!!!");
+	obj->setType(spaceship);
 	return obj;
 }
 
@@ -107,35 +128,37 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");
+	gpuProgram.setUniform(true, "glow");
 
 	worldLine->DrawDiagram();
-	if (selected || hovered) {
-		float t = worldLine->intersect(intersectable);
-		vec4 pos;
-		if (settings.transformToProperFrame) {
-			if (settings.doLorentz) {
-				pos = RelPhysics::lorentzTransformation(
-					worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
-					RelPhysics::To3DVelocity(observerProperties.velocity));
-			}
-			else {
-				pos = RelPhysics::galileanTransformation(
-					worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
-					RelPhysics::To3DVelocity(observerProperties.velocity));
-			}
+	
+	float t = worldLine->intersect(intersectable);
+	vec4 pos;
+	if (settings.transformToProperFrame) {
+		if (settings.doLorentz) {
+			pos = RelPhysics::lorentzTransformation(
+				worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
+				RelPhysics::To3DVelocity(observerProperties.velocity));
 		}
 		else {
-			pos = worldLine->getLocationAtAbsoluteTime(t);
+			pos = RelPhysics::galileanTransformation(
+				worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
+				RelPhysics::To3DVelocity(observerProperties.velocity));
 		}
+	}
+	else {
+		pos = worldLine->getLocationAtAbsoluteTime(t);
+	}
 
-		vec3 pos3 = vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]);
-		gpuProgram.setUniform(TranslateMatrix(pos3) * camera.Translate() * camera.V() * camera.P(), "MVP");
-		gpuProgram.setUniform(TranslateMatrix(pos3), "M");
-		gpuProgram.setUniform(TranslateMatrix(-pos3), "invM");
-		gpuProgram.setUniform(true, "directRenderMode");
-		gpuProgram.setUniform(false, "glow");
+	vec3 pos3 = vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]);
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos3) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos3), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos3), "invM");
+	gpuProgram.setUniform(true, "directRenderMode");
+	gpuProgram.setUniform(false, "glow");
 
-		Assets::getObserverNodeGeometry()->Draw();
+	Assets::getObserverNodeGeometry()->Draw();
+	if (selected || hovered) {
 		(*diagramCaption)->setPos(pos3);
 		(*diagramCaption)->setVisible(true);
 	}
@@ -185,6 +208,9 @@ Object* Object::loadFromFile(std::ifstream& file)
 				break;
 			case dice:
 				retVal = createDice(NULL);
+				break;
+			case spaceship:
+				retVal = createSpaceship(NULL);
 				break;
 			case none:
 				break;

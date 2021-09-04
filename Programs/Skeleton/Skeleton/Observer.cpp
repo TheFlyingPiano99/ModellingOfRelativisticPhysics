@@ -88,6 +88,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "outline");
+	gpuProgram.setUniform(false, "directRenderMode");
 
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);

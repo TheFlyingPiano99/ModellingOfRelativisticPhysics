@@ -73,8 +73,14 @@ public:
 	static Object* createEarth(WorldLine* wrdln);
 
 	/*
+	* Factory
 	*/
 	static Object* createDice(WorldLine* wrdln);
+
+	/*
+	* Factory
+	*/
+	static Object* createSpaceship(WorldLine* wrdln);
 
 	mat4 M() {
 		return ScaleMatrix(scale) * RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);

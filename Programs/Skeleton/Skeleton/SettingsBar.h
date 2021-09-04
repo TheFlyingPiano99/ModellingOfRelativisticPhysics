@@ -20,8 +20,14 @@ public:
 		clear();
 	}
 
+	/*
+	* Update displayed settings.
+	*/
 	void updateSettings(const Settings& settings);
 
+	/*
+	* Erease captions.
+	*/
 	void clear();
 
 };

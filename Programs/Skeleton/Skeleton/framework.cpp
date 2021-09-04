@@ -75,7 +75,7 @@ int main(int argc, char * argv[]) {
 	glutMotionFunc(onMouseMotion);
 	glutPassiveMotionFunc(onMouseMotion);
 	HWND hWnd = GetConsoleWindow();
-	//ShowWindow(hWnd, SW_HIDE);
+	ShowWindow(hWnd, SW_HIDE);
 
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 	glutMainLoop();

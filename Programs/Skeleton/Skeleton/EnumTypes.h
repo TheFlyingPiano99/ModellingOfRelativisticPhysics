@@ -3,6 +3,7 @@
 enum ObjectType {
 	earth,
 	dice,
+	spaceship,
 	none
 };
 
@@ -55,10 +56,10 @@ struct Settings {
 	bool doLorentz = true;
 	bool transformToProperFrame = true;
 	bool doShading = true;
+	bool running = false;
 	int diagramX = 0;
 	int diagramY = 1;
 	int diagramZ = 3;
-
 };
 
 struct ObserverProperties {

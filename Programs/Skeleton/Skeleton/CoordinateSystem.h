@@ -17,9 +17,10 @@ class CoordinateSystem {
 	std::string name[3];
 	std::shared_ptr<Caption*> axisName[3];
 	std::shared_ptr<Caption*> negAxisName[3];
+	std::vector<std::shared_ptr<Caption*>> axisScale[3];
 
 	void drawAxis(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx, const vec3 center);
-	void drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center, const float density);
+	void drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center);
 	void genGeometry(vec3 base, unsigned int* vao, unsigned int* vbo);
 
 public:
@@ -36,7 +37,15 @@ public:
 		name[1] = "y";
 		name[2] = "t";
 
-		float nameDist = 50;
+		int nameDist = 50;
+		for (int i = -20; i <= 20; i++) {
+			if (i * 5 != nameDist) {
+				axisScale[0].push_back(Caption::createSmallCaption(base[0] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+				axisScale[1].push_back(Caption::createSmallCaption(base[1] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+				axisScale[2].push_back(Caption::createSmallCaption(base[2] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+			}
+		}
+
 		for (int i = 0; i < 3; i++) {
 			axisName[i] = Caption::createNormalCaption(base[i] * nameDist, name[i].c_str());
 			(*axisName[i])->setColor(color[i] + vec3(0.5f, 0.5f, 0.5f));

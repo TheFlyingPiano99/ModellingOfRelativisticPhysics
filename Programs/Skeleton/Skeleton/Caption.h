@@ -77,6 +77,11 @@ public:
 		return caption->getSharedPtr();
 	}
 
+	static std::shared_ptr<Caption*> createSmallCaption(vec3 pos, const char* text, vec3 _color = vec3(1, 1, 1)) {
+		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.015f, _color, text);
+		return caption->getSharedPtr();
+	}
+
 	static std::shared_ptr<Caption*> createNormalCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
 
 		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, _color, text);

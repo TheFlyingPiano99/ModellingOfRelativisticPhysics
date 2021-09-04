@@ -76,6 +76,9 @@ void Scene::Initialise()
 		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "");
 		objects.push_back(Object::createDice(wrdln));
 	}
+
+	objects.push_back(Object::createSpaceship(new GeodeticLine(vec3(0.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line")));
+	objects.push_back(Object::createSpaceship(new GeodeticLine(vec3(0.0f, -6.0f, -3.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line")));
 	*/
 
 
@@ -179,7 +182,7 @@ void Scene::Control(float dt) {
 		allowQuit = false;
 	}
 
-	if (running) {
+	if (settings.running) {
 		dt *= timeScale;	// Scale time to sym speed.
 		if (activeObserver != nullptr) {
 			activeObserver->increaseTimeByDelta(dt, settings);
@@ -193,7 +196,7 @@ void Scene::Animate(float dt) {
 		return;
 	}
 	hud->Animate(dt);						// Always animate!
-	if (running) {
+	if (settings.running) {
 		dt *= timeScale;					// Scale time to symulation speed.
 		if (activeObserver != nullptr) {
 			activeObserver->syncCamera(realTime3DCamera, settings);
@@ -325,6 +328,7 @@ void Scene::toggleTransformToProperFrame()
 		str = std::string("Diagram transformed to absolute observers frame");
 	}
 	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
 }
 
 void Scene::toggleIntersectionMode() {
@@ -370,6 +374,7 @@ void Scene::toggleViewMode() {
 		break;
 	}
 	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
 }
 
 void Scene::toggleShading()
@@ -386,42 +391,43 @@ void Scene::toggleShading()
 }
 
 void Scene::togglePause() {
-	running = !running;
+	settings.running = !settings.running;
 	std::string str;
-	if (running) {
+	if (settings.running) {
 		str = std::string("Resumed");
 	}
 	else {
 		str = std::string("Paused");
 	}
 	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
 }
 
 void Scene::setTime(float t) {
 	if (activeObserver != nullptr) {
 		activeObserver->setCurrentTimeAtAbsoluteTime(t, settings);
 	}
-	bool prevState = running;
-	running = true;
+	bool prevState = settings.running;
+	settings.running = true;
 	Animate(0.0f);
-	running = prevState;
+	settings.running = prevState;
 }
 
 void Scene::reset() {
 	setTime(0.0f);
-	bool prevState = running;
-	running = true;
+	bool prevState = settings.running;
+	settings.running = true;
 	Animate(0.0f);
-	running = prevState;
+	settings.running = prevState;
 	hud->pushMessage("Reset");
 }
 
 void Scene::windTime(float deltaTau) {
 	float realDelta = activeObserver->increaseTimeByDelta(deltaTau, settings);
-	bool prevState = running;
-	running = true;
+	bool prevState = settings.running;
+	settings.running = true;
 	Animate(0.0f);
-	running = prevState;
+	settings.running = prevState;
 	std::string str("Time shifted by tau = ");
 	hud->pushMessage(str.append(std::to_string(realDelta)).append(" m").c_str());
 }
@@ -650,14 +656,16 @@ void Scene::clearScene()
 
 void Scene::pause()
 {
-	running = false;
+	settings.running = false;
 	hud->pushMessage("Paused");
+	hud->updateSettings(settings);
 }
 
 void Scene::resume()
 {
-	running = true;
+	settings.running = true;
 	hud->pushMessage("Resumed");
+	hud->updateSettings(settings);
 }
 
 
