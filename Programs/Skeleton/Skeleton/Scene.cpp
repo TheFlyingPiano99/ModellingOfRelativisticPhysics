@@ -90,6 +90,7 @@ void Scene::Initialise()
 
 	// Other:----------------------------------------------------------
 	//toggleActiveObserver();
+	hud->updateSettings(settings);
 }
 
 void Scene::Control(float dt) {
@@ -310,6 +311,7 @@ void Scene::toggleLorentzTransformation() {
 		str = std::string("Lorentz transformation disabled");
 	}
 	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
 }
 
 void Scene::toggleTransformToProperFrame()
@@ -317,7 +319,7 @@ void Scene::toggleTransformToProperFrame()
 	settings.transformToProperFrame = !settings.transformToProperFrame;
 	std::string str;
 	if (settings.transformToProperFrame) {
-		str = std::string("Diagram transformed to active observers frame.");
+		str = std::string("Diagram transformed to active observers frame");
 	}
 	else {
 		str = std::string("Diagram transformed to absolute observers frame");
@@ -340,6 +342,7 @@ void Scene::toggleIntersectionMode() {
 		break;
 	}
 	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
 }
 
 void Scene::toggleViewMode() {
@@ -506,12 +509,12 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 				intersectable = activeObserver->getHyperplane(settings);
 			}
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(), activeObserver->getVelocity(settings));
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(), activeObserver->getVelocity(settings));
+				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;

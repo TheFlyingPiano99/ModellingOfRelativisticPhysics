@@ -24,9 +24,19 @@ vec4 Observer::getVelocity(const Settings& settings)
 	}
 }
 
-vec4 Observer::getLocationAtZero()	// Must be fixed!
+vec4 Observer::getLocationAtZero(const Settings& settings)	// Must be fixed!
 {
-	return worldLine->getLocationAtAbsoluteTime(0.0f);	// Not cool!!! Must use projected zero pos along geodetic! Probably...
+	vec4 location;
+	vec4 velocity;
+	if (settings.doLorentz) {
+		location = worldLine->getLocationAtProperTime(currentProperTime);
+		velocity = worldLine->getVelocityAtProperTime(currentProperTime);
+	}
+	else {
+		location = worldLine->getLocationAtAbsoluteTime(currentProperTime);
+		velocity = worldLine->getVelocityAtAbsoluteTime(currentProperTime);
+	}
+	return location - velocity / velocity.w * location.w;
 }
 
 /*
@@ -37,7 +47,7 @@ ObserverProperties Observer::getProperties(const Settings& settings) {
 	ObserverProperties properties;
 	properties.velocity = getVelocity(settings);
 	properties.location = getLocation(settings);
-	properties.locationAtZero = getLocationAtZero();
+	properties.locationAtZero = getLocationAtZero(settings);
 	return properties;
 }
 
@@ -250,7 +260,7 @@ void Observer::loadOnGPU(GPUProgram& gpuProgram, const Settings& settings)
 {
 	gpuProgram.setUniform(getVelocity(settings), "observersVelocity");
 	gpuProgram.setUniform(getLocation(settings), "observersLocation");
-	gpuProgram.setUniform(getLocationAtZero(), "observersStartPos");
+	gpuProgram.setUniform(getLocationAtZero(settings), "observersStartPos");
 }
 
 std::string Observer::genSaveString()

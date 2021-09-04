@@ -48,7 +48,7 @@ public:
 	/*
 	* Return location in absolute observers frame, when this observer crosses absolute observers t = 0 hyperplane.
 	*/
-	vec4 getLocationAtZero();
+	vec4 getLocationAtZero(const Settings& settings);
 
 	/*
 	* Return all necessary properties.

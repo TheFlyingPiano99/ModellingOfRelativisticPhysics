@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "MessageQueue.h"
 #include "TextEntry.h"
+#include "SettingsBar.h"
 #include <memory>
 
 /*
@@ -26,11 +27,11 @@ class HUD
 	std::vector<std::shared_ptr<Caption*>> captions;	// Every caption present in scene.
 	MessageQueue* messageQueue = NULL;
 	TextEntry* entry = NULL;							// Created, when needed.
-
+	SettingsBar* settingsBar = NULL;
 
 public:
 
-	HUD(void* _owner) : owner(_owner), messageQueue(new MessageQueue(this, vec3(0.6f, 0.95f, 0))) {
+	HUD(void* _owner) : owner(_owner), messageQueue(new MessageQueue(this, vec3(0.6f, 0.95f, 0))), settingsBar(new SettingsBar(this, vec2(-1, -0.95f))) {
 		if (instance != nullptr) {
 			delete instance;
 		}
@@ -41,6 +42,7 @@ public:
 
 	~HUD() {
 		delete messageQueue;
+		delete settingsBar;
 		if (entry != nullptr) {
 			delete entry;
 		}
@@ -69,6 +71,11 @@ public:
 	* Push a new caption in the message queue.
 	*/
 	void pushMessage(const char* text);
+
+	/*
+	* Update diplayed settings.
+	*/
+	void updateSettings(const Settings& settings);
 
 	/*
 	* Push a new caption. Used only through wrapped function pointer by Caption constructor.

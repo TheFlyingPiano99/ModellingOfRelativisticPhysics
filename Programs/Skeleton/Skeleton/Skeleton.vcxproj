@@ -96,6 +96,7 @@
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SettingsBar.cpp" />
     <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="StringOperations.cpp" />
     <ClCompile Include="Caption.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="SettingsBar.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="StringOperations.h" />
     <ClInclude Include="Caption.h" />

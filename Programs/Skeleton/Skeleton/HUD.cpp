@@ -33,6 +33,11 @@ void HUD::pushMessage(const char* text)
 	messageQueue->push(text);
 }
 
+void HUD::updateSettings(const Settings& settings)
+{
+	settingsBar->updateSettings(settings);
+}
+
 void HUD::pushCaption(std::shared_ptr<Caption*> captionToPush)
 {
 	captions.push_back(captionToPush);
