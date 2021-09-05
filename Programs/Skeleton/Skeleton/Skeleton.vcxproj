@@ -89,6 +89,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
+    <ClCompile Include="Interpolatable.cpp" />
     <ClCompile Include="LightCone.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="Interpolatable.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="MessageQueue.h" />

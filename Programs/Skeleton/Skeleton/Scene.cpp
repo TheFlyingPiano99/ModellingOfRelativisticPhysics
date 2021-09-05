@@ -10,6 +10,17 @@ Scene* Scene::instance = NULL;
 
 void Scene::Initialise()
 {
+	settings.viewMode = ViewMode::realTime3D;
+	settings.intersectionMode.get() = IntersectionMode::lightCone;
+	settings.dopplerMode.get() = DopplerMode::mild;
+	settings.doLorentz.get() = true;
+	settings.transformToProperFrame.get() = true;
+	settings.doShading = true;
+	settings.running = false;
+	settings.diagramX = 0;
+	settings.diagramY = 1;
+	settings.diagramZ = 3;
+
 
 	hud = new HUD(this);
 
@@ -196,7 +207,14 @@ void Scene::Animate(float dt) {
 		return;
 	}
 	hud->Animate(dt);						// Always animate!
+	settings.intersectionMode.animate(dt);
+	settings.dopplerMode.animate(dt);
+	settings.doLorentz.animate(dt);
+	settings.transformToProperFrame.animate(dt);
+
+	// "In app world time" animate
 	if (settings.running) {
+
 		dt *= timeScale;					// Scale time to symulation speed.
 		if (activeObserver != nullptr) {
 			activeObserver->syncCamera(realTime3DCamera, settings);
@@ -216,12 +234,12 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		//Prefase:
 		gpuProgram.setUniform(false, "textMode");
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(settings.intersectionMode, "intersectionMode");
-		gpuProgram.setUniform(settings.dopplerMode, "dopplerMode");
-		gpuProgram.setUniform(settings.doLorentz, "doLorentz");
+		gpuProgram.setUniform(settings.intersectionMode.get(), "intersectionMode");
+		gpuProgram.setUniform(settings.dopplerMode.get(), "dopplerMode");
+		gpuProgram.setUniform(settings.doLorentz.get(), "doLorentz");
 		gpuProgram.setUniform(settings.doShading, "doShading");
 		gpuProgram.setUniform(settings.viewMode, "viewMode");
-		gpuProgram.setUniform(settings.transformToProperFrame, "transformToProperFrame");
+		gpuProgram.setUniform(settings.transformToProperFrame.get(), "transformToProperFrame");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
@@ -285,9 +303,9 @@ void Scene::moveCamera(vec3 delta)
 // Symulation controls:
 
 void Scene::toggleDoppler() {
-	settings.dopplerMode = (DopplerMode)((3 > settings.dopplerMode + 1) ? (settings.dopplerMode + 1) : 0);
+	settings.dopplerMode = (DopplerMode)((3 > settings.dopplerMode.get() + 1) ? (settings.dopplerMode.get() + 1) : 0);
 	std::string str("Doppler mode: ");
-	switch (settings.dopplerMode)
+	switch (settings.dopplerMode.get())
 	{
 	case DopplerMode::full:
 		str.append("full");
@@ -305,9 +323,9 @@ void Scene::toggleDoppler() {
 }
 
 void Scene::toggleLorentzTransformation() {
-	settings.doLorentz = !settings.doLorentz;
+	settings.doLorentz.get() = !settings.doLorentz.get();
 	std::string str;
-	if (settings.doLorentz) {
+	if (settings.doLorentz.get()) {
 		str = std::string("Lorentz transformation enabled");
 	}
 	else {
@@ -319,9 +337,9 @@ void Scene::toggleLorentzTransformation() {
 
 void Scene::toggleTransformToProperFrame()
 {
-	settings.transformToProperFrame = !settings.transformToProperFrame;
+	settings.transformToProperFrame.get() = !settings.transformToProperFrame.get();
 	std::string str;
-	if (settings.transformToProperFrame) {
+	if (settings.transformToProperFrame.get()) {
 		str = std::string("Diagram transformed to active observers frame");
 	}
 	else {
@@ -332,9 +350,9 @@ void Scene::toggleTransformToProperFrame()
 }
 
 void Scene::toggleIntersectionMode() {
-	settings.intersectionMode = (IntersectionMode)((2 > settings.intersectionMode + 1) ? (settings.intersectionMode + 1) : 0);
+	settings.intersectionMode = (IntersectionMode)((2 > settings.intersectionMode.get() + 1) ? (settings.intersectionMode.get() + 1) : 0);
 	std::string str("Intersection mode: ");
-	switch (settings.intersectionMode)
+	switch (settings.intersectionMode.get())
 	{
 	case IntersectionMode::lightCone:
 		str.append("light cone");
@@ -507,26 +525,22 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 			}
 		}
 		else if (settings.viewMode == ViewMode::realTime3D) {						// RealTime3D view
-			Intersectable* intersectable;
-			if (settings.intersectionMode == IntersectionMode::lightCone) {
-				intersectable = activeObserver->getLightCone(settings);
-			}
-			else if (settings.intersectionMode == IntersectionMode::hyperplane) {
-				intersectable = activeObserver->getHyperplane(settings);
-			}
+			LightCone* lightCone = activeObserver->getLightCone(settings);
+			Hyperplane* hyperplane = activeObserver->getHyperplane(settings);
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, intersectable, settings.doLorentz, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+				float d = objects[i]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
 				}
 			}
-			delete intersectable;
+			delete lightCone;
+			delete hyperplane;
 		}
 
 		if (selectionIdx >= 0) {

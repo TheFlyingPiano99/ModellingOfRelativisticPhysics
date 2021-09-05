@@ -90,6 +90,9 @@
     <ClCompile Include="SettingsBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Interpolatable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -192,6 +195,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SettingsBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpolatable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

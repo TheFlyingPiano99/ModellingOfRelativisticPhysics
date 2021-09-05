@@ -74,7 +74,7 @@ void Object::Animate(float dt) {
 	//Todo
 }
 
-void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, bool doLorentz) {
+void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings) {
 	//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
 
 	worldLine->loadOnGPU(gpuProgram);
@@ -101,7 +101,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& interse
 
 	// Caption:
 	if (selected || hovered) {		
-		vec3 pos = perceivedPosition(&intersectable, doLorentz, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
+		vec3 pos = perceivedPosition(lightCone, hyperplane, settings, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
 		(*diagramCaption)->setPos(pos + normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		(*diagramCaption)->setVisible(true);
 	}
@@ -134,8 +134,8 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 	
 	float t = worldLine->intersect(intersectable);
 	vec4 pos;
-	if (settings.transformToProperFrame) {
-		if (settings.doLorentz) {
+	if (settings.transformToProperFrame.get()) {
+		if (settings.doLorentz.get()) {
 			pos = RelPhysics::lorentzTransformation(
 				worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
 				RelPhysics::To3DVelocity(observerProperties.velocity));
@@ -242,34 +242,64 @@ Object* Object::loadFromFile(std::ifstream& file)
 	return nullptr;
 }
 
-float Object::rayDistanceToObject(const Ray& ray, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+float Object::rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
-	vec3 locationInProperFrame = perceivedPosition(intersectable, doLorentz, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
+	vec3 locationInProperFrame = perceivedPosition(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
 	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
 	float d = length(locationInProperFrame - rayPos - dot(ray.dir, locationInProperFrame - rayPos) * ray.dir);
 	return (dot(locationInProperFrame - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
 }
 
-vec3 Object::perceivedPosition(Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+vec3 Object::perceivedPosition(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
 	//Intersect:
 	float t = 0;		// absolute time parametre
 
-	t = worldLine->intersect(*intersectable);
-
-	vec3 locationInProperFrame;
-
-	if (doLorentz) {
-		vec4 shiftedOrigoFrame = worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero;	// The absolute observers frame, but with shifted origo.
-		vec4 location4D = RelPhysics::lorentzTransformation(shiftedOrigoFrame, RelPhysics::To3DVelocity(observersCurrentVelocity));	// In the current observer's frame.
-		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
+	float tLightCone = worldLine->intersect(lightCone);
+	float tHyperplane = worldLine->intersect(hyperplane);
+	if (settings.intersectionMode.interpolating()) {
+		if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
+			t = lerp(tHyperplane, tLightCone, settings.intersectionMode.getFraction());
+		}
+		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
+			t = lerp(tLightCone, tHyperplane, settings.intersectionMode.getFraction());
+		}
 	}
-	else {			// Euclidean transformation
-		vec4 location4D = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation, RelPhysics::To3DVelocity(observersCurrentVelocity));
-		locationInProperFrame = vec3(location4D.x, location4D.y, location4D.z);
+	else {
+		if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
+			t = tLightCone;
+		}
+		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
+			t = tHyperplane;
+		}
 	}
 
-	return locationInProperFrame;
+	vec4 location4D = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));	// In the current observer's frame.
+	vec3 locationInProperFrameLorentz = vec3(location4D.x, location4D.y, location4D.z);
+
+	location4D = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation, RelPhysics::To3DVelocity(observersCurrentVelocity));
+	vec3 locationInProperFrameGalilean = vec3(location4D.x, location4D.y, location4D.z);
+
+	vec3 retVal;
+	
+	if (settings.doLorentz.interpolating()) {
+		if (settings.doLorentz.get()) {	// to Lorentz
+			retVal = lerp<vec3>(locationInProperFrameGalilean, locationInProperFrameLorentz, settings.doLorentz.getFraction());
+		}
+		else {			// to Galilean
+			retVal = lerp<vec3>(locationInProperFrameLorentz, locationInProperFrameGalilean, settings.doLorentz.getFraction());
+		}
+	}
+	else {
+		if (settings.doLorentz.get()) {
+			retVal = locationInProperFrameLorentz;
+		}
+		else {
+			retVal = locationInProperFrameGalilean;
+		}
+	}
+
+	return retVal;
 }
 
 void Object::hover()

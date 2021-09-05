@@ -536,4 +536,19 @@ vec3 Rotate(vec3 u, vec4 q) {
 }
 */
 
+template<typename T>
+inline T lerp(const T startVal, const T endVal, const float t) {
+	return startVal * (1 - t) + endVal * t;
+}
+
+template<typename T>
+inline float invLerp(const T startVal, const T endVal, const T val) {
+	return (val - startVal) / (endVal - startVal);
+}
+template<typename TIn, typename TOut>
+inline TOut remap(const TIn startIn, const TIn endIn, const TOut startOut, TOut endOut, TIn val) {
+	float t = invLerp(startIn, endIn, val);
+	return lerp(startOut, endOut, t);
+}
+
 #endif /*!FRAMEWORK_H*/

@@ -6,36 +6,56 @@
 
 vec4 Observer::getLocation(const Settings& settings)
 {
-	if (settings.doLorentz) {
-		return worldLine->getLocationAtProperTime(currentProperTime);
+	vec4 lorentz = worldLine->getLocationAtProperTime(currentProperTime);
+	vec4 galilean = worldLine->getLocationAtAbsoluteTime(currentProperTime);
+	vec4 retVal;
+	if (settings.doLorentz.interpolating()) {
+		if (settings.doLorentz.get()) {
+			retVal = lerp<vec4>(galilean, lorentz, settings.doLorentz.getFraction());
+		}
+		else {
+			retVal = lerp<vec4>(lorentz, galilean, settings.doLorentz.getFraction());
+		}
 	}
 	else {
-		return worldLine->getLocationAtAbsoluteTime(currentProperTime);
+		if (settings.doLorentz.get()) {
+			retVal = lorentz;
+		}
+		else {
+			retVal = galilean;
+		}
 	}
+	return retVal;
 }
 
 vec4 Observer::getVelocity(const Settings& settings)
 {
-	if (settings.doLorentz) {
-		return worldLine->getVelocityAtProperTime(currentProperTime);
+	vec4 lorentz = worldLine->getVelocityAtProperTime(currentProperTime);
+	vec4 galilean = worldLine->getVelocityAtAbsoluteTime(currentProperTime);
+	vec4 retVal;
+	if (settings.doLorentz.interpolating()) {
+		if (settings.doLorentz.get()) {
+			retVal = lerp<vec4>(galilean, lorentz, settings.doLorentz.getFraction());
+		}
+		else {
+			retVal = lerp<vec4>(lorentz, galilean, settings.doLorentz.getFraction());
+		}
 	}
 	else {
-		return worldLine->getVelocityAtAbsoluteTime(currentProperTime);
+		if (settings.doLorentz.get()) {
+			retVal = lorentz;
+		}
+		else {
+			retVal = galilean;
+		}
 	}
+	return retVal;
 }
 
 vec4 Observer::getLocationAtZero(const Settings& settings)	// Must be fixed!
 {
-	vec4 location;
-	vec4 velocity;
-	if (settings.doLorentz) {
-		location = worldLine->getLocationAtProperTime(currentProperTime);
-		velocity = worldLine->getVelocityAtProperTime(currentProperTime);
-	}
-	else {
-		location = worldLine->getLocationAtAbsoluteTime(currentProperTime);
-		velocity = worldLine->getVelocityAtAbsoluteTime(currentProperTime);
-	}
+	vec4 location = getLocation(settings);
+	vec4 velocity = getVelocity(settings);
 	return location - velocity / velocity.w * location.w;
 }
 
@@ -53,25 +73,36 @@ ObserverProperties Observer::getProperties(const Settings& settings) {
 
 Hyperplane* Observer::getHyperplane(const Settings& settings)
 {
-	if (settings.doLorentz) {
-		return worldLine->getSimultaneousHyperplaneAtProperTime(currentProperTime);
+	vec4 location = getLocation(settings);
+	vec4 tangent = worldLine->getVelocityAtProperTime(currentProperTime);
+	vec4 lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);
+	vec4 galileanNormal = vec4(0,0,0,1);
+
+	vec4 normal;
+	if (settings.doLorentz.interpolating()) {
+		if (settings.doLorentz.get()) {
+			normal = lerp<vec4>(galileanNormal, lorentzNormal, settings.doLorentz.getFraction());
+		}
+		else {
+			normal = lerp<vec4>(lorentzNormal, galileanNormal, settings.doLorentz.getFraction());
+		}
 	}
-	else {		// Euclidean space
-		vec4 location = worldLine->getLocationAtAbsoluteTime(currentProperTime);
-		return new Hyperplane(location, vec4(0, 0, 0, 1));
+	else {
+		if (settings.doLorentz.get()) {
+			normal = lorentzNormal;
+		}
+		else {
+			normal = galileanNormal;
+		}
 	}
+	return new Hyperplane(location, normal);
 }
 
 
 
 LightCone* Observer::getLightCone(const Settings& settings)
 {
-	if (settings.doLorentz) {
-		return worldLine->getLigtConeAtProperTime(currentProperTime);
-	}
-	else {
-		return worldLine->getLigtConeAtAbsoluteTime(currentProperTime);
-	}
+	return new LightCone(getLocation(settings));
 }
 
 void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
@@ -99,7 +130,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
 	vec3 pos;
-	if (settings.transformToProperFrame) {
+	if (settings.transformToProperFrame.get()) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
@@ -116,7 +147,7 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Sett
 	gpuProgram.setUniform(true, "directRenderMode");
 	
 	vec4 v = getVelocity(settings);
-	vec3 planeNormal = (settings.transformToProperFrame || !settings.doLorentz) ?
+	vec3 planeNormal = (settings.transformToProperFrame.get() || !settings.doLorentz.get()) ?
 		vec3(0, 0, 1)
 		: normalize(vec3(-v.x, -v.y, v.w));
 
@@ -131,7 +162,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Setti
 {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	vec3 pos;
-	if (settings.transformToProperFrame) {
+	if (settings.transformToProperFrame.get()) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
@@ -153,7 +184,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Setti
 void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
 	vec3 pos;
-	if (settings.transformToProperFrame) {
+	if (settings.transformToProperFrame.get()) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
@@ -172,10 +203,10 @@ void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& 
 
 void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings)
 {
-	if (settings.intersectionMode == IntersectionMode::lightCone) {
+	if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
 		DrawLightCone(gpuProgram, camera, settings);
 	}
-	else if (settings.intersectionMode == IntersectionMode::hyperplane) {
+	else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
 		DrawHyperplane(gpuProgram, camera, settings);
 	}
 	DrawNode(gpuProgram, camera, settings);
@@ -185,10 +216,10 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 		prevTau = currentProperTime;
 		updateCounter = 0;
 		(*timerCaption)->changeText(std::string("tau = ").append(std::to_string(prevTau)).append(" m\n")
-			.append("t = ").append(std::to_string((settings.doLorentz) ? worldLine->getAbsoluteTimeAtProperTime(currentProperTime) : currentProperTime)).append(" m").c_str());
+			.append("t = ").append(std::to_string((settings.doLorentz.get()) ? worldLine->getAbsoluteTimeAtProperTime(currentProperTime) : currentProperTime)).append(" m").c_str());
 	}
 	vec3 pos;
-	if (settings.transformToProperFrame) {
+	if (settings.transformToProperFrame.get()) {
 		pos = vec3(0, 0, currentProperTime);
 	}
 	else {
@@ -197,7 +228,7 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 	}
 	(*timerCaption)->setPos(pos + camera.getRight() * 11 + camera.getUp() * 1);
 	(*timerCaption)->setVisible(selected);
-	(*diagramCaption)->setPos((settings.transformToProperFrame)? vec3(0 , 0, 0)
+	(*diagramCaption)->setPos((settings.transformToProperFrame.get())? vec3(0 , 0, 0)
 		: vec3(observerProperties.locationAtZero[settings.diagramX],
 			observerProperties.locationAtZero[settings.diagramY],
 			observerProperties.locationAtZero[settings.diagramZ]
@@ -208,7 +239,7 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 
 void Observer::setCurrentTimeAtAbsoluteTime(float t, const Settings& settings)
 {
-	if (settings.doLorentz) {
+	if (settings.doLorentz.get()) {
 		currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
 	}
 	else {
@@ -218,7 +249,7 @@ void Observer::setCurrentTimeAtAbsoluteTime(float t, const Settings& settings)
 
 float Observer::getAbsoluteTimeAtCurrentTime(const Settings& settings)
 {
-	if (settings.doLorentz) {
+	if (settings.doLorentz.get()) {
 		return worldLine->getAbsoluteTimeAtProperTime(currentProperTime);
 	}
 	else {
@@ -248,7 +279,7 @@ void Observer::syncTimeToObserversSimultaneity(Observer& observer, const Setting
 {
 	Hyperplane* plane = observer.getHyperplane(settings);
 	float t = worldLine->intersectHyperplane(*plane);
-	if (settings.doLorentz) {
+	if (settings.doLorentz.get()) {
 		currentProperTime = worldLine->getProperTimeAtAbsoluteTime(t);
 	}
 	else {

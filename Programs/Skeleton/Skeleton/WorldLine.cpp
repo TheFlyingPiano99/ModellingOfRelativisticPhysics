@@ -406,11 +406,11 @@ float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProp
     for (int i = 0; i < noOfVds4D - 1; i++) {
         vec4 pos1 = vds4D[i];
         vec4 pos2 = vds4D[i + 1];
-        if (settings.transformToProperFrame) {
+        if (settings.transformToProperFrame.get()) {
             // !!! Eucleadian is not correct !!!
-            pos1 = (settings.doLorentz) ? lorentzTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
+            pos1 = (settings.doLorentz.get()) ? lorentzTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
                 : galileanTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
-            pos2 = (settings.doLorentz) ? lorentzTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
+            pos2 = (settings.doLorentz.get()) ? lorentzTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
                 : galileanTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
         }
         vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);

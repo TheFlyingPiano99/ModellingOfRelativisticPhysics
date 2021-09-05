@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "AdvancedTexture.h"
 #include "EnumTypes.h"
+#include "Observer.h"
 #include <map>
 #include "Caption.h"
 #include <memory>
@@ -97,7 +98,7 @@ public:
 
 	void Animate(float dt);
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera, Intersectable& intersectable, bool doLorentz);
+	void Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings);
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersectable& intersectable, const ObserverProperties& observerProperties, const Settings& settings);
 
@@ -123,19 +124,20 @@ public:
 	/*
 	* Returns shortest distance between given ray and the object's world line's diagram representation.
 	*/
-	float rayDistanceToDiagram(const Ray& ray, ObserverProperties observerProperties, Settings settings) {
+	float rayDistanceToDiagram(const Ray& ray, ObserverProperties observerProperties, const Settings& settings) {
 		return worldLine->distanceBetweenRayAndDiagram(ray, observerProperties, settings);
 	}
 
 	/*
 	* Returns shortest distance between center of the object in current world space with current relativistic transformations and the given ray.
 	*/
-	float rayDistanceToObject(const Ray& ray, Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+	float rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 
 	/*
 	* Returns 3D position perceived by the observer.
+	* Interpolates between intersection modes and transformation modes.
 	*/
-	vec3 perceivedPosition(Intersectable* intersectable, bool doLorentz, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+	vec3 perceivedPosition(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 
 	float getOverallRadius() {
 		return geometry->getOverallRadius();

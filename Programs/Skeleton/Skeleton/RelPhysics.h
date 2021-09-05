@@ -102,6 +102,9 @@ namespace RelPhysics
 		return vec4(rTrans.x, rTrans.y, rTrans.z, tTrans);
 	}
 
+	static vec3 galileanTransformationOfVelocity(vec3 toTransform, vec3 relVelocity) {
+		return toTransform - relVelocity;
+	}
 };
 
 #endif /*!RELPHYSICS_H*/

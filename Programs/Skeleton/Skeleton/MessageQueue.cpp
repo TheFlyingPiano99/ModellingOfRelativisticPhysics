@@ -52,8 +52,7 @@ void MessageQueue::Animate(float dt) {
 	}
 	if (transitPhase) {		// Move entries
 		for (int i = 0; i < queue.size(); i++) {			// Interpolate position between prev and next pos.
-			(*queue[i])->setPos((startPos + entryOffset * (i + 1)) * timeLeft / transitTime
-				+ (startPos + entryOffset * (i) ) * (1 - timeLeft / transitTime) );
+			(*queue[i])->setPos(remap<float, vec3>(0, transitTime, startPos + entryOffset * i, startPos + entryOffset * (i + 1), timeLeft));
 		}
 	}
 }
