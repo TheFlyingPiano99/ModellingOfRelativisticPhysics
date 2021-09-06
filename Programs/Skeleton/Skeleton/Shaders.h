@@ -18,19 +18,30 @@ const char* const vertexSource = R"(
 	uniform float speedOfLight;
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
+
 	uniform bool doLorentz;
+	uniform bool interpolateDoLorentz;
+	uniform float tDoLorentz;
+
 	uniform mat4 MVP;
 	uniform mat4 M;
 	uniform mat4 invM;
+
 	uniform bool textMode;
 	uniform bool directRenderMode;
 	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
 	uniform vec4 observersStartPos;
+
 	uniform bool transformToProperFrame;
+	uniform bool interpolateTransformToProperFrame;
+	uniform float tTransformToProperFrame;
+
 
 	uniform int intersectionMode;	// 0 = lightCone, 1 = hyperplane
+	uniform bool interpolateIntersectionMode;
+	uniform float tIntersectionMode;
 
 	//WorldLine:
 	uniform int worldLineType;	// 0 = geodetic
@@ -158,38 +169,97 @@ const char* const vertexSource = R"(
 		return sqrt((speedOfLight + v) / (speedOfLight - v));
 	}
 
+	vec4 lerp(vec4 startVal, vec4 endVal, float t) {
+		return startVal * (1 - t) + endVal * t;
+	}
+
+	vec3 lerp(vec3 startVal, vec3 endVal, float t) {
+		return startVal * (1 - t) + endVal * t;
+	}
+
+	float lerp(float startVal, float endVal, float t) {
+		return startVal * (1 - t) + endVal * t;
+	}
+
+
 	/*
 		Calculates the intersection of a hyperplane and world line of this vertex
 		Also calculates the Doppler shift for this vertex.
 	*/
 	void geodetic() {
-		float t = 0;		// absolute time parametre
+		float t;		// absolute time parametre
 		vec4 offsetedStartPos;
 		vec4 tangentVelocity;
 		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
+			vec4 offsetedStartPosLorentz;
+			vec4 offsetedStartPosGalilean;
 			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
 			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
-			if (doLorentz) {			// (Length contraction is applied)
-				vec3 v = To3DVelocity(tangentVelocity);
-				float gamma = lorentzFactor(length(v));
-				vec3 n = normalize(v);
-				vec3 pParalel = dot(vp.xyz, n) * n;
-				vec3 pPerpend = vp.xyz - pParalel;
-				offsetedStartPos = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + tangent worldLine start pos
+			vec3 v = To3DVelocity(tangentVelocity);
+			float gamma = lorentzFactor(length(v));
+			vec3 n = normalize(v);
+			vec3 pParalel = dot(vp.xyz, n) * n;
+			vec3 pPerpend = vp.xyz - pParalel;
+			offsetedStartPosLorentz = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + tangent worldLine start pos
+			offsetedStartPosGalilean = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos
+			if (interpolateDoLorentz) {
+				if (doLorentz) {
+					offsetedStartPos = lerp(offsetedStartPosGalilean, offsetedStartPosLorentz, tDoLorentz);
+				}
+				else {
+					offsetedStartPos = lerp(offsetedStartPosLorentz, offsetedStartPosGalilean, tDoLorentz);
+				}
 			}
-			else {		// Don't do Lorentz
-				offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos
+			else {
+				if (doLorentz) {
+					offsetedStartPos = offsetedStartPosLorentz;
+				}
+				else {
+					offsetedStartPos = offsetedStartPosGalilean;
+				}
 			}
 
 			//Intersect:
-			if (intersectionMode == 0) {					// Light cone
-				vec4 coneLocation = observersLocation;
-				t = GeodeticIntersectLightCone(offsetedStartPos, tangentVelocity, coneLocation);
+			vec4 coneLocation = observersLocation;
+			float tCone = GeodeticIntersectLightCone(offsetedStartPos, tangentVelocity, coneLocation);
+
+			vec4 planeLocation = observersLocation;
+			vec4 planeNormal;
+			vec4 planeNormalLorentz = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
+			vec4 planeNormalGalilean = vec4(0, 0, 0, 1);
+			if (interpolateDoLorentz) {
+				if (doLorentz) {
+					planeNormal = lerp(planeNormalGalilean, planeNormalLorentz, tDoLorentz);
+				}
+				else {
+					planeNormal = lerp(planeNormalLorentz, planeNormalGalilean, tDoLorentz);
+				}
 			}
-			else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
-				vec4 planeLocation = observersLocation;
-				vec4 planeNormal = (doLorentz) ? normalize(vec4(-(observersVelocity.xyz), observersVelocity.w)) : vec4(0, 0, 0, 1);
-				t = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);		
+			else {
+				if (doLorentz) {
+					planeNormal = planeNormalLorentz;
+				}
+				else {
+					planeNormal = planeNormalGalilean;
+				}
+			}
+			float tPlane = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);		
+
+			if (interpolateIntersectionMode) {
+				if (intersectionMode == 0) {					// Light cone
+					t = lerp(tPlane, tCone, tIntersectionMode);
+				}
+				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
+					t = lerp(tCone, tPlane, tIntersectionMode);
+				}
+			}
+			else {
+				if (intersectionMode == 0) {					// Light cone
+					t = tCone;
+				}
+				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
+					t = tPlane;
+				}
 			}
 
 			if (
@@ -201,19 +271,45 @@ const char* const vertexSource = R"(
 		    }
 		}
 		
+		vec3 vertexLocationProperFrameLorentz;
+		vec3 vertexVelocityProperFrameLorentz;
+
+		vec3 vertexLocationProperFrameGalilean;
+		vec3 vertexVelocityProperFrameGalilean;
+
 		vec3 vertexLocationProperFrame;
 		vec3 vertexVelocityProperFrame;
-		if (doLorentz) {
-			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
-			vertexLocationProperFrame = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
-			vertexVelocityProperFrame = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)), To3DVelocity(observersVelocity));
+
+		vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
+		vertexLocationProperFrameLorentz = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
+		vertexVelocityProperFrameLorentz = lorentzTransformationOfVelocity(To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)), To3DVelocity(observersVelocity));
+
+		shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
+		vertexLocationProperFrameGalilean = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
+		vertexVelocityProperFrameGalilean = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)) - To3DVelocity(observersVelocity);
+		
+		if (interpolateDoLorentz) {
+			if (doLorentz) {
+				vertexLocationProperFrame = lerp(vertexLocationProperFrameGalilean, vertexLocationProperFrameLorentz, tDoLorentz);
+				vertexVelocityProperFrame = lerp(vertexVelocityProperFrameGalilean, vertexVelocityProperFrameLorentz, tDoLorentz);
+			}
+			else {
+				vertexLocationProperFrame = lerp(vertexLocationProperFrameLorentz, vertexLocationProperFrameGalilean, tDoLorentz);
+				vertexVelocityProperFrame = lerp(vertexVelocityProperFrameLorentz, vertexVelocityProperFrameGalilean, tDoLorentz);
+			}
 		}
 		else {
-			vec4 shiftedOrigoFrame = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, t) - observersStartPos;	// The absolute observers frame, but with shifted origo.
-			vertexLocationProperFrame = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity)).xyz;	// In the current observer's frame.
-			vertexVelocityProperFrame = To3DVelocity(GeodeticVelocityAtAbsoluteTime(offsetedStartPos, tangentVelocity, t)) - To3DVelocity(observersVelocity);
+			if (doLorentz) {
+				vertexLocationProperFrame = vertexLocationProperFrameLorentz;
+				vertexVelocityProperFrame = vertexVelocityProperFrameLorentz;
+			}
+			else {
+				vertexLocationProperFrame = vertexLocationProperFrameGalilean;
+				vertexVelocityProperFrame = vertexVelocityProperFrameGalilean;
+			}
 		}
-		
+
+				
 		if (dopplerMode == 0) {	// Full
 			dopplerShift = calculateDopplerShift(vertexVelocityProperFrame, vertexLocationProperFrame);
 		}
@@ -236,18 +332,43 @@ const char* const vertexSource = R"(
 
 	void diagram() {
 		vec4 transformed;
-		if (transformToProperFrame) {
+		vec4 transformedProperFrame;
+		vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
+		vec4 transformedLorentz = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+
+		shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
+		vec4 transformedGalilean = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+		if (interpolateDoLorentz) {
 			if (doLorentz) {
-				vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
-				transformed = lorentzTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
+				transformedProperFrame = lerp(transformedGalilean, transformedLorentz, tDoLorentz);
 			}
 			else {
-				vec4 shiftedOrigoFrame = vp - observersStartPos;	// The absolute observers frame, but with shifted origo.
-				transformed = galileanTransformation(shiftedOrigoFrame, To3DVelocity(observersVelocity));	// In the current observer's frame.
-}
+				transformedProperFrame = lerp(transformedLorentz, transformedGalilean, tDoLorentz);
+			}
 		}
-		else {		// "Transformed" is the original.
-			transformed = vp;
+		else {
+			if (doLorentz) {
+				transformedProperFrame = transformedLorentz;
+			}
+			else {
+				transformedProperFrame = transformedGalilean;
+			}
+		}
+		if (interpolateTransformToProperFrame) {
+			if (transformToProperFrame) {
+				transformed = lerp(vp, transformedProperFrame, tTransformToProperFrame);
+			}
+			else {
+				transformed = lerp(transformedProperFrame, vp, tTransformToProperFrame);
+			}
+		}
+		else {
+			if (transformToProperFrame) {
+				transformed = transformedProperFrame;
+			}
+			else {
+				transformed = vp;
+			}
 		}
 
 		wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;

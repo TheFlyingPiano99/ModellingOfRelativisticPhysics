@@ -13,10 +13,10 @@ class InterpolationControl
 
 public:
 
-	InterpolationControl(float _tMax = 300): t(0.0f), tMax(_tMax) {
+	InterpolationControl(float _tMax = 400): t(0.0f), tMax(_tMax) {
 	}
 
-	InterpolationControl(T _val, float _tMax = 300) : val(_val), tMax(_tMax), t(0.0f) {
+	InterpolationControl(T _val, float _tMax = 400) : val(_val), tMax(_tMax), t(0.0f) {
 	}
 
 	void animate(const float dt) {

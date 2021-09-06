@@ -234,12 +234,22 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		//Prefase:
 		gpuProgram.setUniform(false, "textMode");
 		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(settings.intersectionMode.get(), "intersectionMode");
 		gpuProgram.setUniform(settings.dopplerMode.get(), "dopplerMode");
+
 		gpuProgram.setUniform(settings.doLorentz.get(), "doLorentz");
+		gpuProgram.setUniform(settings.doLorentz.interpolating(), "interpolateDoLorentz");
+		gpuProgram.setUniform(settings.doLorentz.getFraction(), "tDoLorentz");
+
+		gpuProgram.setUniform(settings.intersectionMode.get(), "intersectionMode");
+		gpuProgram.setUniform(settings.intersectionMode.interpolating(), "interpolateIntersectionMode");
+		gpuProgram.setUniform(settings.intersectionMode.getFraction(), "tIntersectionMode");
+
+		gpuProgram.setUniform(settings.transformToProperFrame.get(), "transformToProperFrame");
+		gpuProgram.setUniform(settings.transformToProperFrame.interpolating(), "interpolateTransformToProperFrame");
+		gpuProgram.setUniform(settings.transformToProperFrame.getFraction(), "tTransformToProperFrame");
+
 		gpuProgram.setUniform(settings.doShading, "doShading");
 		gpuProgram.setUniform(settings.viewMode, "viewMode");
-		gpuProgram.setUniform(settings.transformToProperFrame.get(), "transformToProperFrame");
 		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
