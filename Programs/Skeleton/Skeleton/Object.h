@@ -10,8 +10,10 @@
 #include "AdvancedTexture.h"
 #include "EnumTypes.h"
 #include "Observer.h"
-#include <map>
+#include "RelPhysics.h"
 #include "Caption.h"
+
+#include <map>
 #include <memory>
 
 class Object : public Entity
@@ -96,11 +98,16 @@ public:
 		;
 	}
 
+	/*
+	* Return vec3 diagram intersection position.
+	*/
+	vec3 getDiagramPos(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, const ObserverProperties& observerProperties);
+
 	void Animate(float dt);
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings);
 
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersectable& intersectable, const ObserverProperties& observerProperties, const Settings& settings);
+	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone& cone, const Hyperplane& plane, const ObserverProperties& observerProperties, const Settings& settings);
 
 	std::string genSaveString();
 
@@ -134,15 +141,21 @@ public:
 	float rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 
 	/*
-	* Returns 3D position perceived by the observer.
+	* Returns location perceived by the observer expressed in observer's proper frame.
 	* Interpolates between intersection modes and transformation modes.
 	*/
-	vec3 perceivedPosition(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
+	vec4 intersect(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity);
 
+	/*
+	* Sphere model for collision detection.
+	*/
 	float getOverallRadius() {
 		return geometry->getOverallRadius();
 	}
 
+	/*
+	* Tell object, that mouse cursor hovered over image of object.
+	*/
 	void hover();
 };
 

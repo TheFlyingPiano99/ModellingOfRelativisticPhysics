@@ -70,13 +70,45 @@ Object* Object::createSpaceship(WorldLine* wrdln)
 	return obj;
 }
 
+vec3 Object::getDiagramPos(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, const ObserverProperties& observerProperties) {
+	// Transformation mode interpolation:
+	vec4 absoluteFramePos4 = intersect(lightCone, hyperplane, settings,
+		vec4(0, 0, 0, 0),
+		vec4(0, 0, 0, 0),
+		vec4(0, 0, 0, RelPhysics::speedOfLight));
+	vec3 absoluteFramePos = vec3(absoluteFramePos4[settings.diagramX], absoluteFramePos4[settings.diagramY], absoluteFramePos4[settings.diagramZ]);
+	vec4 properFramePos4 = intersect(lightCone, hyperplane, settings,
+		observerProperties.location,
+		observerProperties.locationAtZero,
+		observerProperties.velocity);
+	vec3 properFramePos = vec3(properFramePos4[settings.diagramX], properFramePos4[settings.diagramY], properFramePos4[settings.diagramZ]);
+
+	// "Transformation to proper frame" interpolation:
+	vec3 pos;
+	if (settings.transformToProperFrame.interpolating()) {
+		if (settings.transformToProperFrame.get()) {
+			pos = lerp<vec3>(absoluteFramePos, properFramePos, settings.transformToProperFrame.getFraction());
+		}
+		else {
+			pos = lerp<vec3>(properFramePos, absoluteFramePos, settings.transformToProperFrame.getFraction());
+		}
+	}
+	else {
+		if (settings.transformToProperFrame.get()) {
+			pos = properFramePos;
+		}
+		else {
+			pos = absoluteFramePos;
+		}
+	}
+	return pos;
+}
+
 void Object::Animate(float dt) {
 	//Todo
 }
 
 void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings) {
-	//geometry->updateBeforeDraw(camera.getVelocityFV(), camera.getLocationFV(), *worldLine);
-
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
@@ -101,7 +133,8 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 
 	// Caption:
 	if (selected || hovered) {		
-		vec3 pos = perceivedPosition(lightCone, hyperplane, settings, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
+		vec4 pos4 = intersect(lightCone, hyperplane, settings, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
+		vec3 pos = vec3(pos4.x, pos4.y, pos4.z);
 		(*diagramCaption)->setPos(pos + normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		(*diagramCaption)->setVisible(true);
 	}
@@ -110,7 +143,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	}
 }
 
-void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersectable& intersectable, const ObserverProperties& observerProperties, const Settings& settings) {
+void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const ObserverProperties& observerProperties, const Settings& settings) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
@@ -132,34 +165,17 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const Intersect
 
 	worldLine->DrawDiagram();
 	
-	float t = worldLine->intersect(intersectable);
-	vec4 pos;
-	if (settings.transformToProperFrame.get()) {
-		if (settings.doLorentz.get()) {
-			pos = RelPhysics::lorentzTransformation(
-				worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
-				RelPhysics::To3DVelocity(observerProperties.velocity));
-		}
-		else {
-			pos = RelPhysics::galileanTransformation(
-				worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero,
-				RelPhysics::To3DVelocity(observerProperties.velocity));
-		}
-	}
-	else {
-		pos = worldLine->getLocationAtAbsoluteTime(t);
-	}
-
-	vec3 pos3 = vec3(pos[settings.diagramX], pos[settings.diagramY], pos[settings.diagramZ]);
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos3) * camera.Translate() * camera.V() * camera.P(), "MVP");
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos3), "M");
-	gpuProgram.setUniform(TranslateMatrix(-pos3), "invM");
+	
+	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "directRenderMode");
 	gpuProgram.setUniform(false, "glow");
 
 	Assets::getObserverNodeGeometry()->Draw();
 	if (selected || hovered) {
-		(*diagramCaption)->setPos(pos3);
+		(*diagramCaption)->setPos(pos);
 		(*diagramCaption)->setVisible(true);
 	}
 	else {
@@ -244,13 +260,14 @@ Object* Object::loadFromFile(std::ifstream& file)
 
 float Object::rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
-	vec3 locationInProperFrame = perceivedPosition(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
+	vec4 location4 = intersect(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
+	vec3 wPos = vec3(location4.x, location4.y, location4.z);	// only space coordinates!
 	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
-	float d = length(locationInProperFrame - rayPos - dot(ray.dir, locationInProperFrame - rayPos) * ray.dir);
-	return (dot(locationInProperFrame - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
+	float d = length(wPos - rayPos - dot(ray.dir, wPos - rayPos) * ray.dir);
+	return (dot(wPos - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
 }
 
-vec3 Object::perceivedPosition(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
 	//Intersect:
 	float t = 0;		// absolute time parametre
@@ -273,32 +290,26 @@ vec3 Object::perceivedPosition(const LightCone& lightCone, const Hyperplane& hyp
 			t = tHyperplane;
 		}
 	}
-
-	vec4 location4D = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));	// In the current observer's frame.
-	vec3 locationInProperFrameLorentz = vec3(location4D.x, location4D.y, location4D.z);
-
-	location4D = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerCurrentLocation, RelPhysics::To3DVelocity(observersCurrentVelocity));
-	vec3 locationInProperFrameGalilean = vec3(location4D.x, location4D.y, location4D.z);
-
-	vec3 retVal;
 	
+	vec4 retVal;
 	if (settings.doLorentz.interpolating()) {
+		vec4 locationInProperFrameLorentz = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
+		vec4 locationInProperFrameGalilean = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		if (settings.doLorentz.get()) {	// to Lorentz
-			retVal = lerp<vec3>(locationInProperFrameGalilean, locationInProperFrameLorentz, settings.doLorentz.getFraction());
+			retVal = lerp<vec4>(locationInProperFrameGalilean, locationInProperFrameLorentz, settings.doLorentz.getFraction());
 		}
 		else {			// to Galilean
-			retVal = lerp<vec3>(locationInProperFrameLorentz, locationInProperFrameGalilean, settings.doLorentz.getFraction());
+			retVal = lerp<vec4>(locationInProperFrameLorentz, locationInProperFrameGalilean, settings.doLorentz.getFraction());
 		}
 	}
 	else {
 		if (settings.doLorentz.get()) {
-			retVal = locationInProperFrameLorentz;
+			retVal = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		}
 		else {
-			retVal = locationInProperFrameGalilean;
+			retVal = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		}
 	}
-
 	return retVal;
 }
 

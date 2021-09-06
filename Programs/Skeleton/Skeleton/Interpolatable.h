@@ -5,7 +5,7 @@
 * Allows variable, to control interpolated states.
 */
 template<typename T>
-class Interpolatable
+class InterpolationControl
 {	
 	T val;
 	T prevVal;
@@ -13,10 +13,10 @@ class Interpolatable
 
 public:
 
-	Interpolatable(float _tMax = 300): t(0.0f), tMax(_tMax) {
+	InterpolationControl(float _tMax = 300): t(0.0f), tMax(_tMax) {
 	}
 
-	Interpolatable(T _val, float _tMax = 300) : val(_val), tMax(_tMax), t(0.0f) {
+	InterpolationControl(T _val, float _tMax = 300) : val(_val), tMax(_tMax), t(0.0f) {
 	}
 
 	void animate(const float dt) {

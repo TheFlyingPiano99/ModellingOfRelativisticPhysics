@@ -37,33 +37,51 @@ public:
 
 	/*
 	* Returns spacetime location according to absolute observer when this observer measures "current proper time".
+	* Interpolates between values, when transformation mode is changed.
 	*/
+
 	vec4 getLocation(const Settings& settings);
 
 	/*
 	* Returns velocity 4-vector according to absolute observer when this observer measures "current proper time".
+	* Interpolates between values, when transformation mode is changed.
 	*/
 	vec4 getVelocity(const Settings& settings);
 
 	/*
 	* Return location in absolute observers frame, when this observer crosses absolute observers t = 0 hyperplane.
+	* Interpolates between values, when transformation mode is changed.
 	*/
 	vec4 getLocationAtZero(const Settings& settings);
 
 	/*
 	* Return all necessary properties.
+	* Interpolates between values, when transformation mode is changed.
 	*/
 	ObserverProperties getProperties(const Settings& settings);
 
 	/*
-	* Returns simultaneous hyperplane, where the observer measures currentProperTime.
+	* Returns simultaneous hyperplane of this observer in absolute observers frame, where this observer measures currentProperTime.
+	* Interpolates between values, when transformation mode is changed.
 	*/
 	Hyperplane* getHyperplane(const Settings& settings);
 
 	/*
 	* Returns light cone, where the observer measures currentProperTime.
+	* Interpolates between values, when transformation mode is changed.
 	*/
 	LightCone* getLightCone(const Settings& settings);
+
+	/*
+	* Transform own position at current proper time to interpolated diagram position between proper frame and absolute frame.
+	*/
+	vec3 transformPosToDiagramSpace(vec4 pos4, const Settings& settings);
+
+	/*
+	* Transform own hyperplane normal at current proper time to interpolated diagram position between proper frame and absolute frame.
+	*/
+	vec3 transformHyperplaneNormalToDiagramSpace(vec4 normal4, const Settings& settings);
+
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);

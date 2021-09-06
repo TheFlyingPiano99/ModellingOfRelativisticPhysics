@@ -53,10 +53,10 @@ enum ControlEvent {
 */
 struct Settings {
 	ViewMode viewMode;
-	Interpolatable<IntersectionMode> intersectionMode;
-	Interpolatable<DopplerMode> dopplerMode;
-	Interpolatable<bool> doLorentz;
-	Interpolatable<bool> transformToProperFrame;
+	InterpolationControl<IntersectionMode> intersectionMode;
+	InterpolationControl<DopplerMode> dopplerMode;
+	InterpolationControl<bool> doLorentz;
+	InterpolationControl<bool> transformToProperFrame;
 	bool doShading;
 	bool running;
 	int diagramX;

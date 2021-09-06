@@ -57,17 +57,12 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 
 	//Actual drawing:
 	Camera* activeCamera = scene->getActiveCamera();
-	Intersectable* intersectable;
+	LightCone* lightCone = scene->getActiveObserver()->getLightCone(scene->getSettings());
+	Hyperplane* hyperplane = scene->getActiveObserver()->getHyperplane(scene->getSettings());
 	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
-	if (scene->getSettings().intersectionMode.get() == IntersectionMode::lightCone) {
-		intersectable = scene->getActiveObserver()->getLightCone(scene->getSettings());
-	}
-	else if (scene->getSettings().intersectionMode.get() == IntersectionMode::hyperplane) {
-		intersectable = scene->getActiveObserver()->getHyperplane(scene->getSettings());
-	}
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->DrawDiagram(gpuProgram, *activeCamera, *intersectable,
+		obj->DrawDiagram(gpuProgram, *activeCamera, *lightCone, *hyperplane,
 			scene->getActiveObserver()->getProperties(scene->getSettings()),
 			scene->getSettings());			// Objects
 	}
@@ -80,7 +75,8 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getActiveObserver()->getProperties(scene->getSettings()), scene->getSettings());
 
 	scene->getHUD()->DrawDiagram(gpuProgram, *activeCamera);			// HUD
-	delete intersectable;
+	delete lightCone;
+	delete hyperplane;
 }
 
 void DiagramView::transitionFrom()
