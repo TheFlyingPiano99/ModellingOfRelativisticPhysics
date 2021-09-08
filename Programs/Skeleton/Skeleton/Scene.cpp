@@ -122,65 +122,65 @@ void Scene::Control(float dt) {
 	else if (!entryMode) {
 		allowQuit = true;
 		while (!controlEvents.empty()) {
-			ControlEvent event = controlEvents.back();
+			ControlEventEnum event = controlEvents.back();
 			controlEvents.pop_back();
 			switch (event) {
-			case ControlEvent::toggleObserver:
+			case ControlEventEnum::toggleObserver:
 				toggleActiveObserver();
 				break;
-			case ControlEvent::togglePause:
+			case ControlEventEnum::togglePause:
 				togglePause();
 				break;
-			case ControlEvent::zoomIn:
+			case ControlEventEnum::zoomIn:
 				zoomCamera(1 - 0.01f * dt);
 				break;
-			case ControlEvent::zoomOut:
+			case ControlEventEnum::zoomOut:
 				zoomCamera(1 + 0.01f * dt);
 				break;
-			case ControlEvent::toggleDopplerEffect:
+			case ControlEventEnum::toggleDopplerEffect:
 				toggleDoppler();
 				break;
-			case ControlEvent::rewindTime:
+			case ControlEventEnum::rewindTime:
 				windTime(-5);
 				break;
-			case ControlEvent::windTime:
+			case ControlEventEnum::windTime:
 				windTime(5);
 				break;
-			case ControlEvent::toggleIntersectionMode:
+			case ControlEventEnum::toggleIntersectionMode:
 				toggleIntersectionMode();
 				break;
-			case ControlEvent::toggleTransformToProperFrame:
+			case ControlEventEnum::toggleTransformToProperFrame:
 				toggleTransformToProperFrame();
 				break;
-			case ControlEvent::toggleLorentz:
+			case ControlEventEnum::toggleLorentz:
 				toggleLorentzTransformation();
 				break;
-			case ControlEvent::toggleViewMode:
+			case ControlEventEnum::toggleViewMode:
 				toggleViewMode();
 				break;
-			case ControlEvent::toggleShading:
+			case ControlEventEnum::toggleShading:
 				toggleShading();
 				break;
-			case ControlEvent::toggleSelection:
+			case ControlEventEnum::toggleSelection:
 				toggleSelected();
 				break;
-			case ControlEvent::moveCameraForward:
+			case ControlEventEnum::moveCameraForward:
 				moveCamera(vec3(1, 0, 0) * cameraVelocity * dt);
 				break;
-			case ControlEvent::moveCameraBackward:
+			case ControlEventEnum::moveCameraBackward:
 				moveCamera(vec3(-1, 0, 0) * cameraVelocity * dt);
 				break;
-			case ControlEvent::moveCameraLeft:
+			case ControlEventEnum::moveCameraLeft:
 				moveCamera(vec3(0, -1, 0) * cameraVelocity * dt);
 				break;
-			case ControlEvent::moveCameraRight:
+			case ControlEventEnum::moveCameraRight:
 				moveCamera(vec3(0, 1, 0) * cameraVelocity * dt);
 				break;
-			case ControlEvent::save:
+			case ControlEventEnum::save:
 				entryMode = true;
 				hud->createTextEntry("Enter save file's name!", saveHandler);
 				break;
-			case ControlEvent::load:
+			case ControlEventEnum::load:
 				entryMode = true;
 				hud->createTextEntry("Enter file name to load!", loadHandler);
 				break;
@@ -230,27 +230,10 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 	if (loadingScene) {
 		return;
 	}
-	if (activeObserver != nullptr || settings.viewMode == diagram) {
+	if (activeObserver != nullptr) {
 		//Prefase:
-		gpuProgram.setUniform(false, "textMode");
-		gpuProgram.setUniform(RelPhysics::speedOfLight, "speedOfLight");
-		gpuProgram.setUniform(settings.dopplerMode.get(), "dopplerMode");
-
-		gpuProgram.setUniform(settings.doLorentz.get(), "doLorentz");
-		gpuProgram.setUniform(settings.doLorentz.interpolating(), "interpolateDoLorentz");
-		gpuProgram.setUniform(settings.doLorentz.getFraction(), "tDoLorentz");
-
-		gpuProgram.setUniform(settings.intersectionMode.get(), "intersectionMode");
-		gpuProgram.setUniform(settings.intersectionMode.interpolating(), "interpolateIntersectionMode");
-		gpuProgram.setUniform(settings.intersectionMode.getFraction(), "tIntersectionMode");
-
-		gpuProgram.setUniform(settings.transformToProperFrame.get(), "transformToProperFrame");
-		gpuProgram.setUniform(settings.transformToProperFrame.interpolating(), "interpolateTransformToProperFrame");
-		gpuProgram.setUniform(settings.transformToProperFrame.getFraction(), "tTransformToProperFrame");
-
-		gpuProgram.setUniform(settings.doShading, "doShading");
-		gpuProgram.setUniform(settings.viewMode, "viewMode");
-		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
+		RelPhysics::loadOnGPU(gpuProgram);
+		settings.loadOnGPU(gpuProgram);
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
 		view->Draw(gpuProgram);
@@ -606,7 +589,8 @@ void Scene::load(const char* sourceFileName)
 
 		//Scene::getInstance()->pause();
 		Scene::getInstance()->clearScene();
-
+		
+		// Set flags:
 		entryMode = false;
 		loadingScene = true;
 		finishedLoading = false;

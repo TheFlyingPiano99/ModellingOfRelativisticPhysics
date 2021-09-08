@@ -85,7 +85,7 @@ vec3 Object::getDiagramPos(const LightCone& lightCone, const Hyperplane& hyperpl
 
 	// "Transformation to proper frame" interpolation:
 	vec3 pos;
-	if (settings.transformToProperFrame.interpolating()) {
+	if (settings.transformToProperFrame.isInterpolating()) {
 		if (settings.transformToProperFrame.get()) {
 			pos = lerp<vec3>(absoluteFramePos, properFramePos, settings.transformToProperFrame.getFraction());
 		}
@@ -274,7 +274,7 @@ vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane,
 
 	float tLightCone = worldLine->intersect(lightCone);
 	float tHyperplane = worldLine->intersect(hyperplane);
-	if (settings.intersectionMode.interpolating()) {
+	if (settings.intersectionMode.isInterpolating()) {
 		if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
 			t = lerp(tHyperplane, tLightCone, settings.intersectionMode.getFraction());
 		}
@@ -292,7 +292,7 @@ vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane,
 	}
 	
 	vec4 retVal;
-	if (settings.doLorentz.interpolating()) {
+	if (settings.doLorentz.isInterpolating()) {
 		vec4 locationInProperFrameLorentz = RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		vec4 locationInProperFrameGalilean = RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity));
 		if (settings.doLorentz.get()) {	// to Lorentz

@@ -51,9 +51,6 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	{
 		lt->loadOnGPU(gpuProgram);									// Load lights
 	}
-	gpuProgram.setUniform(scene->getSettings().diagramX, "diagramX");
-	gpuProgram.setUniform(scene->getSettings().diagramY, "diagramY");
-	gpuProgram.setUniform(scene->getSettings().diagramZ, "diagramZ");
 
 	//Actual drawing:
 	Camera* activeCamera = scene->getActiveCamera();

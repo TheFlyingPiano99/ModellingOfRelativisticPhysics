@@ -19,17 +19,16 @@ public:
 	InterpolationControl(T _val, float _tMax = 400) : val(_val), tMax(_tMax), t(0.0f) {
 	}
 
-	void animate(const float dt) {
-		if (val != prevVal) {
-			t += dt;
-			if (t >= tMax) {
-				prevVal = val;
-				t = 0;
-			}
-		}
-	}
+	void animate(const float dt);
 
-	bool interpolating() {
+/*
+	template <typename retType>
+	retType interpolate(const T& val1, const T& val2, (retType)(*func1)(void), (retType)(*func2)(void));
+*/
+	
+	// Getters:-----------------------------------------------
+
+	bool isInterpolating() {
 		return prevVal != val;
 	}
 
@@ -53,7 +52,9 @@ public:
 		return prevVal;
 	}
 
-	const bool interpolating() const {
+	// Const:---------------------------------------------------
+
+	const bool isInterpolating() const {
 		return prevVal != val;
 	}
 
@@ -72,5 +73,27 @@ public:
 	const T& getPrev() const {
 		return prevVal;
 	}
+
 };
 
+
+template<typename T>
+inline void InterpolationControl<T>::animate(const float dt) {
+	if (val != prevVal) {
+		t += dt;
+		if (t >= tMax) {
+			prevVal = val;
+			t = 0;
+		}
+	}
+}
+
+
+/*
+template<typename T>
+template<typename retType>
+inline retType InterpolationControl<T>::interpolate(const T& val1, const T& val2, (retType)(*func1)(void), (retType)(*func2)(void))
+{
+	return retType();
+}
+*/

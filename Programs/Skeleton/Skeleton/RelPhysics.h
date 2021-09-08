@@ -13,6 +13,13 @@ namespace RelPhysics
 	static const vec3 absObservers3DVelocity = vec3(0, 0, 0);
 
 	/*
+	* Load constants on GPU.
+	*/
+	static inline void loadOnGPU(GPUProgram& gpuProgram) {
+		gpuProgram.setUniform(speedOfLight, "speedOfLight");
+	}
+
+	/*
 	* Converts 3D velocity [m/m] to four-velocity [magnitude = c];
 	*/
 	static inline vec4 ToFourVelocity(const vec3 v) {

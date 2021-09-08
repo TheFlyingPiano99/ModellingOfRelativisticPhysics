@@ -25,7 +25,7 @@ enum DopplerMode {
 	off
 };
 
-enum ControlEvent {
+enum ControlEventEnum {
 	togglePause,
 	toggleObserver,
 	toggleViewMode,
@@ -48,6 +48,7 @@ enum ControlEvent {
 	load
 };
 
+
 /*
 * All important settings mainly related to rendering.
 */
@@ -64,6 +65,31 @@ struct Settings {
 	int diagramZ;
 
 	Settings() {}
+
+	void loadOnGPU(GPUProgram& gpuProgram) {
+		gpuProgram.setUniform(false, "textMode");
+		gpuProgram.setUniform(dopplerMode.get(), "dopplerMode");
+
+		gpuProgram.setUniform(doLorentz.get(), "doLorentz");
+		gpuProgram.setUniform(doLorentz.isInterpolating(), "interpolateDoLorentz");
+		gpuProgram.setUniform(doLorentz.getFraction(), "tDoLorentz");
+
+		gpuProgram.setUniform(intersectionMode.get(), "intersectionMode");
+		gpuProgram.setUniform(intersectionMode.isInterpolating(), "interpolateIntersectionMode");
+		gpuProgram.setUniform(intersectionMode.getFraction(), "tIntersectionMode");
+
+		gpuProgram.setUniform(transformToProperFrame.get(), "transformToProperFrame");
+		gpuProgram.setUniform(transformToProperFrame.isInterpolating(), "interpolateTransformToProperFrame");
+		gpuProgram.setUniform(transformToProperFrame.getFraction(), "tTransformToProperFrame");
+
+		gpuProgram.setUniform(doShading, "doShading");
+		gpuProgram.setUniform(viewMode, "viewMode");
+		gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
+
+		gpuProgram.setUniform(diagramX, "diagramX");
+		gpuProgram.setUniform(diagramY, "diagramY");
+		gpuProgram.setUniform(diagramZ, "diagramZ");
+	}
 };
 
 struct ObserverProperties {

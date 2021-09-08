@@ -7,7 +7,7 @@
 vec4 Observer::getLocation(const Settings& settings)
 {
 	vec4 retVal;
-	if (settings.doLorentz.interpolating()) {
+	if (settings.doLorentz.isInterpolating()) {
 		vec4 lorentz = worldLine->getLocationAtProperTime(currentProperTime);		// Time is relative.
 		vec4 galilean = worldLine->getLocationAtAbsoluteTime(currentProperTime);	// Time is absolute.
 		if (settings.doLorentz.get()) {	// <- direction of interpolation.
@@ -31,7 +31,7 @@ vec4 Observer::getLocation(const Settings& settings)
 vec4 Observer::getVelocity(const Settings& settings)
 {
 	vec4 retVal;
-	if (settings.doLorentz.interpolating()) {
+	if (settings.doLorentz.isInterpolating()) {
 		vec4 lorentz = worldLine->getVelocityAtProperTime(currentProperTime);		// Time is relative.
 		vec4 galilean = worldLine->getVelocityAtAbsoluteTime(currentProperTime);	// Time is absolute.
 		if (settings.doLorentz.get()) {	// <- direction of interpolation.
@@ -72,7 +72,7 @@ Hyperplane* Observer::getHyperplane(const Settings& settings)
 	vec4 location = getLocation(settings);
 
 	vec4 normal;
-	if (settings.doLorentz.interpolating()) {
+	if (settings.doLorentz.isInterpolating()) {
 		vec4 tangent = normalize(worldLine->getVelocityAtProperTime(currentProperTime));
 		vec4 lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);	// Simultaneity is relative.
 		vec4 galileanNormal = vec4(0, 0, 0, 1);										// Simultaneity is absolute.
@@ -110,7 +110,7 @@ vec3 Observer::transformPosToDiagramSpace(vec4 absoluteFramePos4, const Settings
 	vec4 properFramePos4 = vec4(0, 0, 0, currentProperTime);
 	vec3 properFramePos = vec3(properFramePos4[settings.diagramX], properFramePos4[settings.diagramY], properFramePos4[settings.diagramZ]);
 	vec3 pos;
-	if (settings.transformToProperFrame.interpolating()) {
+	if (settings.transformToProperFrame.isInterpolating()) {
 		if (settings.transformToProperFrame.get()) {
 			pos = lerp<vec3>(absoluteFramePos, properFramePos, settings.transformToProperFrame.getFraction());
 		}
@@ -134,7 +134,7 @@ inline vec3 Observer::transformHyperplaneNormalToDiagramSpace(vec4 absoluteFrame
 	vec4 properFrameNormal4 = vec4(0, 0, 0, 1);
 	vec3 properFrameNormal = vec3(properFrameNormal4[settings.diagramX], properFrameNormal4[settings.diagramY], properFrameNormal4[settings.diagramZ]);
 	vec3 normal;
-	if (settings.transformToProperFrame.interpolating()) {
+	if (settings.transformToProperFrame.isInterpolating()) {
 		if (settings.transformToProperFrame.get()) {
 			normal = lerp<vec3>(absoluteFrameNormal, properFrameNormal, settings.transformToProperFrame.getFraction());
 		}

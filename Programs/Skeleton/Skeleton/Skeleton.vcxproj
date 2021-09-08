@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="AdvancedTexture.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ControlEvent.cpp" />
     <ClCompile Include="CoordinateSystem.cpp" />
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="Background.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="ControlEvent.h" />
     <ClInclude Include="CoordinateSystem.h" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Entity.h" />

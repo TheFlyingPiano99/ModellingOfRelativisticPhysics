@@ -36,7 +36,7 @@ class Scene {
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
 	std::vector<WorldLine*> linesToDisplay;				// For testing only!!!
-	std::vector<ControlEvent> controlEvents;
+	std::vector<ControlEventEnum> controlEvents;
 
 	Background* background;
 
@@ -240,7 +240,7 @@ public:
 		return linesToDisplay;
 	}
 
-	void pushBackControlEvent(ControlEvent e) {
+	void pushBackControlEvent(ControlEventEnum e) {
 		controlEvents.push_back(e);
 	}
 
