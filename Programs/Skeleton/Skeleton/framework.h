@@ -32,6 +32,8 @@
 const unsigned int windowWidth = 1920, windowHeight = 1080;
 const bool fullScreenMode = true;
 
+#include "ControlEventInterface.h"
+static std::vector<ControlEventInterface*> controlEvents;	// All used events;
 
 //--------------------------
 struct vec2 {
@@ -65,6 +67,8 @@ struct vec3 {
 	vec3(float x0 = 0, float y0 = 0, float z0 = 0) { x = x0; y = y0; z = z0; }
 	vec3(vec2 v) { x = v.x; y = v.y; z = 0; }
 
+	float& operator[](int j) { return *(&x + j); }
+	float operator[](int j) const { return *(&x + j); }
 	vec3 operator*(float a) const { return vec3(x * a, y * a, z * a); }
 	vec3 operator/(float a) const { return vec3(x / a, y / a, z / a); }
 	vec3 operator+(const vec3& v) const { return vec3(x + v.x, y + v.y, z + v.z); }
@@ -424,6 +428,10 @@ public:
 	~GPUProgram() { if (shaderProgramId > 0) glDeleteProgram(shaderProgramId); }
 };
 
+/*
+* Dual number representation.
+* Automatically calculates derivative of value.
+*/
 template<class T> struct Dnum {
 
 	float f;

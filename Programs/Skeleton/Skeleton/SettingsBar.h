@@ -14,8 +14,8 @@ class SettingsBar
 
 public:
 	SettingsBar(void* _owner, vec2 _pos) : owner(_owner), pos(_pos) {
-
 	}
+
 	~SettingsBar() {
 		clear();
 	}

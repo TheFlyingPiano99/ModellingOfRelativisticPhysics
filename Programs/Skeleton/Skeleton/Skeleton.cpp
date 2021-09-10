@@ -1,7 +1,7 @@
 #include "Skeleton.h"
 #include <map>
 
-#include "EnumTypes.h"
+
 
 // Initialization, getInstance an OpenGL context
 
@@ -9,6 +9,29 @@ static GPUProgram gpuProgram; // vertex and fragment shaders
 int windowID = 0;
 
 void onInitialization() {
+
+	// Controls:
+	controlEvents.push_back(new ToggleObserverEvent());
+	controlEvents.push_back(new TogglePauseEvent());
+	controlEvents.push_back(new ZoomInEvent());
+	controlEvents.push_back(new ZoomOutEvent());
+	controlEvents.push_back(new ToggleDopplerEffectEvent());
+	controlEvents.push_back(new RewindTimeEvent());
+	controlEvents.push_back(new WindTimeEvent());
+	controlEvents.push_back(new ToggleIntersectionModeEvent());
+	controlEvents.push_back(new ToggleTransformToProperFrameEvent());
+	controlEvents.push_back(new ToggleLorentzEvent());
+	controlEvents.push_back(new ToggleViewModeEvent());
+	controlEvents.push_back(new ToggleShadingEvent());
+	controlEvents.push_back(new ToggleSelectionEvent());
+	controlEvents.push_back(new MoveCameraForwardEvent());
+	controlEvents.push_back(new MoveCameraBackwardEvent());
+	controlEvents.push_back(new MoveCameraLeftEvent());
+	controlEvents.push_back(new MoveCameraRightEvent());
+	controlEvents.push_back(new SaveEvent());
+	controlEvents.push_back(new LoadEvent());
+
+
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
@@ -43,73 +66,17 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	int ctrl = modifiers & GLUT_ACTIVE_CTRL;
 	int alt = modifiers & GLUT_ACTIVE_ALT;
 	int shift = modifiers & GLUT_ACTIVE_SHIFT;
-	if (!(ctrl || shift || alt)) {
-		if (key == 'c') {
-			scene->pushBackControlEvent(toggleObserver);
-		}
-		else if (key == ' ') {
-			scene->pushBackControlEvent(togglePause);
-		}
-		else if (key == '=') {
-			scene->pushBackControlEvent(zoomIn);
-		}
-		else if (key == '-') {
-			scene->pushBackControlEvent(zoomOut);
-		}
-		else if (key == 'd') {
-			scene->pushBackControlEvent(toggleDopplerEffect);
-		}
-		else if (key == 'r') {
-			scene->pushBackControlEvent(rewindTime);
-		}
-		else if (key == 'f') {
-			scene->pushBackControlEvent(windTime);
-		}
-		else if (key == 'i') {
-			scene->pushBackControlEvent(toggleIntersectionMode);
-		}
-		else if (key == 't') {
-			scene->pushBackControlEvent(toggleTransformToProperFrame);
-		}
-		else if (key == 'l') {
-			scene->pushBackControlEvent(toggleLorentz);
-		}
-		else if (key == 'v') {
-			scene->pushBackControlEvent(toggleViewMode);
-		}
-		else if (key == 's') {
-			scene->pushBackControlEvent(toggleShading);
-		}
-		else if (key == 'q') {
-		}
-		else if (key == 'o') {
-			scene->pushBackControlEvent(toggleSelection);
-		}
-		else if (key == '[') {	// forward
-			scene->pushBackControlEvent(moveCameraForward);
-		}
-		else if (key == '\'') {	// backward
-			scene->pushBackControlEvent(moveCameraBackward);
-		}
-		else if (key == ';') {	// left
-			scene->pushBackControlEvent(moveCameraLeft);
-		}
-		else if (key == '\\') {	// right
-			scene->pushBackControlEvent(moveCameraRight);
-		}
-		else if (key == 27) {		// Escape
-			if (scene->askToQuit())
-				glutDestroyWindow(windowID);
+	
+	for (ControlEventInterface* event : controlEvents) {
+		if (event->isPressed(key)) {
+			scene->pushBackControlEvent(event);
 		}
 	}
-	else if (ctrl) {		// Ctrl only
-		if (key == '\x13') {	// ctrl^s
-			scene->pushBackControlEvent(save);
-		}
-		if (key == '\xf') {	// ctrl^o
-			scene->pushBackControlEvent(load);
-		}
+	if (key == 27) {
+		if (scene->askToQuit())
+			glutDestroyWindow(windowID);
 	}
+
 }
 
 // Key of ASCII code released

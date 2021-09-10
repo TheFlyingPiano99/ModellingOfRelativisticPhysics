@@ -63,6 +63,7 @@ struct Settings {
 	int diagramX;
 	int diagramY;
 	int diagramZ;
+	int diagramNotVisualised;
 
 	Settings() {}
 

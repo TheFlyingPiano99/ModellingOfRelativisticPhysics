@@ -121,6 +121,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="ControlEventInterface.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Interpolatable.h" />
     <ClInclude Include="LightSource.h" />

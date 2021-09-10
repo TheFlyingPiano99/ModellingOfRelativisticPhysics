@@ -12,6 +12,8 @@ namespace RelPhysics
 	static const vec4 absObservers4Velocity = vec4(0, 0, 0, 1);
 	static const vec3 absObservers3DVelocity = vec3(0, 0, 0);
 
+	static const float diagramIntersectConstraint = 0.0001f;
+
 	/*
 	* Load constants on GPU.
 	*/

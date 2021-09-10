@@ -6,50 +6,18 @@
 
 vec4 Observer::getLocation(const Settings& settings)
 {
-	vec4 retVal;
-	if (settings.doLorentz.isInterpolating()) {
-		vec4 lorentz = worldLine->getLocationAtProperTime(currentProperTime);		// Time is relative.
-		vec4 galilean = worldLine->getLocationAtAbsoluteTime(currentProperTime);	// Time is absolute.
-		if (settings.doLorentz.get()) {	// <- direction of interpolation.
-			retVal = lerp<vec4>(galilean, lorentz, settings.doLorentz.getFraction());
-		}
-		else {
-			retVal = lerp<vec4>(lorentz, galilean, settings.doLorentz.getFraction());
-		}
-	}
-	else {			// No need to calculate both values and then interpolate.
-		if (settings.doLorentz.get()) {	// Time is relative.
-			retVal = worldLine->getLocationAtProperTime(currentProperTime);
-		}
-		else {							// Time is absolute.
-			retVal = worldLine->getLocationAtAbsoluteTime(currentProperTime);
-		}
-	}
-	return retVal;
+	return interpolate<bool, vec4>(settings.doLorentz, true, false,
+		worldLine->getLocationAtProperTime(currentProperTime),
+		worldLine->getLocationAtAbsoluteTime(currentProperTime)
+		);
 }
 
 vec4 Observer::getVelocity(const Settings& settings)
 {
-	vec4 retVal;
-	if (settings.doLorentz.isInterpolating()) {
-		vec4 lorentz = worldLine->getVelocityAtProperTime(currentProperTime);		// Time is relative.
-		vec4 galilean = worldLine->getVelocityAtAbsoluteTime(currentProperTime);	// Time is absolute.
-		if (settings.doLorentz.get()) {	// <- direction of interpolation.
-			retVal = lerp<vec4>(galilean, lorentz, settings.doLorentz.getFraction());
-		}
-		else {
-			retVal = lerp<vec4>(lorentz, galilean, settings.doLorentz.getFraction());
-		}
-	}
-	else {		// No need to calculate both values and then interpolate.
-		if (settings.doLorentz.get()) {					// Time is relative.
-			retVal = worldLine->getVelocityAtProperTime(currentProperTime);
-		}
-		else {											// Time is absolute.
-			retVal = worldLine->getVelocityAtAbsoluteTime(currentProperTime);
-		}
-	}
-	return retVal;
+	return interpolate<bool, vec4>(settings.doLorentz, true, false,
+		worldLine->getVelocityAtProperTime(currentProperTime),
+		worldLine->getVelocityAtAbsoluteTime(currentProperTime)
+		);
 }
 
 vec4 Observer::getLocationAtZero(const Settings& settings)
@@ -71,34 +39,16 @@ Hyperplane* Observer::getHyperplane(const Settings& settings)
 {
 	vec4 location = getLocation(settings);
 
-	vec4 normal;
-	if (settings.doLorentz.isInterpolating()) {
-		vec4 tangent = normalize(worldLine->getVelocityAtProperTime(currentProperTime));
-		vec4 lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);	// Simultaneity is relative.
-		vec4 galileanNormal = vec4(0, 0, 0, 1);										// Simultaneity is absolute.
-		if (settings.doLorentz.get()) {		// <- direction of interpolation.
-			normal = lerp<vec4>(galileanNormal, lorentzNormal, settings.doLorentz.getFraction());
-		}
-		else {
-			normal = lerp<vec4>(lorentzNormal, galileanNormal, settings.doLorentz.getFraction());
-		}
-	}
-	else {		// No need to calculate both values and then interpolate.
-		if (settings.doLorentz.get()) {										// Simultaneity is relative.
-			vec4 tangent = normalize(worldLine->getVelocityAtProperTime(currentProperTime));
-			normal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);					
-		}
-		else {																// Simultaneity is absolute.
-			normal = vec4(0, 0, 0, 1);
-
-		}
-	}
+	vec4 tangent = normalize(worldLine->getVelocityAtProperTime(currentProperTime));
+	vec4 lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);	// Simultaneity is relative.
+	vec4 galileanNormal = vec4(0, 0, 0, 1);										// Simultaneity is absolute.
+	vec4 normal = interpolate<bool, vec4>(settings.doLorentz, true, false, lorentzNormal, galileanNormal);
 	return new Hyperplane(location, normal);
 }
 
 
 /*
-* Returns interpolated light cone.
+* Returns interpolated light cone in absolute frame.
 */
 LightCone* Observer::getLightCone(const Settings& settings)
 {
@@ -109,48 +59,25 @@ vec3 Observer::transformPosToDiagramSpace(vec4 absoluteFramePos4, const Settings
 	vec3 absoluteFramePos = vec3(absoluteFramePos4[settings.diagramX], absoluteFramePos4[settings.diagramY], absoluteFramePos4[settings.diagramZ]);
 	vec4 properFramePos4 = vec4(0, 0, 0, currentProperTime);
 	vec3 properFramePos = vec3(properFramePos4[settings.diagramX], properFramePos4[settings.diagramY], properFramePos4[settings.diagramZ]);
-	vec3 pos;
-	if (settings.transformToProperFrame.isInterpolating()) {
-		if (settings.transformToProperFrame.get()) {
-			pos = lerp<vec3>(absoluteFramePos, properFramePos, settings.transformToProperFrame.getFraction());
-		}
-		else {
-			pos = lerp<vec3>(properFramePos, absoluteFramePos, settings.transformToProperFrame.getFraction());
-		}
-	}
-	else {
-		if (settings.transformToProperFrame.get()) {
-			pos = properFramePos;
-		}
-		else {
-			pos = absoluteFramePos;
-		}
-	}
-	return pos;
+	return interpolate<bool, vec3>(settings.transformToProperFrame, true, false, properFramePos, absoluteFramePos);
 }
 
-inline vec3 Observer::transformHyperplaneNormalToDiagramSpace(vec4 absoluteFrameNormal4, const Settings& settings) {
+inline vec3 Observer::transformNormalToDiagramSpace(vec4 absoluteFrameNormal4, const Settings& settings) {
 	vec3 absoluteFrameNormal = normalize(vec3(absoluteFrameNormal4[settings.diagramX], absoluteFrameNormal4[settings.diagramY], absoluteFrameNormal4[settings.diagramZ]));
 	vec4 properFrameNormal4 = vec4(0, 0, 0, 1);
 	vec3 properFrameNormal = vec3(properFrameNormal4[settings.diagramX], properFrameNormal4[settings.diagramY], properFrameNormal4[settings.diagramZ]);
-	vec3 normal;
-	if (settings.transformToProperFrame.isInterpolating()) {
-		if (settings.transformToProperFrame.get()) {
-			normal = lerp<vec3>(absoluteFrameNormal, properFrameNormal, settings.transformToProperFrame.getFraction());
-		}
-		else {
-			normal = lerp<vec3>(properFrameNormal, absoluteFrameNormal, settings.transformToProperFrame.getFraction());
-		}
-	}
-	else {
-		if (settings.transformToProperFrame.get()) {
-			normal = properFrameNormal;
-		}
-		else {
-			normal = absoluteFrameNormal;
-		}
-	}
-	return normal;
+	return interpolate<bool, vec3>(settings.transformToProperFrame, true, false, properFrameNormal, absoluteFrameNormal);
+}
+
+vec3 Observer::transformConeAxisToDiagramSpace(const Settings& settings)
+{
+	vec4 absoluteFrameAxis4 = vec4(0, 0, 0, 1);
+	vec3 absoluteFrameAxis = vec3(absoluteFrameAxis4[settings.diagramX], absoluteFrameAxis4[settings.diagramY], absoluteFrameAxis4[settings.diagramZ]);
+	vec3 properFrameAxisLorentz = absoluteFrameAxis;
+	vec3 properFrameAxisGalilean = normalize(RelPhysics::galileanTransformationOfVelocity(absoluteFrameAxis, RelPhysics::To3DVelocity(getVelocity(settings))));
+	vec3 properFrameAxis = interpolate<bool, vec3>(settings.doLorentz, true, false, properFrameAxisLorentz, properFrameAxisGalilean);
+	vec3 axis = interpolate<bool, vec3>(settings.transformToProperFrame, true, false, properFrameAxis, absoluteFrameAxis);
+	return axis;
 }
 
 void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
@@ -180,7 +107,7 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Sett
 	Hyperplane* plane = getHyperplane(settings);
 
 	vec3 pos = transformPosToDiagramSpace(plane->getLocation(), settings);
-	vec3 normal = transformHyperplaneNormalToDiagramSpace(plane->getNormal(), settings);
+	vec3 normal = transformNormalToDiagramSpace(plane->getNormal(), settings);
 	
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
@@ -206,6 +133,11 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Setti
 
 	LightCone* cone = getLightCone(settings);
 	vec3 pos = transformPosToDiagramSpace(cone->getLocation(), settings);
+	vec3 axis = transformConeAxisToDiagramSpace(settings);
+	
+	LightConeSurface* geometry = new LightConeSurface(axis);
+	geometry->GenSurface(100, 100);
+
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
@@ -214,14 +146,15 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const Setti
 	gpuProgram.setUniform(false, "textMode");
 	gpuProgram.setUniform(true, "directRenderMode");
 	glDisable(GL_CULL_FACE);
-	Assets::getLightConeGeomtry()->Draw();
+	geometry->Draw();
 	glEnable(GL_CULL_FACE);
+	delete geometry;
+	delete cone;
 }
 
 void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
 {
 	vec3 pos = transformPosToDiagramSpace(getLocation(settings), settings);
-
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
@@ -259,11 +192,14 @@ void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const Observer
 	}
 	(*timerCaption)->setPos(pos + camera.getRight() * 11 + camera.getUp() * 1);
 	(*timerCaption)->setVisible(selected);
-	(*diagramCaption)->setPos((settings.transformToProperFrame.get())? vec3(0 , 0, 0)
-		: vec3(observerProperties.locationAtZero[settings.diagramX],
+	(*diagramCaption)->setPos(interpolate<bool, vec3>(settings.transformToProperFrame,
+		true,
+		false,
+		vec3(0 , 0, 0),
+		vec3(observerProperties.locationAtZero[settings.diagramX],
 			observerProperties.locationAtZero[settings.diagramY],
-			observerProperties.locationAtZero[settings.diagramZ]
-			));
+			observerProperties.locationAtZero[settings.diagramZ])
+		));
 	(*diagramCaption)->setVisible(true);
 	(*timerCaption)->setVisible(true);
 }
@@ -288,7 +224,7 @@ float Observer::getAbsoluteTimeAtCurrentTime(const Settings& settings)
 	}
 }
 
-float Observer::increaseTimeByDelta(float deltaTau, const Settings& settings)
+float Observer::changeTimeByDelta(float deltaTau, const Settings& settings)
 {
 	if (currentProperTime + deltaTau < 0.0f) {		// Crop delta
 		float realDelta = -currentProperTime;

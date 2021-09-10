@@ -38,7 +38,7 @@ public:
 
 	static Geometry* getLightConeGeomtry() {
 		if (lightConeGeometry == nullptr) {
-			lightConeGeometry = new LightConeSurface();
+			lightConeGeometry = new LightConeSurface(vec3(0, 0, 1));
 			lightConeGeometry->GenSurface(50, 50);
 		}
 		return lightConeGeometry;

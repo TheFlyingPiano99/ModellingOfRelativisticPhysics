@@ -78,10 +78,14 @@ public:
 	vec3 transformPosToDiagramSpace(vec4 pos4, const Settings& settings);
 
 	/*
-	* Transform own hyperplane normal at current proper time to interpolated diagram position between proper frame and absolute frame.
+	* Transform hyperplane normal at current proper time to interpolated diagram normal between proper frame and absolute frame.
 	*/
-	vec3 transformHyperplaneNormalToDiagramSpace(vec4 normal4, const Settings& settings);
+	vec3 transformNormalToDiagramSpace(vec4 normal4, const Settings& settings);
 
+	/*
+	* Transform light cone axis at current proper time to interpolated diagram axis between proper frame and absolute frame.
+	*/
+	vec3 transformConeAxisToDiagramSpace(const Settings& settings);
 
 	void Draw(GPUProgram& gpuProgram, Camera& camera);
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
@@ -108,7 +112,7 @@ public:
 	* Receives delta time in proper frame if it does not sinc below zero.
 	* Returns actually applied delta tau.
 	*/
-	float increaseTimeByDelta(float deltaTau, const Settings& settings);
+	float changeTimeByDelta(float deltaTau, const Settings& settings);
 
 	void syncCamera(Camera* camera, const Settings& settings);
 	

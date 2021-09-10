@@ -20,7 +20,7 @@ void Scene::Initialise()
 	settings.diagramX = 0;
 	settings.diagramY = 1;
 	settings.diagramZ = 3;
-
+	settings.diagramNotVisualised = 2;
 
 	hud = new HUD(this);
 
@@ -121,71 +121,11 @@ void Scene::Control(float dt) {
 	}
 	else if (!entryMode) {
 		allowQuit = true;
+
 		while (!controlEvents.empty()) {
-			ControlEventEnum event = controlEvents.back();
+			ControlEventInterface* event = controlEvents.back();
 			controlEvents.pop_back();
-			switch (event) {
-			case ControlEventEnum::toggleObserver:
-				toggleActiveObserver();
-				break;
-			case ControlEventEnum::togglePause:
-				togglePause();
-				break;
-			case ControlEventEnum::zoomIn:
-				zoomCamera(1 - 0.01f * dt);
-				break;
-			case ControlEventEnum::zoomOut:
-				zoomCamera(1 + 0.01f * dt);
-				break;
-			case ControlEventEnum::toggleDopplerEffect:
-				toggleDoppler();
-				break;
-			case ControlEventEnum::rewindTime:
-				windTime(-5);
-				break;
-			case ControlEventEnum::windTime:
-				windTime(5);
-				break;
-			case ControlEventEnum::toggleIntersectionMode:
-				toggleIntersectionMode();
-				break;
-			case ControlEventEnum::toggleTransformToProperFrame:
-				toggleTransformToProperFrame();
-				break;
-			case ControlEventEnum::toggleLorentz:
-				toggleLorentzTransformation();
-				break;
-			case ControlEventEnum::toggleViewMode:
-				toggleViewMode();
-				break;
-			case ControlEventEnum::toggleShading:
-				toggleShading();
-				break;
-			case ControlEventEnum::toggleSelection:
-				toggleSelected();
-				break;
-			case ControlEventEnum::moveCameraForward:
-				moveCamera(vec3(1, 0, 0) * cameraVelocity * dt);
-				break;
-			case ControlEventEnum::moveCameraBackward:
-				moveCamera(vec3(-1, 0, 0) * cameraVelocity * dt);
-				break;
-			case ControlEventEnum::moveCameraLeft:
-				moveCamera(vec3(0, -1, 0) * cameraVelocity * dt);
-				break;
-			case ControlEventEnum::moveCameraRight:
-				moveCamera(vec3(0, 1, 0) * cameraVelocity * dt);
-				break;
-			case ControlEventEnum::save:
-				entryMode = true;
-				hud->createTextEntry("Enter save file's name!", saveHandler);
-				break;
-			case ControlEventEnum::load:
-				entryMode = true;
-				hud->createTextEntry("Enter file name to load!", loadHandler);
-				break;
-			defualt: break;
-			}
+			event->performAction(dt);
 		}
 	}
 	else {
@@ -196,7 +136,7 @@ void Scene::Control(float dt) {
 	if (settings.running) {
 		dt *= timeScale;	// Scale time to sym speed.
 		if (activeObserver != nullptr) {
-			activeObserver->increaseTimeByDelta(dt, settings);
+			activeObserver->changeTimeByDelta(dt, settings);
 		}
 		//Todo
 	}
@@ -434,13 +374,25 @@ void Scene::reset() {
 }
 
 void Scene::windTime(float deltaTau) {
-	float realDelta = activeObserver->increaseTimeByDelta(deltaTau, settings);
+	float realDelta = activeObserver->changeTimeByDelta(deltaTau, settings);
 	bool prevState = settings.running;
 	settings.running = true;
 	Animate(0.0f);
 	settings.running = prevState;
 	std::string str("Time shifted by tau = ");
 	hud->pushMessage(str.append(std::to_string(realDelta)).append(" m").c_str());
+}
+
+void Scene::startSaveProcess()
+{
+	entryMode = true;
+	hud->createTextEntry("Enter save file's name!", saveHandler);
+}
+
+void Scene::startLoadProcess()
+{
+	entryMode = true;
+	hud->createTextEntry("Enter file name to load!", loadHandler);
 }
 
 void Scene::toggleSelected()

@@ -84,5 +84,10 @@ int main(int argc, char * argv[]) {
 	//scene->save("../../../Saves/default.txt");
 	delete scene;
 	Assets::cleanUp();
+
+	for (ControlEventInterface* event : controlEvents) {
+		delete event;
+	}
+
 	return 0;
 }

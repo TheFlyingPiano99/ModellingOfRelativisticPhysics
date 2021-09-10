@@ -20,11 +20,6 @@ public:
 	}
 
 	void animate(const float dt);
-
-/*
-	template <typename retType>
-	retType interpolate(const T& val1, const T& val2, (retType)(*func1)(void), (retType)(*func2)(void));
-*/
 	
 	// Getters:-----------------------------------------------
 
@@ -89,11 +84,24 @@ inline void InterpolationControl<T>::animate(const float dt) {
 }
 
 
-/*
-template<typename T>
-template<typename retType>
-inline retType InterpolationControl<T>::interpolate(const T& val1, const T& val2, (retType)(*func1)(void), (retType)(*func2)(void))
+template<typename ReqType, typename ValType>
+inline ValType interpolate(const InterpolationControl<ReqType>& control, const ReqType& req1, const ReqType& req2, const ValType& val1, const ValType& val2)
 {
-	return retType();
+	ValType retVal;
+	if (control.isInterpolating()) {
+		// Direction of interpolation:
+		if (control.getPrev() == req1 && control.get() == req2) {
+			return lerp<ValType>(val1, val2, control.getFraction());
+		}
+		else if (control.getPrev() == req2 && control.get() == req1) {
+			return lerp<ValType>(val2, val1, control.getFraction());
+		}
+	}
+	if (control.get() == req1) {	// Time is relative.
+		return val1;
+	}
+	else if (control.get() == req2) {	// Time is relative.
+		return val2;
+	}
+	return ValType();
 }
-*/

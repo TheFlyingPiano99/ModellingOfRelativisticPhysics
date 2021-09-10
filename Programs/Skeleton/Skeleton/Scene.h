@@ -14,6 +14,8 @@
 #include "EnumTypes.h"
 #include "CoordinateSystem.h"
 #include "HUD.h"
+#include "ControlEventInterface.h"
+
 #include <map>
 #include <thread>
 
@@ -36,7 +38,7 @@ class Scene {
 	std::vector<LightSource*> lights;
 	std::vector<LightSource*> diagramLights;
 	std::vector<WorldLine*> linesToDisplay;				// For testing only!!!
-	std::vector<ControlEventEnum> controlEvents;
+	std::vector<ControlEventInterface*> controlEvents;
 
 	Background* background;
 
@@ -150,6 +152,12 @@ public:
 
 	void windTime(float deltaTau);
 
+	// Save / load control:
+
+	void startSaveProcess();
+
+	void startLoadProcess();
+
 	// Selection:
 
 	void toggleSelected();
@@ -206,6 +214,10 @@ public:
 		return hud;
 	}
 
+	float getCameraVelocity() {
+		return cameraVelocity;
+	}
+
 	//-----------------------------------------------------------------
 
 	/*
@@ -240,7 +252,7 @@ public:
 		return linesToDisplay;
 	}
 
-	void pushBackControlEvent(ControlEventEnum e) {
+	void pushBackControlEvent(ControlEventInterface* e) {
 		controlEvents.push_back(e);
 	}
 
