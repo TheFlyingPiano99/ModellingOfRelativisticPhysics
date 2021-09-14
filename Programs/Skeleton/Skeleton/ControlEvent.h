@@ -262,3 +262,25 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ClearSceneEvent : public ControlEvent {
+public:
+	ClearSceneEvent()
+	{
+		keyShortcut = 0;
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class DeleteSelectedEvent: public ControlEvent {
+public:
+	DeleteSelectedEvent()
+	{
+		keyShortcut = (char)127;
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

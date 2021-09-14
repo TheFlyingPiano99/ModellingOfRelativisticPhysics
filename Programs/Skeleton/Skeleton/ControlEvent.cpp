@@ -104,3 +104,17 @@ void ToggleEditorEvent::performAction(const float dt)
 {
 	Scene::getInstance()->toggleEditorMode();
 }
+
+void ClearSceneEvent::performAction(const float dt)
+{
+	Scene::getInstance()->clearScene();
+	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
+	Scene::getInstance()->getObservers()->push_back(observer);
+	Scene::getInstance()->toggleActiveObserver();
+}
+
+void DeleteSelectedEvent::performAction(const float dt)
+{
+	Scene::getInstance()->deleteSelected();
+}

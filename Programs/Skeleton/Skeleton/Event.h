@@ -27,7 +27,7 @@ public:
 	virtual std::string genSaveString() override;
 
 	virtual void draggedTo(vec4 location) override;
-	vec4 getReferenceLocation() override;
+	vec4 getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings) override;
 };
 
 

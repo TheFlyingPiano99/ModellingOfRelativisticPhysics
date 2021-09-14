@@ -5,6 +5,7 @@
 
 #include "framework.h"
 #include "Exceptions.h"
+#include "EnumTypes.h"
 
 namespace RelPhysics
 {
@@ -13,6 +14,13 @@ namespace RelPhysics
 	static const vec3 absObservers3DVelocity = vec3(0, 0, 0);
 
 	static const float diagramIntersectConstraint = 0.0001f;
+
+	/*
+	* Return's a vector, that point's to the oposite space direction and in the same time direction (forward).
+	*/
+	static inline vec4 invert(vec4 velocity) {
+		return vec4(-velocity.x, -velocity.y, -velocity.z, velocity.w);
+	}
 
 	/*
 	* Load constants on GPU.
@@ -34,6 +42,14 @@ namespace RelPhysics
 	static inline vec3 To3DVelocity(const vec4 fv) {
 		vec4 scaled = fv / fv.w;
 		return vec3(scaled.x, scaled.y, scaled.z);
+	}
+
+	static inline ObserverProperties getAbsulteObserverProperties() {
+		ObserverProperties properties;
+		properties.location = vec4(0, 0, 0, 0);
+		properties.locationAtZero = vec4(0, 0, 0, 0);
+		properties.velocity = ToFourVelocity(vec3(0, 0, 0));
+		return properties;
 	}
 
 	/*

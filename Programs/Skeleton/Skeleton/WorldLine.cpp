@@ -8,12 +8,13 @@
 using namespace RelPhysics;
 
 inline void GeodeticLine::genGeometry() {
-    vds4D.resize(1000);     // Size give in shader.
+    vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
         vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * (i - noOfVds4D / 2.0f) * 50;
         vds4D[i] = pos;
     }
-
+    
+    // OpenGL:
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, noOfVds4D * sizeof(vec4), &vds4D[0], GL_STATIC_DRAW);
@@ -74,11 +75,6 @@ GeodeticLine* GeodeticLine::loadFromFile(std::ifstream& file)
     return nullptr;
 }
 
-
-vec4 GeodeticLine::getReferenceLocation()
-{
-    return locationAtZeroT;
-}
 
 std::string GeodeticLine::genSaveString()
 {
@@ -405,10 +401,11 @@ void WorldLine::DrawDiagram()
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
 }
 
-float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
+float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings, vec4& closestLocation)
 {
     float distance = -1;
-    vec3 closestPoint;      // Todo
+    closestLocation = vds4D[0];
+    //vec3 closestPoint;      // Todo
     for (int i = 0; i < noOfVds4D - 1; i++) {
         vec4 pos1 = vds4D[i];
         vec4 pos2 = vds4D[i + 1];
@@ -421,18 +418,19 @@ float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProp
         }
         vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);
         vec4 offsettedStartPos = pos1 - tangentVelocity / tangentVelocity.w * pos1.w;
-        vec3 diagramPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
+        vec3 diagramStartPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
         vec3 diagramDir = normalize(vec3(tangentVelocity[settings.diagramX], tangentVelocity[settings.diagramY], tangentVelocity[settings.diagramZ]));
-        float temp = abs(dot(ray.pos - diagramPos, cross(diagramDir, ray.dir)));
-        vec3 cn = normalize(cross(diagramDir, ray.dir));
-        vec3 projected = dot(diagramPos - ray.pos, ray.dir) * ray.dir;
-        vec3 rejected = diagramPos - ray.pos - projected - dot(diagramPos - ray.pos, cn) * cn;
-        closestPoint = diagramPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
+        float temp = abs(dot(ray.pos - diagramStartPos, cross(diagramDir, ray.dir)));
+        //vec3 cn = normalize(cross(diagramDir, ray.dir));
+        //vec3 projected = dot(diagramPos - ray.pos, ray.dir) * ray.dir;
+        //vec3 rejected = diagramPos - ray.pos - projected - dot(diagramPos - ray.pos, cn) * cn;
+        //closestPoint = diagramPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
         vec3 endPoint1 = vec3(pos1[settings.diagramX], pos1[settings.diagramY], pos1[settings.diagramZ]);
         vec3 endPoint2 = vec3(pos2[settings.diagramX], pos2[settings.diagramY], pos2[settings.diagramZ]);
         if (/*dot(endPoint2 - endPoint1, closestPoint - endPoint1) > 0.0f && dot(endPoint1 - endPoint2, closestPoint - endPoint2) > 0.0f && */
             (distance == -1 || temp < diagram)) {
             distance = temp;
+            closestLocation = pos1;
         }
     }
     return distance;
@@ -456,6 +454,151 @@ float WorldLine::intersect(const Intersectable& intersectable) {
 
 void GeodeticLine::draggedTo(vec4 location)
 {
-    fourVelocity = normalize(location - locationAtZeroT) * RelPhysics::speedOfLight;
+    vec4 temp = normalize(location - locationAtZeroT) * RelPhysics::speedOfLight;
+    if (length(RelPhysics::To3DVelocity(temp)) > RelPhysics::speedOfLight * 0.99f) {   // Don't set if speed of light exceeded!
+        return;
+    }
+    fourVelocity = temp;
     genGeometry();
+}
+
+vec4 GeodeticLine::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
+{
+    return locationAtZeroT;
+    //vec4 closestLocation;
+    //distanceBetweenRayAndDiagram(ray, observerProperties, settings, closestLocation);
+   //return closestLocation;
+}
+
+void CompositeLine::genGeometry()
+{
+    vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
+    vec4 velocity;
+    int countVDS = 0;
+    velocity = RelPhysics::tangentFourVelocity(controlPoints[0], controlPoints[1]);
+    vds4D[countVDS++] = controlPoints[0] + velocity * -50.0f;
+    for (int i = 0; i < controlPoints.size(); i++) {
+        vds4D[countVDS++] = controlPoints[i];
+    }
+    velocity = RelPhysics::tangentFourVelocity(controlPoints[controlPoints.size() - 2], controlPoints[controlPoints.size() - 1]);
+    vds4D[countVDS++] = controlPoints[controlPoints.size() - 1] + velocity * 50.0f;
+    noOfVds4D = countVDS;
+
+    // OpenGL:
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, noOfVds4D * sizeof(vec4), &vds4D[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+}
+
+void CompositeLine::draggedTo(vec4 location)
+{
+    int idx = getClosestControlPointIndex(location);
+    vec4 prevVelocity = vec4(0, 0, 0, 1);
+    vec4 follVelocity = vec4(0, 0, 0, 1);
+    if (idx > 0) {
+        prevVelocity = RelPhysics::tangentFourVelocity(controlPoints[idx - 1], location);
+        if (length(RelPhysics::To3DVelocity(prevVelocity)) > RelPhysics::speedOfLight * 0.99f
+            ||
+            location.w < controlPoints[idx - 1].w
+            ) {
+            return;
+        }
+    }
+    if (idx < controlPoints.size() - 1) {
+        follVelocity = RelPhysics::tangentFourVelocity(location, controlPoints[idx + 1]);
+        if (length(RelPhysics::To3DVelocity(follVelocity)) > RelPhysics::speedOfLight * 0.99f
+            ||
+            location.w > controlPoints[idx + 1].w
+            ) {
+            return;
+        }
+    }
+
+    controlPoints[idx] = location;
+
+    genGeometry();
+
+}
+
+std::string CompositeLine::genSaveString()
+{
+    std::string str(
+        "CompositeLine\n"
+        "ID " + std::to_string(getID()) + "\n"
+        "name " + name + "\n"
+        "description " + description + "\n"
+        "noOfControlPoints " + std::to_string(controlPoints.size()) + "\n"
+        "controlPoints\n"
+    );
+    for (const vec4& cp : controlPoints) {
+        str.append(std::to_string(cp.x) + " " + std::to_string(cp.y) + " " + std::to_string(cp.z) + " " + std::to_string(cp.w) + "\n");
+    }
+    str.append(
+        "!controlPoints\n"
+        "!CompositeLine\n");
+    return str;
+}
+
+CompositeLine* CompositeLine::loadFromFile(std::ifstream& file)
+{
+    int _ID;
+    std::string _name;
+    std::string _description;
+    std::vector<vec4> controlPoints;
+    bool readControlPoints = false;
+    std::string line;
+    while (getline(file, line)) {
+        std::vector<std::string> words = split(line, ' ');
+        if (words.empty()) {									// Empty line
+            continue;
+        }
+        else if (words.at(0).at(0) == '#') {					// Comment
+            continue;
+        }
+        else if (words.at(0).compare("!CompositeLine") == 0) {	// End of declaration
+            CompositeLine* retVal = new CompositeLine(controlPoints, _name, _description);
+            retVal->setID(_ID);
+            return retVal;
+        }
+        else if (words.at(0).compare("ID") == 0) {              // ID
+            _ID = std::stoi(words.at(1));
+        }
+        else if (words.at(0).compare("name") == 0) {              // name
+            _name = join(words, 1);
+        }
+        else if (words.at(0).compare("description") == 0) {         // description
+            _description = join(words, 1);
+        }
+        else if (words.at(0).compare("controlPoints") == 0) {         // controlPoints
+            readControlPoints = true;
+        }
+        else if (words.at(0).compare("!controlPoints") == 0) {         // controlPoints
+            readControlPoints = false;
+        }
+        else if (readControlPoints) {
+            controlPoints.push_back(vec4(stof(words[0]), stof(words[1]), stof(words[2]), stof(words[3])));
+        }
+    }
+    return nullptr;
+}
+
+vec4 CompositeLine::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
+{
+    return controlPoints[0];
+}
+
+int CompositeLine::getClosestControlPointIndex(vec4 location)
+{
+    int idx = -1;
+    float dist = -1;
+    for (int i = 0; i < controlPoints.size(); i++) {
+        float temp = length(controlPoints[i] - location);
+        if (dist < 0.0f || temp < dist) {
+            dist = temp;
+            idx = i;
+        }
+    }
+    return idx;
 }

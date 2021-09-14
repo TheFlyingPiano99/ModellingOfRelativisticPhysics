@@ -192,6 +192,8 @@ public:
 
 	void toggleEditorMode();
 
+	void deleteSelected();
+
 	// Getters:--------------------------------------------------------------------
 
 	std::vector<LightSource*>* getLights() {
@@ -279,6 +281,10 @@ public:
 	void setFinishedLoading(bool b) {
 		finishedLoading = b;
 	}
+
+	/*
+	*/
+	vec4 getEditedLocation(const float cX, const float cY);
 
 };
 

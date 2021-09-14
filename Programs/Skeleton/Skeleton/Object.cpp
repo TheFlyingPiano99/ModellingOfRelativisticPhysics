@@ -122,6 +122,15 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 		vec3 pos = vec3(pos4.x, pos4.y, pos4.z);
 		(*diagramCaption)->setPos(pos + normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		(*diagramCaption)->setVisible(true);
+		float t;
+		if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
+			t = worldLine->intersect(lightCone);
+		}
+		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
+			t = worldLine->intersect(hyperplane);
+		}
+		float tau = worldLine->getProperTimeAtAbsoluteTime(t);
+		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m").c_str());
 	}
 	else {
 		(*diagramCaption)->setVisible(false);
@@ -162,6 +171,15 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	if (selected || hovered) {
 		(*diagramCaption)->setPos(pos);
 		(*diagramCaption)->setVisible(true);
+		float t;
+		if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
+			t = worldLine->intersect(lightCone);
+		}
+		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
+			t = worldLine->intersect(hyperplane);
+		}
+		float tau = worldLine->getProperTimeAtAbsoluteTime(t);
+		(*diagramCaption)->changeText(getName().append("\n").append("tau = ").append(std::to_string(tau)).append(" m").c_str());
 	}
 	else {
 		(*diagramCaption)->setVisible(false);
@@ -285,8 +303,8 @@ void Object::draggedTo(vec4 location)
 	worldLine->draggedTo(location);
 }
 
-vec4 Object::getReferenceLocation()
+vec4 Object::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
 {
-	return worldLine->getReferenceLocation();
+	return worldLine->getClosestLocation(ray, observerProperties, settings);
 }
 

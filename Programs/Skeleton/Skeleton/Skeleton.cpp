@@ -31,7 +31,8 @@ void onInitialization() {
 	controlEvents.push_back(new SaveEvent());
 	controlEvents.push_back(new LoadEvent());
 	controlEvents.push_back(new ToggleEditorEvent());
-
+	controlEvents.push_back(new ClearSceneEvent());
+	controlEvents.push_back(new DeleteSelectedEvent());
 
 
 	glViewport(0, 0, windowWidth, windowHeight);

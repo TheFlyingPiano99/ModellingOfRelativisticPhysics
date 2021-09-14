@@ -32,6 +32,8 @@
 const unsigned int windowWidth = 1920, windowHeight = 1080;
 const bool fullScreenMode = true;
 
+const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!
+
 #include "ControlEventInterface.h"
 static std::vector<ControlEventInterface*> controlEvents;	// All used events;
 
@@ -90,6 +92,10 @@ inline vec3 cross(const vec3& v1, const vec3& v2) {
 inline vec3 operator*(float a, const vec3& v) { return vec3(v.x * a, v.y * a, v.z * a); }
 
 //--------------------------
+/*
+* x, y, z .. used for space dimensions
+* w ... used for time
+*/
 struct vec4 {
 //--------------------------
 	float x, y, z, w;

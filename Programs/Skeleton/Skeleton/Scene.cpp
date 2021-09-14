@@ -77,11 +77,11 @@ void Scene::Initialise()
 	}
 
 	//Dice:
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.50f, 0.0f), "");
 	objects.push_back(Object::createDice(wrdln));
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.5f, 0.0f), "");
 	objects.push_back(Object::createDice(wrdln));
-	wrdln = new GeodeticLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.99f, 0.0f), "");
+	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.50f, 0.0f), "");
 	objects.push_back(Object::createDice(wrdln));
 	for (int i = 0; i < 10; i++) {
 		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "");
@@ -90,8 +90,8 @@ void Scene::Initialise()
 		objects.push_back(Object::createDice(wrdln));
 	}
 
-	objects.push_back(Object::createSpaceship(new GeodeticLine(vec3(0.0f, -6.0f, 3.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line")));
-	objects.push_back(Object::createSpaceship(new GeodeticLine(vec3(0.0f, -6.0f, -3.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line")));
+	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 10.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
+	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 12.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
 	*/
 
 
@@ -99,7 +99,12 @@ void Scene::Initialise()
 
 	// Load from file:-------------------------------------------------
 	load("defaultSave01.txt");
-
+	/*
+	WorldLine* wrdln = new GeodeticLine(vec3(-10.0f, -9.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "");
+	observers.push_back(new Observer(wrdln));
+	wrdln = new CompositeLine(vec3(-10.0f, -9.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "");
+	objects.push_back(Object::createDice(wrdln));
+	*/
 
 	// Background:-----------------------------------------------------
 	background = new Background();
@@ -272,6 +277,10 @@ void Scene::toggleLorentzTransformation() {
 
 void Scene::toggleTransformToProperFrame()
 {
+	if (settings.editorMode) {	// In editor mode no transformation is allowed!
+		settings.transformToProperFrame.get() = false;
+		return;
+	}
 	settings.transformToProperFrame.get() = !settings.transformToProperFrame.get();
 	std::string str;
 	if (settings.transformToProperFrame.get()) {
@@ -462,13 +471,7 @@ void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, co
 	}
 	else if (mouseState.mouseLeftDown) {
 		if (settings.viewMode == ViewMode::diagram && settings.editorMode && grabbed != nullptr) {
-			Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
-			vec4 referenceLocation = grabbed->getReferenceLocation();
-			vec3 planePos = vec3(referenceLocation[settings.diagramX], referenceLocation[settings.diagramY], referenceLocation[settings.diagramZ]);
-			vec3 planeNorm = normalize(activeCamera->getEye() - planePos);
-			Plane plane = Plane(planePos, planeNorm);
-			vec4 location = vec4(0,0,0, 1);
-			grabbed->draggedTo(location);
+			grabbed->draggedTo(getEditedLocation(cX, cY));
 		}
 	}
 }
@@ -530,12 +533,27 @@ void Scene::toggleEditorMode()
 	}
 	settings.editorMode = !settings.editorMode;
 	if (settings.editorMode) {
+		settings.transformToProperFrame.get() = false;
 		hud->pushMessage("Editor mode on");
 	}
 	else {
 		hud->pushMessage("Editor mode off");
 	}
 	hud->updateSettings(settings);
+}
+
+void Scene::deleteSelected()
+{
+	if (settings.editorMode && selected != nullptr) {
+		int i = 0;
+		for (; i < objects.size(); i++) {
+			if (objects[i] == selected) {
+				break;
+			}
+		}
+		objects.erase(objects.begin() + i);
+		delete selected;
+	}
 }
 
 void Scene::save(const char* destinationFile)
@@ -607,6 +625,12 @@ void Scene::load(const char* sourceFileName)
 					worldLines.insert({ wrdLn->getID(), wrdLn });
 				}
 			}
+			else if (words.at(0).compare("CompositeLine") == 0) {	// CompositeLine
+				WorldLine* wrdLn = CompositeLine::loadFromFile(*file);
+				if (wrdLn != nullptr) {
+					worldLines.insert({ wrdLn->getID(), wrdLn });
+				}
+			}
 			else if (words.at(0).compare("Observer") == 0) {		// Observer
 				Observer* obs = Observer::loadFromFile(*file);
 				if (obs != nullptr) {
@@ -654,6 +678,7 @@ void Scene::clearScene()
 	objects.clear();
 	activeObserver = NULL;
 	selected = NULL;
+	grabbed = NULL;
 	hud->clearCaptions();
 }
 
@@ -669,6 +694,56 @@ void Scene::resume()
 	settings.running = true;
 	hud->pushMessage("Resumed");
 	hud->updateSettings(settings);
+}
+
+vec4 Scene::getEditedLocation(const float cX, const float cY)
+{
+	Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
+	ObserverProperties properties;
+	if (settings.viewMode == ViewMode::diagram && settings.transformToProperFrame.get()) {
+		properties = activeObserver->getProperties(settings);
+	}
+	else {
+		properties = RelPhysics::getAbsulteObserverProperties();
+	}
+
+	if (grabbed == nullptr) {							// Pre condition
+		throw std::exception("Nothing is grabbed!");
+	}
+
+	vec4 referenceLocation = grabbed->getClosestLocation(ray, properties, settings);
+	vec3 planePos;
+	if (settings.viewMode == ViewMode::diagram) {
+		planePos = vec3(referenceLocation[settings.diagramX], referenceLocation[settings.diagramY], referenceLocation[settings.diagramZ]);
+	}
+	else if (settings.viewMode == ViewMode::realTime3D) {
+		throw std::exception("Unimplemented behaviour!");
+	}
+	vec3 prefUp = activeCamera->getPrefUp();
+	vec3 right = activeCamera->getRight();
+	vec3 planeNorm = cross(right, prefUp);
+	Plane plane = Plane(planePos, planeNorm);
+	vec3 diagramPos = intersect(plane, ray);
+	vec4 location;
+	location[settings.diagramX] = diagramPos.x;
+	location[settings.diagramY] = diagramPos.y;
+	location[settings.diagramZ] = diagramPos.z;
+	location[settings.diagramNotVisualised] = referenceLocation[settings.diagramNotVisualised];	// Do not change!
+
+	// Return to absolute frame:
+	vec4 invTransformed = interpolate(settings.transformToProperFrame, true, false,
+		interpolate(settings.doLorentz, true, false,
+			RelPhysics::lorentzTransformation(location,
+				RelPhysics::lorentzTransformationOfVelocity(vec3(0, 0, 0),
+					RelPhysics::To3DVelocity(activeObserver->getVelocity(settings)))),
+			RelPhysics::galileanTransformation(location,
+				RelPhysics::galileanTransformationOfVelocity(vec3(0, 0, 0),
+					RelPhysics::To3DVelocity(activeObserver->getVelocity(settings))))
+			),
+		location
+	);
+	invTransformed[settings.diagramNotVisualised] = referenceLocation[settings.diagramNotVisualised];
+	return invTransformed;
 }
 
 

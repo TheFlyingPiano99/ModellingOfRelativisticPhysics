@@ -1,6 +1,8 @@
 #pragma once
 
 #include "framework.h"
+#include "Ray.h"
+#include "EnumTypes.h"
 
 #include <string>
 
@@ -90,8 +92,8 @@ public:
 	virtual void draggedTo(vec4 location) = 0;
 
 	/*
-	* Returns a location, that is iddeal to be a position on a plane that will contain the edited location.
+	* Return location in absolute frame, that is ideal to be a position on a plane that will contain the edited location.
 	*/
-	virtual vec4 getReferenceLocation() = 0;
+	virtual vec4 getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings) = 0;
 };
 

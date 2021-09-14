@@ -9,7 +9,6 @@
 #include "RelPhysics.h"
 #include "Exceptions.h"
 #include <fstream>
-#include "Ray.h"
 
 /*
 * World-line of an object / observer in space-time continuum.
@@ -125,7 +124,7 @@ public:
 	*/
 	void DrawDiagram();
 
-	float distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings);
+	float distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings, vec4& closestLocation = vec4());
 
 	/*
 	* Intersects intersectable and returns time measered by absolute observer at intersection.
@@ -170,16 +169,47 @@ public:
 	static GeodeticLine* loadFromFile(std::ifstream& file);
 
 	void draggedTo(vec4 location) override;
-	vec4 getReferenceLocation() override;
+	vec4 getClosestLocation (const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings) override;
 
 };
 
 class CompositeLine : public WorldLine {
-	std::vector<WorldLine*> parts;
+	std::vector<vec4> controlPoints;
 
-
+	void genGeometry();
 public:
 
+	CompositeLine(std::vector<vec4>& points, std::string _name = "", std::string _desc = "")
+		: WorldLine(_name, _desc) {
+		controlPoints = points;
+		genGeometry();
+	}
+
 	CompositeLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name = "", std::string _desc = "")
-		: WorldLine(_name, _desc) {}
+		: WorldLine(_name, _desc) {
+		vec4 startPos = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
+		controlPoints.push_back(startPos);
+		controlPoints.push_back(startPos + RelPhysics::ToFourVelocity(_velocity) * 50);
+		controlPoints.push_back(startPos + RelPhysics::ToFourVelocity(_velocity) * 100);
+		genGeometry();
+	}
+
+	void draggedTo(vec4 location) override;
+
+
+	// Inherited via WorldLine
+	virtual std::string genSaveString() override;
+
+	/*
+	* Returns the loaded object.
+	*/
+	static CompositeLine* loadFromFile(std::ifstream& file);
+
+	virtual vec4 getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings) override;
+
+	void setControlPoints(std::vector<vec4>& points) {
+		controlPoints = points;
+	}
+
+	int getClosestControlPointIndex(vec4 location);
 };

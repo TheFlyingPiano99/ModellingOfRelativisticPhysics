@@ -14,7 +14,7 @@ void Event::draggedTo(vec4 location)
     this->location = location;
 }
 
-vec4 Event::getReferenceLocation()
+vec4 Event::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
 {
     return location;
 }

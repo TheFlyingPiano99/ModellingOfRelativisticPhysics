@@ -323,7 +323,7 @@ void Observer::draggedTo(vec4 location)
 	worldLine->draggedTo(location);
 }
 
-vec4 Observer::getReferenceLocation()
+vec4 Observer::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
 {
-	return worldLine->getReferenceLocation();
+	return worldLine->getClosestLocation(ray, observerProperties, settings);
 }

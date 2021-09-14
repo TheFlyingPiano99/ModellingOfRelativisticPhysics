@@ -1,6 +1,6 @@
 GeodeticLine
 ID 0
-name Obs1'sworldline
+name Obs1's world line
 description 
 locationAtZeroT 0.000000 0.000000 0.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -9,13 +9,13 @@ fourVelocity 0.000000 0.000000 0.000000 1.000000
 Observer
 ID 1
 name Obs1
-description Anobserver
+description An observer
 worldLine 0
 !Observer
 
 GeodeticLine
 ID 2
-name Obs1'sworldline
+name Obs2's world line
 description 
 locationAtZeroT 0.000000 -6.000000 0.000000 0.000000
 fourVelocity 0.000000 0.703545 0.000000 0.710651
@@ -24,13 +24,13 @@ fourVelocity 0.000000 0.703545 0.000000 0.710651
 Observer
 ID 3
 name Obs2
-description Anobserver
+description An observer
 worldLine 2
 !Observer
 
 GeodeticLine
 ID 4
-name Obs1'sworldline
+name Obs3's world line
 description 
 locationAtZeroT -20.000000 10.000000 0.000000 0.000000
 fourVelocity 0.681013 0.000000 0.000000 0.732272
@@ -39,13 +39,13 @@ fourVelocity 0.681013 0.000000 0.000000 0.732272
 Observer
 ID 5
 name Obs3
-description Anobserver
+description An observer
 worldLine 4
 !Observer
 
 GeodeticLine
 ID 6
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 -6.000000 0.000000 0.000000
 fourVelocity 0.000000 0.703545 0.000000 0.710651
@@ -55,13 +55,13 @@ Object
 type 0
 ID 7
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 6
 !Object
 
 GeodeticLine
 ID 8
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 -6.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -71,13 +71,13 @@ Object
 type 0
 ID 9
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 8
 !Object
 
 GeodeticLine
 ID 10
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 -3.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -87,13 +87,13 @@ Object
 type 0
 ID 11
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 10
 !Object
 
 GeodeticLine
 ID 12
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 0.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -103,13 +103,13 @@ Object
 type 0
 ID 13
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 12
 !Object
 
 GeodeticLine
 ID 14
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 3.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -119,13 +119,13 @@ Object
 type 0
 ID 15
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 14
 !Object
 
 GeodeticLine
 ID 16
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 6.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -135,13 +135,13 @@ Object
 type 0
 ID 17
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 16
 !Object
 
 GeodeticLine
 ID 18
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 9.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -151,13 +151,13 @@ Object
 type 0
 ID 19
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 18
 !Object
 
 GeodeticLine
 ID 20
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 12.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -167,13 +167,13 @@ Object
 type 0
 ID 21
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 20
 !Object
 
 GeodeticLine
 ID 22
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 15.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -183,13 +183,13 @@ Object
 type 0
 ID 23
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 22
 !Object
 
 GeodeticLine
 ID 24
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 18.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -199,13 +199,13 @@ Object
 type 0
 ID 25
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 24
 !Object
 
 GeodeticLine
 ID 26
-name Obj1'sworldline
+name Obj1's world line
 description 
 locationAtZeroT 3.000000 21.000000 -1.000000 0.000000
 fourVelocity 0.000000 0.000000 0.000000 1.000000
@@ -215,55 +215,67 @@ Object
 type 0
 ID 27
 name Earth
-description Inhabitedplanet
+description Inhabited planet
 worldLine 26
 !Object
 
-GeodeticLine
+CompositeLine
 ID 28
 name 
 description 
-locationAtZeroT -10.000000 -6.000000 0.000000 0.000000
-fourVelocity 0.000000 0.703545 0.000000 0.710651
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+-10.000000 -28.360680 0.000000 -44.721359
+-10.000000 -6.000000 0.000000 0.000000
+-10.000000 16.360680 0.000000 44.721359
+!controlPoints
+!CompositeLine
 
 Object
 type 1
 ID 29
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 28
 !Object
 
-GeodeticLine
+CompositeLine
 ID 30
 name 
 description 
-locationAtZeroT -10.000000 -6.000000 3.000000 0.000000
-fourVelocity 0.000000 0.703545 0.000000 0.710651
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+-10.000000 -28.360680 3.000000 -44.721359
+-10.000000 -6.000000 3.000000 0.000000
+-10.000000 16.360680 3.000000 44.721359
+!controlPoints
+!CompositeLine
 
 Object
 type 1
 ID 31
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 30
 !Object
 
-GeodeticLine
+CompositeLine
 ID 32
 name 
 description 
-locationAtZeroT -10.000000 -6.000000 6.000000 0.000000
-fourVelocity 0.000000 0.703545 0.000000 0.710651
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+-10.000000 -28.360680 6.000000 -44.721359
+-10.000000 -6.000000 6.000000 0.000000
+-10.000000 16.360680 6.000000 44.721359
+!controlPoints
+!CompositeLine
 
 Object
 type 1
 ID 33
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 32
 !Object
 
@@ -279,7 +291,7 @@ Object
 type 1
 ID 35
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 34
 !Object
 
@@ -295,7 +307,7 @@ Object
 type 1
 ID 37
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 36
 !Object
 
@@ -311,7 +323,7 @@ Object
 type 1
 ID 39
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 38
 !Object
 
@@ -327,7 +339,7 @@ Object
 type 1
 ID 41
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 40
 !Object
 
@@ -343,7 +355,7 @@ Object
 type 1
 ID 43
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 42
 !Object
 
@@ -359,7 +371,7 @@ Object
 type 1
 ID 45
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 44
 !Object
 
@@ -375,7 +387,7 @@ Object
 type 1
 ID 47
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 46
 !Object
 
@@ -391,7 +403,7 @@ Object
 type 1
 ID 49
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 48
 !Object
 
@@ -407,7 +419,7 @@ Object
 type 1
 ID 51
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 50
 !Object
 
@@ -423,7 +435,7 @@ Object
 type 1
 ID 53
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 52
 !Object
 
@@ -439,7 +451,7 @@ Object
 type 1
 ID 55
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 54
 !Object
 
@@ -455,7 +467,7 @@ Object
 type 1
 ID 57
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 56
 !Object
 
@@ -471,7 +483,7 @@ Object
 type 1
 ID 59
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 58
 !Object
 
@@ -487,7 +499,7 @@ Object
 type 1
 ID 61
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 60
 !Object
 
@@ -503,7 +515,7 @@ Object
 type 1
 ID 63
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 62
 !Object
 
@@ -519,7 +531,7 @@ Object
 type 1
 ID 65
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 64
 !Object
 
@@ -535,7 +547,7 @@ Object
 type 1
 ID 67
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 66
 !Object
 
@@ -551,7 +563,7 @@ Object
 type 1
 ID 69
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 68
 !Object
 
@@ -567,7 +579,7 @@ Object
 type 1
 ID 71
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 70
 !Object
 
@@ -583,39 +595,47 @@ Object
 type 1
 ID 73
 name Dice
-description It'sacube!
+description It's a cube!
 worldLine 72
 !Object
 
-GeodeticLine
-ID 110
-name Obj1's world line
+CompositeLine
+ID 74
+name 
 description 
-locationAtZeroT 0.000000 -6.000000 3.000000 0.000000
-fourVelocity 0.000000 0.703545 0.000000 0.710651
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+10.000000 10.000000 10.000000 -50.000000
+10.000000 10.000000 10.000000 0.000000
+10.000000 10.000000 10.000000 50.000000
+!controlPoints
+!CompositeLine
 
 Object
 type 2
-ID 111
+ID 75
 name Spaceship
 description Wruuuhm!!!
-worldLine 110
+worldLine 74
 !Object
 
-GeodeticLine
-ID 112
-name Obj1's world line
+CompositeLine
+ID 76
+name 
 description 
-locationAtZeroT 0.000000 -6.000000 -3.000000 0.000000
-fourVelocity 0.000000 0.703545 0.000000 0.710651
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+10.000000 12.000000 10.000000 -50.000000
+10.000000 12.000000 10.000000 0.000000
+10.000000 12.000000 10.000000 50.000000
+!controlPoints
+!CompositeLine
 
 Object
 type 2
-ID 113
+ID 77
 name Spaceship
 description Wruuuhm!!!
-worldLine 112
+worldLine 76
 !Object
 
