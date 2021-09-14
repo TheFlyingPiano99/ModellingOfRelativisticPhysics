@@ -157,5 +157,9 @@ public:
 	* Tell object, that mouse cursor hovered over image of object.
 	*/
 	void hover();
+
+	// Inherited via Entity
+	virtual void draggedTo(vec4 location) override;
+	vec4 getReferenceLocation() override;
 };
 

@@ -317,3 +317,13 @@ Observer* Observer::loadFromFile(std::ifstream& file)
 void Observer::hover()
 {
 }
+
+void Observer::draggedTo(vec4 location)
+{
+	worldLine->draggedTo(location);
+}
+
+vec4 Observer::getReferenceLocation()
+{
+	return worldLine->getReferenceLocation();
+}

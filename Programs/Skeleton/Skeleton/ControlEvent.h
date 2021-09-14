@@ -251,3 +251,14 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ToggleEditorEvent : public ControlEvent {
+public:
+	ToggleEditorEvent()
+	{
+		keyShortcut = 'e';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

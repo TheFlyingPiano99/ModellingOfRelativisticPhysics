@@ -21,6 +21,13 @@ public:
 	}
 
 	void hover();
+
+
+	// Inherited via Entity
+	virtual std::string genSaveString() override;
+
+	virtual void draggedTo(vec4 location) override;
+	vec4 getReferenceLocation() override;
 };
 
 

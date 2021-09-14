@@ -30,6 +30,7 @@ void onInitialization() {
 	controlEvents.push_back(new MoveCameraRightEvent());
 	controlEvents.push_back(new SaveEvent());
 	controlEvents.push_back(new LoadEvent());
+	controlEvents.push_back(new ToggleEditorEvent());
 
 
 
@@ -83,8 +84,7 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 void onKeyboardUp(unsigned char key, int pX, int pY) {
 }
 
-static bool down = false;
-static bool prevDown = false;
+MouseState mouseState;
 static float prevCX, prevCY;
 
 // Move mouse with key pressed
@@ -94,17 +94,21 @@ void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the 
 	float cY = 1.0f - 2.0f * pY / windowHeight;
 
 
-	if (!prevDown && down) {
+	if (!mouseState.mouseRightPrevDown && mouseState.mouseRightDown) {
 		prevCX = cX;
 		prevCY = cY;
 	}
 
-	float deltaX = cX - prevCX;
-	float deltaY = cY - prevCY;
+	float deltaCX = cX - prevCX;
+	float deltaCY = cY - prevCY;
 
-	if (down) {
-		prevDown = true;
-		scene->panCamera(deltaX, deltaY);
+	if (mouseState.mouseRightDown) {
+		mouseState.mouseRightPrevDown = true;
+		scene->mouseDragged(cX, cY, deltaCX, deltaCY, mouseState);
+	}
+	if (mouseState.mouseLeftDown) {
+		mouseState.mouseLeftPrevDown = true;
+		scene->mouseDragged(cX, cY, deltaCX, deltaCY, mouseState);
 	}
 
 	scene->mouseMoved(cX, cY);
@@ -125,17 +129,20 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 		case GLUT_LEFT_BUTTON:
 			if (state == GLUT_DOWN) {
 				scene->selectByClick(cX, cY);
+				mouseState.mouseLeftDown = true;
 			}
 			else if (state == GLUT_UP) {
+				scene->releaseGrab();
+				mouseState.mouseLeftDown = false; mouseState.mouseLeftPrevDown = false;
 			}
 			break;
 		case GLUT_MIDDLE_BUTTON: break;
 		case GLUT_RIGHT_BUTTON:
 			if (state == GLUT_DOWN) {	//Start dragging camera
-				down = true;
+				mouseState.mouseRightDown = true;
 			}
 			else if (state == GLUT_UP) {	//Stop dragging camera
-				down = false; prevDown = false;
+				mouseState.mouseRightDown = false; mouseState.mouseRightPrevDown = false;
 			}
 			break;
 		case 3:			// Mouse wheel scroll

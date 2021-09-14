@@ -15,6 +15,7 @@
 #include "CoordinateSystem.h"
 #include "HUD.h"
 #include "ControlEventInterface.h"
+#include "Editor.h"
 
 #include <map>
 #include <thread>
@@ -29,9 +30,11 @@ class Scene {
 	Camera* activeCamera = NULL;
 	CoordinateSystem* system = NULL;
 	HUD* hud = NULL;
+	Editor* editor = NULL;
 
 	Observer* activeObserver = NULL;
 	Entity* selected = NULL;
+	Entity* grabbed = NULL;
 	Entity* hovered = NULL;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
@@ -43,6 +46,7 @@ class Scene {
 	Background* background;
 
 	MenuSystem menu;
+
 	bool entryMode = false;
 	bool allowQuit = false;
 	bool loadingScene = false;
@@ -90,6 +94,7 @@ public:
 		delete background;
 		delete system;
 		delete hud;
+		delete editor;
 		/*
 		if (loadThread != nullptr && loadThread->joinable()) {
 			loadThread->join();
@@ -168,9 +173,24 @@ public:
 	*/
 	void selectByClick(float cX, float cY);
 
+	void releaseGrab();
+
+	/*
+	* Mouse moved without regards to pressed button.
+	* Receives the current mouse position on camera plane.
+	*/
 	void mouseMoved(float cX, float cY);
 
+	/*
+	* When the mouse is moved with pressed buttons.
+	*/
+	void mouseDragged(const float cX, const float cY, const float deltaCX, const float deltaCY, const MouseState& mouseState);
+
 	Entity* getUnderCursor(float cX, float cY);
+
+	// Editor:
+
+	void toggleEditorMode();
 
 	// Getters:--------------------------------------------------------------------
 

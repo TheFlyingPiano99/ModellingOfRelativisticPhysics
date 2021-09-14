@@ -5,6 +5,7 @@
 #include "StringOperations.h"
 #include "Exceptions.h"
 #include "Assets.h"
+#include "Plane.h"
 
 Scene* Scene::instance = NULL;
 
@@ -23,6 +24,7 @@ void Scene::Initialise()
 	settings.diagramNotVisualised = 2;
 
 	hud = new HUD(this);
+	editor = new Editor(this);
 
 	//View:
 	view = new RealTime3DView(this);
@@ -314,6 +316,7 @@ void Scene::toggleViewMode() {
 		str = std::string("View mode: real time 3D");
 		break;
 	case ViewMode::diagram:
+		settings.editorMode = false;		// Turn off editor mode!
 		activeCamera = diagramCamera;
 		view->transitionFrom();
 		delete view;
@@ -425,7 +428,13 @@ void Scene::selectByClick(float cX, float cY)
 		}
 		selected = entity;
 		selected->select();
+		grabbed = selected;
 	}
+}
+
+void Scene::releaseGrab()
+{
+	grabbed = NULL;
 }
 
 void Scene::mouseMoved(float cX, float cY)
@@ -441,6 +450,25 @@ void Scene::mouseMoved(float cX, float cY)
 		}
 		else {
 			hovered = nullptr;
+		}
+	}
+}
+
+void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, const float deltaCY, const MouseState& mouseState)
+{
+	if (mouseState.mouseRightDown) {
+		panCamera(deltaCX, deltaCY);
+		return;
+	}
+	else if (mouseState.mouseLeftDown) {
+		if (settings.viewMode == ViewMode::diagram && settings.editorMode && grabbed != nullptr) {
+			Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
+			vec4 referenceLocation = grabbed->getReferenceLocation();
+			vec3 planePos = vec3(referenceLocation[settings.diagramX], referenceLocation[settings.diagramY], referenceLocation[settings.diagramZ]);
+			vec3 planeNorm = normalize(activeCamera->getEye() - planePos);
+			Plane plane = Plane(planePos, planeNorm);
+			vec4 location = vec4(0,0,0, 1);
+			grabbed->draggedTo(location);
 		}
 	}
 }
@@ -493,6 +521,21 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 		}
 	}
 	return nullptr;
+}
+
+void Scene::toggleEditorMode()
+{
+	if (settings.viewMode != ViewMode::diagram) {	// Toggle only in diagram mode.
+		return;
+	}
+	settings.editorMode = !settings.editorMode;
+	if (settings.editorMode) {
+		hud->pushMessage("Editor mode on");
+	}
+	else {
+		hud->pushMessage("Editor mode off");
+	}
+	hud->updateSettings(settings);
 }
 
 void Scene::save(const char* destinationFile)

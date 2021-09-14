@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framework.h"
+
 #include <string>
 
 
@@ -69,6 +71,9 @@ public:
 
 	virtual std::string genSaveString() = 0;
 
+	/*
+	* Entity gets selected.
+	*/
 	void select();
 	void deselect();
 
@@ -76,7 +81,17 @@ public:
 	* The cursor is hovering over the entity.
 	*/
 	void hover();
-
 	void endHover();
+
+	/*
+	* Entity is dragged by user.
+	* Receives current mouse position on camera plane.
+	*/
+	virtual void draggedTo(vec4 location) = 0;
+
+	/*
+	* Returns a location, that is iddeal to be a position on a plane that will contain the edited location.
+	*/
+	virtual vec4 getReferenceLocation() = 0;
 };
 

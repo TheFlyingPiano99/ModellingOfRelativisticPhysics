@@ -153,5 +153,10 @@ public:
 	* Mouse is hovered above the image of the observer.
 	*/
 	void hover();
+
+	// Inherited via Entity
+	virtual void draggedTo(vec4 location) override;
+
+	vec4 getReferenceLocation() override;
 };
 

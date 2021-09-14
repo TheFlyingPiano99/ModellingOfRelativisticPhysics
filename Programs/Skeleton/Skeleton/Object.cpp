@@ -280,3 +280,13 @@ void Object::hover()
 {
 }
 
+void Object::draggedTo(vec4 location)
+{
+	worldLine->draggedTo(location);
+}
+
+vec4 Object::getReferenceLocation()
+{
+	return worldLine->getReferenceLocation();
+}
+

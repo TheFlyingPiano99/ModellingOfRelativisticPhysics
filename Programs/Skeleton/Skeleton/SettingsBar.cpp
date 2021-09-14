@@ -37,6 +37,9 @@ void SettingsBar::updateSettings(const Settings& settings)
 
 		str = std::string("[v] View mode: Diagram");
 		captions.emplace(offsetof(Settings, viewMode), Caption::createSmallCameraSpaceCaption(pos + 9 * vec2(0.2f, 0), str.c_str()));
+		if (settings.editorMode) {
+			captions.emplace(offsetof(Settings, editorMode), Caption::createSmallCameraSpaceCaption(pos + 5 * vec2(0.2f, 0) + vec2(0, 0.1f), "Editing", vec3(0.4f, 1, 0)));
+		}
 	}
 	else {												// RealTime3D
 		str = std::string("[v] View mode: Real time 3D");

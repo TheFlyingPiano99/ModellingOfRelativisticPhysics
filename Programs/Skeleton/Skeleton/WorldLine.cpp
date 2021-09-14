@@ -74,6 +74,12 @@ GeodeticLine* GeodeticLine::loadFromFile(std::ifstream& file)
     return nullptr;
 }
 
+
+vec4 GeodeticLine::getReferenceLocation()
+{
+    return locationAtZeroT;
+}
+
 std::string GeodeticLine::genSaveString()
 {
     std::string str(
@@ -445,4 +451,11 @@ float WorldLine::intersect(const Intersectable& intersectable) {
         t = intersectHyperplane(reinterpret_cast<const Hyperplane&>(intersectable));
     }
     return t;
+}
+
+
+void GeodeticLine::draggedTo(vec4 location)
+{
+    fourVelocity = normalize(location - locationAtZeroT) * RelPhysics::speedOfLight;
+    genGeometry();
 }

@@ -131,6 +131,7 @@ public:
 	* Intersects intersectable and returns time measered by absolute observer at intersection.
 	*/
 	float intersect(const Intersectable& intersectable);
+
 };
 
 class GeodeticLine : public WorldLine
@@ -167,6 +168,10 @@ public:
 	* Returns the loaded object.
 	*/
 	static GeodeticLine* loadFromFile(std::ifstream& file);
+
+	void draggedTo(vec4 location) override;
+	vec4 getReferenceLocation() override;
+
 };
 
 class CompositeLine : public WorldLine {
@@ -177,7 +182,4 @@ public:
 
 	CompositeLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name = "", std::string _desc = "")
 		: WorldLine(_name, _desc) {}
-
-	//Todo
-
 };

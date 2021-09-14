@@ -48,6 +48,12 @@ enum ControlEventEnum {
 	load
 };
 
+struct MouseState {
+	bool mouseRightPrevDown = false;
+	bool mouseLeftPrevDown = false;
+	bool mouseRightDown = false;
+	bool mouseLeftDown = false;
+};
 
 /*
 * All important settings mainly related to rendering.
@@ -64,8 +70,7 @@ struct Settings {
 	int diagramY;
 	int diagramZ;
 	int diagramNotVisualised;
-
-	Settings() {}
+	bool editorMode = false;
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(false, "textMode");

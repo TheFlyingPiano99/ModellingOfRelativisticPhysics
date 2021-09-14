@@ -83,6 +83,7 @@
     <ClCompile Include="ControlEvent.cpp" />
     <ClCompile Include="CoordinateSystem.cpp" />
     <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -96,6 +97,7 @@
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="RelPhysics.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SettingsBar.cpp" />
@@ -114,6 +116,7 @@
     <ClInclude Include="ControlEvent.h" />
     <ClInclude Include="CoordinateSystem.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="Editor.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EnumTypes.h" />
     <ClInclude Include="Event.h" />
@@ -127,6 +130,7 @@
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="MessageQueue.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="SettingsBar.h" />
     <ClInclude Include="Skeleton.h" />

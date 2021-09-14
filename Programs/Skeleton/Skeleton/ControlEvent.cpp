@@ -99,3 +99,8 @@ void LoadEvent::performAction(const float dt)
 {
 	Scene::getInstance()->startLoadProcess();
 }
+
+void ToggleEditorEvent::performAction(const float dt)
+{
+	Scene::getInstance()->toggleEditorMode();
+}
