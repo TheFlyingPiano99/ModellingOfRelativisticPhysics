@@ -1,4 +1,5 @@
 #include "WorldLine.h"
+#include "WorldLineView.h"
 #include <iostream>
 #include "StringOperations.h"
 
@@ -13,13 +14,6 @@ inline void GeodeticLine::genGeometry() {
         vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * (i - noOfVds4D / 2.0f) * 50;
         vds4D[i] = pos;
     }
-    
-    // OpenGL:
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, noOfVds4D * sizeof(vec4), &vds4D[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 
@@ -93,15 +87,11 @@ std::string GeodeticLine::genSaveString()
 //------------------------------------------------------------------------
 
 WorldLine::WorldLine(std::string _name, std::string _desc) : Entity(_name, _desc) {
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 }
 
 WorldLine::~WorldLine() {
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
+
 }
 
 /*
@@ -389,18 +379,6 @@ void WorldLine::loadOnGPU(GPUProgram& gpuProgram)
     gpuProgram.setUniform((int)noOfVds4D, "noOfWorldLineNodes");
 }
 
-/*
-* Used to draw in diagram view.
-*/
-
-void WorldLine::DrawDiagram()
-{
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glLineWidth(3);
-    glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
-}
-
 float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings, vec4& closestLocation)
 {
     float distance = -1;
@@ -470,6 +448,11 @@ vec4 GeodeticLine::getClosestLocation(const Ray& ray, const ObserverProperties& 
    //return closestLocation;
 }
 
+void* GeodeticLine::createView()
+{
+    return new GeodeticLineView(this);
+}
+
 void CompositeLine::genGeometry()
 {
     vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
@@ -483,13 +466,6 @@ void CompositeLine::genGeometry()
     velocity = RelPhysics::tangentFourVelocity(controlPoints[controlPoints.size() - 2], controlPoints[controlPoints.size() - 1]);
     vds4D[countVDS++] = controlPoints[controlPoints.size() - 1] + velocity * 50.0f;
     noOfVds4D = countVDS;
-
-    // OpenGL:
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, noOfVds4D * sizeof(vec4), &vds4D[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 void CompositeLine::draggedTo(vec4 location)
@@ -602,3 +578,9 @@ int CompositeLine::getClosestControlPointIndex(vec4 location)
     }
     return idx;
 }
+
+void* CompositeLine::createView()
+{
+    return new CompositeLineView(this);
+}
+

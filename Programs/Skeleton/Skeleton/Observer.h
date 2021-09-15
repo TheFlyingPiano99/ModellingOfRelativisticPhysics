@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Entity.h"
 #include "WorldLine.h"
+#include "WorldLineView.h"
 #include "Material.h"
 #include "Caption.h"
 #include "EnumTypes.h"
@@ -14,6 +15,7 @@
 class Observer : public Entity
 {
 	WorldLine* worldLine = NULL;
+	WorldLineView* worldLineView = NULL;
 	float currentProperTime = 0.0f;
 	int worldLineID = 0;
 	std::shared_ptr<Caption*> diagramCaption;
@@ -23,6 +25,9 @@ public:
 
 	Observer(WorldLine* _worldLine, std::string _name = "", std::string _desc = "")
 		: Entity(_name, _desc), worldLine(_worldLine) {
+		if (worldLine != nullptr) {
+			worldLineView = (WorldLineView*)worldLine->createView();
+		}
 		diagramCaption = Caption::createNormalCaption(vec3(0, 0, 0), name.c_str());
 		timerCaption = Caption::createNormalCaption(vec3(0, 0, 0), "");
 		(*diagramCaption)->setVisible(false);
@@ -31,6 +36,7 @@ public:
 
 	~Observer() {
 		delete worldLine;
+		delete worldLineView;
 		(*diagramCaption)->erease();
 		(*timerCaption)->erease();		// static
 	}
@@ -145,9 +151,7 @@ public:
 	/*
 	* Must be called after loading!
 	*/
-	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
-		worldLine = worldLines.at(worldLineID);
-	}
+	void setWorldLine(std::map<int, WorldLine*>& worldLines);
 
 	/*
 	* Mouse is hovered above the image of the observer.

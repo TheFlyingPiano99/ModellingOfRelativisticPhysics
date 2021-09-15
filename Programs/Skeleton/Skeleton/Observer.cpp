@@ -99,7 +99,7 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);
 
-	worldLine->DrawDiagram();
+	worldLineView->DrawDiagram();
 }
 
 void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)
@@ -314,6 +314,18 @@ Observer* Observer::loadFromFile(std::ifstream& file)
 	return nullptr;
 }
 
+
+/*
+* Must be called after loading!
+*/
+
+void Observer::setWorldLine(std::map<int, WorldLine*>& worldLines) {
+	worldLine = worldLines.at(worldLineID);
+	if (worldLine != nullptr) {
+		worldLineView = (WorldLineView*)worldLine->createView();
+	}
+}
+
 void Observer::hover()
 {
 }
@@ -321,6 +333,8 @@ void Observer::hover()
 void Observer::draggedTo(vec4 location)
 {
 	worldLine->draggedTo(location);
+	worldLineView->update();
+	worldLineView->updateGeometry();
 }
 
 vec4 Observer::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)

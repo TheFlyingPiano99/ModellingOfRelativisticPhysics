@@ -17,18 +17,14 @@
 class WorldLine : public Entity
 {
 protected:
-	unsigned int vao, vbo;
-
-	//New part:
-	std::vector<vec4> vds4D;
-	unsigned int noOfVds4D;
 
 	enum WorldLineType {
 		geodetic,
 		other
 	} type;
 
-
+	std::vector<vec4> vds4D;
+	unsigned int noOfVds4D;
 
 	//Functions:--------------------------------------------------------
 
@@ -119,11 +115,6 @@ public:
 
 	void loadOnGPU(GPUProgram& gpuProgram);
 
-	/*
-	* Draw in diagram view.
-	*/
-	void DrawDiagram();
-
 	float distanceBetweenRayAndDiagram(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings, vec4& closestLocation = vec4());
 
 	/*
@@ -131,12 +122,30 @@ public:
 	*/
 	float intersect(const Intersectable& intersectable);
 
+	int getNoOfVds() {
+		return noOfVds4D;
+	}
+
+	std::vector<vec4>& getVds() {
+		return vds4D;
+	}
+
+	const int getNoOfVds() const {
+		return noOfVds4D;
+	}
+
+	const std::vector<vec4>& getVds() const {
+		return vds4D;
+	}
+	
+	virtual void* createView() = 0;
 };
 
 class GeodeticLine : public WorldLine
 {
 	vec4 locationAtZeroT;	//When tau = 0
 	vec4 fourVelocity;
+
 
 	void genGeometry();
 public:
@@ -150,6 +159,7 @@ public:
 		locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
 		fourVelocity = RelPhysics::ToFourVelocity(_velocity);
 		noOfVds4D = 100;
+
 		genGeometry();
 	}
 
@@ -170,7 +180,15 @@ public:
 
 	void draggedTo(vec4 location) override;
 	vec4 getClosestLocation (const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings) override;
+	void* createView() override;
 
+	vec4 getLocationAtZeroT() {
+		return locationAtZeroT;
+	}
+
+	vec4 getVelocity() {
+		return fourVelocity;
+	}
 };
 
 class CompositeLine : public WorldLine {
@@ -212,4 +230,6 @@ public:
 	}
 
 	int getClosestControlPointIndex(vec4 location);
+	void* createView() override;
+
 };

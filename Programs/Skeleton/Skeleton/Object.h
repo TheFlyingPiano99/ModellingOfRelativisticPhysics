@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include "WorldLine.h"
+#include "WorldLineView.h"
 #include "Material.h"
 #include "Geometry.h"
 #include "Camera.h"
@@ -21,6 +22,7 @@ class Object : public Entity
 	float rotationAngle, rotationSpeed;
 	vec3 scale, rotationAxis, translation;
 	WorldLine* worldLine = NULL;
+	WorldLineView* worldLineView = NULL;
 	Geometry* geometry;
 	Material* material = NULL;
 	Material* diagramMaterial = NULL;
@@ -58,11 +60,15 @@ public:
 		diagramMaterial(_diagramMaterial),
 		texture(_texture)
 	{
+		if (worldLine != nullptr) {
+			worldLineView = (WorldLineView*)worldLine->createView();
+		}
 		diagramCaption = Caption::createNormalCaption(vec3(0, 0, 0), name.c_str());
 	}
 
 	~Object() {
 		delete worldLine;
+		delete worldLineView;
 		(*diagramCaption)->erease();
 	}
 
@@ -124,9 +130,7 @@ public:
 		return worldLineID;
 	}
 
-	void setWorldLine(std::map<int, WorldLine*>& worldLines) {
-		worldLine = worldLines.at(worldLineID);
-	}
+	void setWorldLine(std::map<int, WorldLine*>& worldLines);
 
 	/*
 	* Returns shortest distance between given ray and the object's world line's diagram representation.

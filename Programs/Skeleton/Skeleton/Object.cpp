@@ -129,7 +129,13 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
 			t = worldLine->intersect(hyperplane);
 		}
-		float tau = worldLine->getProperTimeAtAbsoluteTime(t);
+		float tau;
+		if (settings.doLorentz.get()) {
+			tau = worldLine->getProperTimeAtAbsoluteTime(t);
+		}
+		else {
+			tau = t;
+		}
 		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m").c_str());
 	}
 	else {
@@ -157,7 +163,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	gpuProgram.setUniform(false, "directRenderMode");
 	gpuProgram.setUniform(true, "glow");
 
-	worldLine->DrawDiagram();
+	worldLineView->DrawDiagram();
 	
 	
 	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
@@ -178,8 +184,14 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 		else if (settings.intersectionMode.get() == IntersectionMode::hyperplane) {
 			t = worldLine->intersect(hyperplane);
 		}
-		float tau = worldLine->getProperTimeAtAbsoluteTime(t);
-		(*diagramCaption)->changeText(getName().append("\n").append("tau = ").append(std::to_string(tau)).append(" m").c_str());
+		float tau;
+		if (settings.doLorentz.get()) {
+			tau = worldLine->getProperTimeAtAbsoluteTime(t);
+		}
+		else {
+			tau = t;
+		}
+		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m").c_str());
 	}
 	else {
 		(*diagramCaption)->setVisible(false);
@@ -261,6 +273,13 @@ Object* Object::loadFromFile(std::ifstream& file)
 	return nullptr;
 }
 
+void Object::setWorldLine(std::map<int, WorldLine*>& worldLines) {
+	worldLine = worldLines.at(worldLineID);
+	if (worldLine != nullptr) {
+		worldLineView = (WorldLineView*)worldLine->createView();
+	}
+}
+
 float Object::rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
 	vec4 location4 = intersect(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
@@ -301,6 +320,8 @@ void Object::hover()
 void Object::draggedTo(vec4 location)
 {
 	worldLine->draggedTo(location);
+	worldLineView->update();
+	worldLineView->updateGeometry();
 }
 
 vec4 Object::getClosestLocation(const Ray& ray, const ObserverProperties& observerProperties, const Settings& settings)
