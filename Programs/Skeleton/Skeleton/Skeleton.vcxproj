@@ -92,6 +92,7 @@
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Hyperplane.cpp" />
     <ClCompile Include="Interpolatable.cpp" />
+    <ClCompile Include="Lamp.cpp" />
     <ClCompile Include="LightCone.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="ControlEventInterface.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Interpolatable.h" />
+    <ClInclude Include="Lamp.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="MessageQueue.h" />
