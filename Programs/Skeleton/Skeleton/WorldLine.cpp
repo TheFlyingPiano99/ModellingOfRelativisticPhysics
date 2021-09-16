@@ -432,7 +432,16 @@ float WorldLine::intersect(const Intersectable& intersectable) {
 
 void GeodeticLine::draggedTo(vec4 location)
 {
+    if (length(location - locationAtZeroT) < 2.0f) {
+        locationAtZeroT = location;
+        genGeometry();
+        locationAtZeroT.w = 0.0f;
+        return;
+    }
     vec4 temp = normalize(location - locationAtZeroT) * RelPhysics::speedOfLight;
+    if (temp.w < 0) {
+        temp = temp * -1.0f;
+    }
     if (length(RelPhysics::To3DVelocity(temp)) > RelPhysics::speedOfLight * 0.99f) {   // Don't set if speed of light exceeded!
         return;
     }

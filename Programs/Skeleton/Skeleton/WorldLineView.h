@@ -18,7 +18,7 @@ public:
 
 	virtual void Draw() = 0;
 	virtual void DrawDiagram() = 0;
-	virtual void drawEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) = 0;
+	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) = 0;
 	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) = 0;
 	virtual void update() = 0;
 	void updateGeometry();
@@ -28,15 +28,20 @@ public:
 
 class GeodeticLineView : public WorldLineView {
 	std::shared_ptr<Caption*> locationAtZeroTCaption;
+	std::shared_ptr<Caption*> velocityCaption;
 	vec4 locationAtZeroT, fourVelocity;
+
 public:
 	GeodeticLineView(const GeodeticLine* line): WorldLineView(line) {
 		update();
 		updateGeometry();
+		locationAtZeroTCaption = Caption::createSmallCaption(vec3(), "");
+		velocityCaption = Caption::createSmallCaption(vec3(), "");
 	}
 
 	~GeodeticLineView() {
 		(**locationAtZeroTCaption).erease();
+		(**velocityCaption).erease();
 	}
 
 	// Inherited via WorldLineView
@@ -44,7 +49,7 @@ public:
 
 	virtual void DrawDiagram() override;
 
-	virtual void drawEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
+	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
 
 	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
 
@@ -53,10 +58,23 @@ public:
 };
 
 class CompositeLineView : public WorldLineView {
+	std::vector<vec4> controlPoints;
+	std::vector<std::shared_ptr<Caption*>> pointCaptions;
+	std::vector<std::shared_ptr<Caption*>> velocityCaptions;
+
 public:
 	CompositeLineView(const CompositeLine* line) : WorldLineView(line) {
 		update();
 		updateGeometry();
+	}
+
+	~CompositeLineView() {
+		for (int i = 0; i < controlPoints.size(); i++) {
+			(**pointCaptions[i]).erease();
+		}
+		for (int i = 0; i < controlPoints.size() - 1; i++) {
+			(**velocityCaptions[i]).erease();
+		}
 	}
 
 	// Inherited via WorldLineView
@@ -64,7 +82,7 @@ public:
 
 	virtual void DrawDiagram() override;
 
-	virtual void drawEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
+	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
 
 	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const Settings& settings) override;
 

@@ -186,22 +186,27 @@ const char* const vertexSource = R"(
 		Calculates the intersection of a hyperplane and world line of this vertex
 		Also calculates the Doppler shift for this vertex.
 	*/
-	void geodetic() {
+	void realTime() {
 		float t;		// absolute time parametre
 		vec4 offsetedStartPos;
 		vec4 tangentVelocity;
+		vec4 sectionStart = worldLineNodes[0];					// <- To make Wigner rotation happen.
 		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
 			vec4 offsetedStartPosLorentz;
 			vec4 offsetedStartPosGalilean;
+			if (i > 0) {
+				sectionStart = worldLineNodes[i];		// Todo (Wigner)
+				// Todo
+			}
 			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
 			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
 			vec3 v = To3DVelocity(tangentVelocity);
 			float gamma = lorentzFactor(length(v));
 			vec3 n = normalize(v);
 			vec3 pParalel = dot(vp.xyz, n) * n;
-			vec3 pPerpend = vp.xyz - pParalel;
-			offsetedStartPosLorentz = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// Length Contraction(vp) + tangent worldLine start pos
-			offsetedStartPosGalilean = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos
+			vec3 pPerpend = vp.xyz - pParalel;								//	 V	place for correction (Wigner rotation)					V		
+			offsetedStartPosLorentz = vec4(pPerpend + pParalel / gamma, 0) + sectionStart - tangentVelocity / tangentVelocity.w * sectionStart.w;	// Length Contraction(vp) + tangent worldLine start pos
+			offsetedStartPosGalilean = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos	also no Wigner rotation (not using "sectorStart").
 			if (interpolateDoLorentz) {
 				if (doLorentz) {
 					offsetedStartPos = lerp(offsetedStartPosGalilean, offsetedStartPosLorentz, tDoLorentz);
@@ -389,7 +394,7 @@ const char* const vertexSource = R"(
 	void main() {
 		if (viewMode == 0 && !directRenderMode) {	// RealTime3D
 			if (worldLineType == 0) {
-				geodetic();
+				realTime();
 			}
 		}
 		else if (viewMode == 1 && !directRenderMode) {	// Diagram

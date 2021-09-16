@@ -141,6 +141,8 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	else {
 		(*diagramCaption)->setVisible(false);
 	}
+	worldLineView->disableEditorInfo(gpuProgram, camera, settings);
+
 }
 
 void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const ObserverProperties& observerProperties, const Settings& settings) {
@@ -195,6 +197,12 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	}
 	else {
 		(*diagramCaption)->setVisible(false);
+	}
+	if (settings.editorMode && selected) {
+		worldLineView->drawEditorInfoDiagram(gpuProgram, camera, settings);
+	}
+	else {
+		worldLineView->disableEditorInfo(gpuProgram, camera, settings);
 	}
 }
 

@@ -229,6 +229,10 @@ public:
 		controlPoints = points;
 	}
 
+	std::vector<vec4>& getControlPoints() {
+		return controlPoints;
+	}
+
 	int getClosestControlPointIndex(vec4 location);
 	void* createView() override;
 
