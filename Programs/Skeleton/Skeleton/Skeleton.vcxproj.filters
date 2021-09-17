@@ -256,5 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="..\..\..\Resources\shaders\vertexShader.vert" />
+    <None Include="..\..\..\Resources\shaders\fragmentShader.frag" />
   </ItemGroup>
 </Project>
