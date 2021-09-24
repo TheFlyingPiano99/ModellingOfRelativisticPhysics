@@ -3,11 +3,11 @@
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
@@ -15,265 +15,226 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Skeleton.cpp">
+    <ClCompile Include="..\Skeleton\AdvancedTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="framework.cpp">
+    <ClCompile Include="..\Skeleton\Assets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RelPhysics.cpp">
+    <ClCompile Include="..\Skeleton\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Observer.cpp">
+    <ClCompile Include="..\Skeleton\Caption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Event.cpp">
+    <ClCompile Include="..\Skeleton\ControlEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="..\Skeleton\CoordinateSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
+    <ClCompile Include="..\Skeleton\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WorldLine.cpp">
+    <ClCompile Include="..\Skeleton\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hyperplane.cpp">
+    <ClCompile Include="..\Skeleton\Event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="..\Skeleton\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
+    <ClCompile Include="..\Skeleton\framework.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry.cpp">
+    <ClCompile Include="..\Skeleton\Geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightCone.cpp">
+    <ClCompile Include="..\Skeleton\HUD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Caption.cpp">
+    <ClCompile Include="..\Skeleton\Hyperplane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MenuSystem.cpp">
+    <ClCompile Include="..\Skeleton\Interpolatable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="View.cpp">
+    <ClCompile Include="..\Skeleton\Lamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CoordinateSystem.cpp">
+    <ClCompile Include="..\Skeleton\LightCone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Assets.cpp">
+    <ClCompile Include="..\Skeleton\MenuSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StringOperations.cpp">
+    <ClCompile Include="..\Skeleton\MessageQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Font.cpp">
+    <ClCompile Include="..\Skeleton\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageQueue.cpp">
+    <ClCompile Include="..\Skeleton\Observer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HUD.cpp">
+    <ClCompile Include="..\Skeleton\Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextEntry.cpp">
+    <ClCompile Include="..\Skeleton\RelPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AdvancedTexture.cpp">
+    <ClCompile Include="..\Skeleton\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SettingsBar.cpp">
+    <ClCompile Include="..\Skeleton\SettingsBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Interpolatable.cpp">
+    <ClCompile Include="..\Skeleton\Skeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ControlEvent.cpp">
+    <ClCompile Include="..\Skeleton\StringOperations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editor.cpp">
+    <ClCompile Include="..\Skeleton\TextEntry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Plane.cpp">
+    <ClCompile Include="..\Skeleton\View.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WorldLineView.cpp">
+    <ClCompile Include="..\Skeleton\WorldLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Lamp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MyForm.cpp">
+    <ClCompile Include="..\Skeleton\WorldLineView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="..\Skeleton\AdvancedTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RelPhysics.h">
+    <ClInclude Include="..\Skeleton\Assets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Observer.h">
+    <ClInclude Include="..\Skeleton\Background.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Event.h">
+    <ClInclude Include="..\Skeleton\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="..\Skeleton\Caption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
+    <ClInclude Include="..\Skeleton\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorldLine.h">
+    <ClInclude Include="..\Skeleton\ControlEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Hyperplane.h">
+    <ClInclude Include="..\Skeleton\ControlEventInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Exceptions.h">
+    <ClInclude Include="..\Skeleton\CoordinateSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
+    <ClInclude Include="..\Skeleton\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
+    <ClInclude Include="..\Skeleton\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
+    <ClInclude Include="..\Skeleton\EnumTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shaders.h">
+    <ClInclude Include="..\Skeleton\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="..\Skeleton\Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Color.h">
+    <ClInclude Include="..\Skeleton\Font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AdvancedTexture.h">
+    <ClInclude Include="..\Skeleton\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Background.h">
+    <ClInclude Include="..\Skeleton\Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightCone.h">
+    <ClInclude Include="..\Skeleton\HUD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Intersectable.h">
+    <ClInclude Include="..\Skeleton\Hyperplane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Caption.h">
+    <ClInclude Include="..\Skeleton\Interpolatable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MenuSystem.h">
+    <ClInclude Include="..\Skeleton\Intersectable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightSource.h">
+    <ClInclude Include="..\Skeleton\Lamp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="View.h">
+    <ClInclude Include="..\Skeleton\LightCone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CoordinateSystem.h">
+    <ClInclude Include="..\Skeleton\LightSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Assets.h">
+    <ClInclude Include="..\Skeleton\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Skeleton.h">
+    <ClInclude Include="..\Skeleton\MenuSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StringOperations.h">
+    <ClInclude Include="..\Skeleton\MessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ray.h">
+    <ClInclude Include="..\Skeleton\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnumTypes.h">
+    <ClInclude Include="..\Skeleton\Observer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Font.h">
+    <ClInclude Include="..\Skeleton\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageQueue.h">
+    <ClInclude Include="..\Skeleton\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HUD.h">
+    <ClInclude Include="..\Skeleton\RelPhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextEntry.h">
+    <ClInclude Include="..\Skeleton\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SettingsBar.h">
+    <ClInclude Include="..\Skeleton\SettingsBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Interpolatable.h">
+    <ClInclude Include="..\Skeleton\Shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ControlEvent.h">
+    <ClInclude Include="..\Skeleton\Skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ControlEventInterface.h">
+    <ClInclude Include="..\Skeleton\StringOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor.h">
+    <ClInclude Include="..\Skeleton\TextEntry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Plane.h">
+    <ClInclude Include="..\Skeleton\View.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorldLineView.h">
+    <ClInclude Include="..\Skeleton\WorldLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Lamp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyForm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Threading.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandling.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandler_Native.h">
+    <ClInclude Include="..\Skeleton\WorldLineView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Resources\lowRes\dice.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Resources\lowRes\dice.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Resources\lowRes\earth_daymap.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Resources\lowRes\earth_normal_map.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Resources\lowRes\Harold.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Resources\lowRes\stars_milky_way.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="..\..\..\Resources\shaders\fragmentShader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\..\..\Resources\shaders\vertexShader.vert">
       <Filter>Header Files</Filter>
     </None>

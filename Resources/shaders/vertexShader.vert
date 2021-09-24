@@ -203,11 +203,6 @@
 		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
 			tangentVelocityLorentz = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
 			vec4 nextTangentVelocityLorentz = tangentVelocityLorentz;
-			vec3 v = To3DVelocity(tangentVelocityLorentz);
-			float gamma = lorentzFactor(length(v));
-			vec3 n = normalize(v);
-			vec3 pParalel = dot(vp.xyz, n) * n;
-			vec3 pPerpend = vp.xyz - pParalel;
 			if (i < noOfWorldLineNodes - 2) {
 				nextTangentVelocityLorentz = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]) * speedOfLight;
 			}
@@ -215,7 +210,17 @@
 				geodeticSectionStart = geodeticSectionEnd;
 			}
 			else {			// if i == 0
-				geodeticSectionStart = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[0] - tangentVelocityLorentz / tangentVelocityLorentz.w * worldLineNodes[0].w;	// Length Contraction(vp) + object worldLine start pos;
+				vec3 v = To3DVelocity(tangentVelocityLorentz);
+				if (length(v) > 0) {
+					float gamma = lorentzFactor(length(v));
+					vec3 n = normalize(v);
+					vec3 pParalel = dot(vp.xyz, n) * n;
+					vec3 pPerpend = vp.xyz - pParalel;
+					geodeticSectionStart = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[0] - tangentVelocityLorentz / tangentVelocityLorentz.w * worldLineNodes[0].w;	// Length Contraction(vp) + object worldLine start pos;
+				}
+				else {
+					geodeticSectionStart = vp + worldLineNodes[0] - tangentVelocityLorentz / tangentVelocityLorentz.w * worldLineNodes[0].w;
+				}
 			}
 
 			offsetedStartPosLorentz = geodeticSectionStart - tangentVelocityLorentz / tangentVelocityLorentz.w * geodeticSectionStart.w;
