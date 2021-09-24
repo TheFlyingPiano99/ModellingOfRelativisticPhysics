@@ -242,7 +242,7 @@
     <ClInclude Include="Threading.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputHandling.h">
+    <ClInclude Include="InputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputHandler_Native.h">

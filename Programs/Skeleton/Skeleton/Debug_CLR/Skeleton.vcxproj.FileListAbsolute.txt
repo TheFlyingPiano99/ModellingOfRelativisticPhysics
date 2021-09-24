@@ -1,0 +1,2 @@
+D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\Skeleton\Debug_CLR\ModellingOfRelativisticPhysics.MyForm.resources
+D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\Skeleton\Debug_CLR\Skeleton.vcxproj.GenerateResource.cache
