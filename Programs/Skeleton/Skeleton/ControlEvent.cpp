@@ -118,3 +118,8 @@ void DeleteSelectedEvent::performAction(const float dt)
 {
 	Scene::getInstance()->deleteSelected();
 }
+
+void ToggleSimultaneBoost::performAction(const float dt)
+{
+	Scene::getInstance()->toggleSimultaneBoost();
+}

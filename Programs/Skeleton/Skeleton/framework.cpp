@@ -7,7 +7,7 @@
 
 #include "framework.h"
 #include "Assets.h"
-#include "Skeleton.h"
+#include "OpenGLCallbacks.h"
 
 // Initialization
 void onInitialization();

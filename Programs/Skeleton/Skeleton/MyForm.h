@@ -1,5 +1,5 @@
 #pragma once
-#include "InputHandling.h"
+#include "InputHandler.h"
 
 namespace RelativisticPhysics {
 
@@ -10,20 +10,22 @@ namespace RelativisticPhysics {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	static int argc;
-	static std::vector<const char*> argv;
 
 	/// <summary>
 	/// Summary for MyForm
 	/// </summary>
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
+	private:
+		array<System::String^>^ args;
 		InputHandler inputHandler;
+
 	private: System::Windows::Forms::Label^ label1;
 
 		public:
-			MyForm(void)
+			MyForm(array<System::String^>^ _args)
 			{
+				args = _args;
 				InitializeComponent();
 				//
 				//TODO: Add the constructor code here

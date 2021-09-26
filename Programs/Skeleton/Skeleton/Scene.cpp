@@ -353,6 +353,20 @@ void Scene::toggleShading()
 	hud->pushMessage(str.c_str());
 }
 
+void Scene::toggleSimultaneBoost()
+{
+	settings.simultaneBoost = !settings.simultaneBoost;
+	std::string str;
+	if (settings.simultaneBoost) {
+		str = "Simultane boosting set";
+	}
+	else {
+		str = "Absolute boosting set";
+	}
+
+	hud->pushMessage(str.c_str());
+}
+
 void Scene::togglePause() {
 	settings.running = !settings.running;
 	std::string str;

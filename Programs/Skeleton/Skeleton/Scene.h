@@ -146,6 +146,7 @@ public:
 
 	void toggleShading();
 
+	void toggleSimultaneBoost();
 
 	// Time manipulation:
 

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Skeleton.cpp">
+    <ClCompile Include="OpenGLCallbacks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="framework.cpp">
@@ -188,7 +188,7 @@
     <ClInclude Include="Assets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Skeleton.h">
+    <ClInclude Include="OpenGLCallbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StringOperations.h">
@@ -275,7 +275,8 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\..\Resources\shaders\vertexShader.vert">
-      <Filter>Header Files</Filter>
+      <Filter>Resource Files</Filter>
     </None>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
