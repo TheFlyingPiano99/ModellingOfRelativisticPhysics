@@ -30,8 +30,8 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = false;
-static bool terminateSym = false;
+const bool fullScreenMode = true;
+static bool terminateSym = false;	// flag for closing thread
 
 
 const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!

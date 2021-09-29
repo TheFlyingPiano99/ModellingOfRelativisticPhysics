@@ -1,35 +1,33 @@
 #include "MyForm.h"
 
+#include "InputHandler.h"
 
 using namespace System;
 using namespace System::Windows::Forms;
 
+array<String^>^ args;
+
 [STAThreadAttribute]
-void Main(array<String^>^ args)
+void Main(array<String^>^ _args)
 {
     Application::EnableVisualStyles();
     Application::SetCompatibleTextRenderingDefault(false);
-    RelativisticPhysics::MyForm form(args);
+    RelativisticPhysics::MyForm form();
     Application::Run(% form);
 }
 
 System::Void RelativisticPhysics::MyForm::startB_Click(System::Object^ sender, System::EventArgs^ e)
 {
 
-    inputHandler.startSym(args);
+    InputHandler::getInstance()->startSym(args);
     return System::Void();
 }
 
 System::Void RelativisticPhysics::MyForm::MyForm_Load(System::Object^ sender, System::EventArgs^ e)
 {
-    inputHandler.closeSym();
+    InputHandler::getInstance()->closeSym();
     return System::Void();
 }
 
-/*
-    RelativisticPhysics::argc = args->Length;
-
-    for (int i = 0; i < RelativisticPhysics::argc; i++) {
-        RelativisticPhysics::argv.push_back(mContext.marshal_as<const char*>(args[i]));
-    }
-*/
+System::Void RelativisticPhysics::MyForm::label1_Click(System::Object^ sender, System::EventArgs^ e) {
+}

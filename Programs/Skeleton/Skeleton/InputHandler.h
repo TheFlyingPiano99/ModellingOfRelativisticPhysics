@@ -8,13 +8,14 @@ using namespace msclr::interop;
 
 public ref class InputHandler {
 private:
+	static InputHandler^ instance;
 	NativeInputHandler* nativeHandler = nullptr;
 	marshal_context mContext;
 
-public:
 	InputHandler() {
 		nativeHandler = new NativeInputHandler();
 	}
+public:
 
 	~InputHandler() {
 		if (nullptr != nativeHandler)
@@ -30,6 +31,13 @@ public:
 			delete nativeHandler;
 			nativeHandler = nullptr;
 		}
+	}
+
+	static InputHandler^ getInstance() {
+		if (instance == nullptr) {
+			instance = gcnew InputHandler();
+		}
+		return instance;
 	}
 
 	inline void startSym(array<System::String^>^ args) {
