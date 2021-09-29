@@ -271,6 +271,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+<<<<<<< HEAD
     <None Include="..\..\..\Resources\shaders\fragmentShader.frag">
       <Filter>Resource Files</Filter>
     </None>
@@ -278,5 +279,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ClassDiagram1.cd" />
+=======
+>>>>>>> parent of 35d7928 (Working on Wigner rotation; Moved shader code to separate files)
   </ItemGroup>
 </Project>

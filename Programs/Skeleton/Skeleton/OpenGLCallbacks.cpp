@@ -42,32 +42,7 @@ void onInitialization() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-	std::string vSourceString, fSourceString;
-
-	// Vertex shader:
-	std::ifstream vertexSource;
-	vertexSource.open(Shaders::getShaderPath().append("vertexShader.vert"));
-	if (vertexSource.is_open()) {
-		vSourceString = std::string(std::istreambuf_iterator<char>(vertexSource), std::istreambuf_iterator<char>());
-		vertexSource.close();
-	}
-	else {
-		throw std::exception("Failed to read vertex shader!");
-	}
-	// Fragment shader:
-	std::ifstream fragmentSource;
-	fragmentSource.open(Shaders::getShaderPath().append("fragmentShader.frag"));
-	if (fragmentSource.is_open()) {
-		fSourceString = std::string(std::istreambuf_iterator<char>(fragmentSource), std::istreambuf_iterator<char>());
-		fragmentSource.close();
-	}
-	else {
-		throw std::exception("Failed to read fragment shader!");
-	}
-	gpuProgram.create(vSourceString.c_str(), fSourceString.c_str(), "outColor");
-
+	gpuProgram.create(vertexSource, fragmentSource, "outColor");
 	windowID = glutGetWindow();
 	
 	scene = Scene::getInstance();
