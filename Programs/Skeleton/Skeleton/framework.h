@@ -30,17 +30,12 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = false;
-static bool terminateSym = false;
-
+const bool fullScreenMode = true;
 
 const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!
 
 #include "ControlEventInterface.h"
 static std::vector<ControlEventInterface*> controlEvents;	// All used events;
-
-int mainSym(int argc, char* argv[]);
-
 
 //--------------------------
 struct vec2 {
@@ -571,4 +566,3 @@ inline TOut remap(const TIn startIn, const TIn endIn, const TOut startOut, TOut 
 }
 
 #endif /*!FRAMEWORK_H*/
-

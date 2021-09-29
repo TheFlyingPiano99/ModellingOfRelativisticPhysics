@@ -108,9 +108,6 @@
     <ClCompile Include="Lamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyForm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -236,18 +233,6 @@
     <ClInclude Include="Lamp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyForm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Threading.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandling.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandler_Native.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\Resources\lowRes\dice.bmp">
@@ -271,11 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
-    <None Include="..\..\..\Resources\shaders\fragmentShader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\Resources\shaders\vertexShader.vert">
-      <Filter>Header Files</Filter>
-    </None>
+    <None Include="..\..\..\Resources\shaders\vertexShader.vert" />
+    <None Include="..\..\..\Resources\shaders\fragmentShader.frag" />
   </ItemGroup>
 </Project>

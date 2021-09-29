@@ -1,3 +1,0 @@
-D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\Skeleton\Release_CLR\ModellingOfRelativisticPhysics.MyForm.resources
-D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\Skeleton\Release_CLR\Skeleton.vcxproj.GenerateResource.cache
-D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\Skeleton\Release_CLR\Skeleton.vcxproj.AssemblyReference.cache
