@@ -1,7 +1,7 @@
 #pragma once
 #include "InputHandling.h"
 
-namespace RelativisticPhysics {
+namespace ModellingOfRelativisticPhysics {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -10,9 +10,6 @@ namespace RelativisticPhysics {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	static int argc;
-	static std::vector<const char*> argv;
-
 	/// <summary>
 	/// Summary for MyForm
 	/// </summary>
@@ -20,6 +17,7 @@ namespace RelativisticPhysics {
 	{
 		InputHandler inputHandler;
 	private: System::Windows::Forms::Label^ label1;
+		   array<String^>^ args;
 
 		public:
 			MyForm(void)
@@ -29,7 +27,6 @@ namespace RelativisticPhysics {
 				//TODO: Add the constructor code here
 				//
 			}
-
 
 		protected:
 			/// <summary>

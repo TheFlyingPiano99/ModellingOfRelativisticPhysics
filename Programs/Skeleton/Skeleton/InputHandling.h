@@ -27,9 +27,8 @@ public:
 		}
 	}
 
-	inline void startSym(int argc, const char* argv[]) {
+	inline void startSym(int argc, char* argv[]) {
 		if (nativeHandler != nullptr) {
-
 			nativeHandler->startSym(argc, argv);
 		}
 	}

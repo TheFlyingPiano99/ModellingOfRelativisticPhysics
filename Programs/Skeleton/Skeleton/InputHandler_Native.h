@@ -6,11 +6,9 @@
 class NativeInputHandler {
 public:
 
-	inline void startSym(int argc, const char* argv[]) {
+	inline void startSym(int argc, char* argv[]) {
 		if (coreThread == nullptr) {
-			std::remove_const<const char**>::type t;
-			t = argv;
-			coreThread = new std::thread(mainSym, argc, (char**)t);
+			coreThread = new std::thread(mainSym, argc, argv);
 		}
 	}
 

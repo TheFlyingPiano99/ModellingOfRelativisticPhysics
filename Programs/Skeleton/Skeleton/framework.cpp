@@ -31,9 +31,11 @@ void onMouse(int button, int state, int pX, int pY);
 void onIdle();
 
 // Entry point of the application
-int main(int argc, char * argv[]) {
-	// Initialize GLUT, Glew and OpenGL
+int mainSym(int argc, char * argv[]) {
 
+	std::cout << "Hello Sym!" << std::endl;
+	return 0;
+	// Initialize GLUT, Glew and OpenGL 
 	glutInit(&argc, argv);
 
 	// OpenGL major and minor versions

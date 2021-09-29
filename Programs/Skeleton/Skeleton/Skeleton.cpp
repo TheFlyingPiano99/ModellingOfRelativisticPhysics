@@ -99,7 +99,7 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 			scene->pushBackControlEvent(event);
 		}
 	}
-	if (key == 27 || terminateSym) {
+	if (key == 27 || terminate) {
 		if (scene->askToQuit())
 			glutDestroyWindow(windowID);
 	}

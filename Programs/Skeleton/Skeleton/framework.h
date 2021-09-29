@@ -39,7 +39,7 @@ const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!
 #include "ControlEventInterface.h"
 static std::vector<ControlEventInterface*> controlEvents;	// All used events;
 
-int main(int argc, char* argv[]);
+int mainSym(int argc, char* argv[]);
 
 
 //--------------------------
