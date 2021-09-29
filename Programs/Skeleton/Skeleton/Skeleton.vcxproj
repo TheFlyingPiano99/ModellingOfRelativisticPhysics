@@ -102,7 +102,7 @@
     <ClCompile Include="RelPhysics.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SettingsBar.cpp" />
-    <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="GlutCallbacks.cpp" />
     <ClCompile Include="StringOperations.cpp" />
     <ClCompile Include="Caption.cpp" />
     <ClCompile Include="TextEntry.cpp" />
@@ -136,7 +136,7 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="SettingsBar.h" />
-    <ClInclude Include="Skeleton.h" />
+    <ClInclude Include="GlutCallbacks.h" />
     <ClInclude Include="StringOperations.h" />
     <ClInclude Include="Caption.h" />
     <ClInclude Include="Intersectable.h" />

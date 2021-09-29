@@ -7,7 +7,7 @@
 
 #include "framework.h"
 #include "Assets.h"
-#include "Skeleton.h"
+#include "GlutCallbacks.h"
 
 // Initialization
 void onInitialization();

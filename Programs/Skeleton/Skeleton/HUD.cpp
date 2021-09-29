@@ -14,6 +14,9 @@ void HUD::Animate(float dt)
 
 void HUD::Draw(GPUProgram& gpuProgram, Camera& camera)
 {
+	if (!visible) {
+		return;
+	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
 		(*cap)->Draw(gpuProgram, camera);
@@ -22,6 +25,9 @@ void HUD::Draw(GPUProgram& gpuProgram, Camera& camera)
 
 void HUD::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 {
+	if (!visible) {
+		return;
+	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
 		(*cap)->DrawDiagram(gpuProgram, camera);

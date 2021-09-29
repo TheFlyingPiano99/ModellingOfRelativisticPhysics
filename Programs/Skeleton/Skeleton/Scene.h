@@ -137,6 +137,8 @@ public:
 
 	void toggleTransformToProperFrame();
 
+	void toogleSimultaneBoost();
+
 	/*
 	* Switches between simultaneous hyperplane intersection and light cone intersection.
 	*/
@@ -145,7 +147,8 @@ public:
 	void toggleViewMode();
 
 	void toggleShading();
-
+	
+	void toggleHUD();
 
 	// Time manipulation:
 

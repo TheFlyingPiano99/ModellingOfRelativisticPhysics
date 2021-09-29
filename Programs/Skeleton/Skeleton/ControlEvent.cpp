@@ -118,3 +118,13 @@ void DeleteSelectedEvent::performAction(const float dt)
 {
 	Scene::getInstance()->deleteSelected();
 }
+
+void ToggleSimultaneBoostEvent::performAction(const float dt)
+{
+	Scene::getInstance()->toogleSimultaneBoost();
+}
+
+void ToggleHUDEvent::performAction(const float dt)
+{
+	Scene::getInstance()->toggleHUD();
+}

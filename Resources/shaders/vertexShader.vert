@@ -40,6 +40,8 @@
 	uniform bool interpolateIntersectionMode;
 	uniform float tIntersectionMode;
 
+	uniform bool simultaneBoost;
+
 	//WorldLine:
 	uniform int worldLineType;	// 0 = geodetic
 
@@ -222,10 +224,19 @@
 
 			// Get geodeticSectionEnd:
 			vec4 boostPlaneLocation = worldLineNodes[i + 1];
-			vec3 tangentVel3 = To3DVelocity(tangentVelocityLorentz);
-			vec3 nextTangentVel3 = To3DVelocity(nextTangentVelocityLorentz);
-			vec4 halfTangent = ToFourVelocity((tangentVel3 + nextTangentVel3) / 2);
-			vec4 boostPlaneNormal = normalize(vec4(-(halfTangent.xyz), halfTangent.w));
+			vec4 boostPlaneNormal;
+			if (simultaneBoost) {
+				if (i < noOfWorldLineNodes - 2) {
+					vec4 nextTangent = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]);
+					boostPlaneNormal = normalize(vec4(-(nextTangent.xyz), nextTangent.w));
+				}
+				else {
+					boostPlaneNormal = normalize(vec4(-(tangentVelocityLorentz.xyz), tangentVelocityLorentz.w));
+				}
+			}
+			else {
+				boostPlaneNormal = vec4(0, 0, 0, 1);
+			}
 			float tSectionEnd = GeodeticIntersectHyperplane(offsetedStartPosLorentz, tangentVelocityLorentz, boostPlaneLocation, boostPlaneNormal);
 			geodeticSectionEnd = GeodeticLocationAtAbsoluteTime(offsetedStartPosLorentz, tangentVelocityLorentz, tSectionEnd);					// <- To make Wigner rotation happen.
 

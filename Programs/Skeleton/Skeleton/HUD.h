@@ -28,6 +28,7 @@ class HUD
 	MessageQueue* messageQueue = NULL;
 	TextEntry* entry = NULL;							// Created, when needed.
 	SettingsBar* settingsBar = NULL;
+	bool visible = true;
 
 public:
 
@@ -50,6 +51,10 @@ public:
 
 	static HUD* getInstance() {
 		return instance;
+	}
+
+	void setVisible(bool v) {
+		visible = v;
 	}
 
 	/*

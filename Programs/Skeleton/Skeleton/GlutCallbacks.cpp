@@ -1,4 +1,4 @@
-#include "Skeleton.h"
+#include "GlutCallbacks.h"
 #include <map>
 
 
@@ -33,7 +33,8 @@ void onInitialization() {
 	controlEvents.push_back(new ToggleEditorEvent());
 	controlEvents.push_back(new ClearSceneEvent());
 	controlEvents.push_back(new DeleteSelectedEvent());
-
+	controlEvents.push_back(new ToggleSimultaneBoostEvent());
+	controlEvents.push_back(new ToggleHUDEvent());	
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
@@ -182,16 +183,19 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 
 
 static float dt = 1;
-
+static float dtLimit = 3;
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
-	static float tEnd = 0;
+	static float tEnd = 0;	// init only once
 	float tStart = tEnd;
 	tEnd = glutGet(GLUT_ELAPSED_TIME);
+
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;
 		scene->Control(DT);
 		scene->Animate(DT);
 	}
-	glutPostRedisplay();
+	if ((tEnd - tStart) < dtLimit) {
+		glutPostRedisplay();
+	}
 }

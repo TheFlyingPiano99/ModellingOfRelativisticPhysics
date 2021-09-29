@@ -284,3 +284,25 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ToggleSimultaneBoostEvent : public ControlEvent {
+public:
+	ToggleSimultaneBoostEvent()
+	{
+		keyShortcut = 'b';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class ToggleHUDEvent : public ControlEvent {
+public:
+	ToggleHUDEvent()
+	{
+		keyShortcut = 'h';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

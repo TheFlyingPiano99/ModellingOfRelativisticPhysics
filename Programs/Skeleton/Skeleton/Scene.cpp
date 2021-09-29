@@ -49,56 +49,65 @@ void Scene::Initialise()
 	//diagramLights.push_back(new LightSource(vec3(-100, -100, -100), vec3(100000, 100000, 100000), 0));
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 	diagramLights.push_back(new LightSource(vec3(-1, -1, 1), vec3(1, 1, 1), 2));
-
-	/*
+	
+	if (!initFromFile) {
 		//Observers:-------------------------------------------------
 	//1.:
-	WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
-	Observer* observer = new Observer(wrdln, "Obs1", "An observer");
-	observers.push_back(observer);
+		WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+		Observer* observer = new Observer(wrdln, "Obs1", "An observer");
+		observers.push_back(observer);
 
-	//2.:
-	wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs2's world line");
-	observer = new Observer(wrdln, "Obs2", "An observer");
-	observers.push_back(observer);
+		//2.:
+		wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs2's world line");
+		observer = new Observer(wrdln, "Obs2", "An observer");
+		observers.push_back(observer);
 
-	//3.:
-	wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs3's world line");
-	observer = new Observer(wrdln, "Obs3", "An observer");
-	observers.push_back(observer);
+		//3.:
+		wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs3's world line");
+		observer = new Observer(wrdln, "Obs3", "An observer");
+		observers.push_back(observer);
 
-	//Objects:----------------------------------------------------
-	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
-	objects.push_back(Object::createEarth(wrdln));
-
-	for (int i = 0; i < 10; i++) {
-		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		//Objects:----------------------------------------------------
+		/*
+		wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
 		objects.push_back(Object::createEarth(wrdln));
-	}
 
-	//Dice:
-	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.50f, 0.0f), "");
-	objects.push_back(Object::createDice(wrdln));
-	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.5f, 0.0f), "");
-	objects.push_back(Object::createDice(wrdln));
-	wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.50f, 0.0f), "");
-	objects.push_back(Object::createDice(wrdln));
-	for (int i = 0; i < 10; i++) {
-		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, -3.0f), vec3(0.0f, 0.0f, 0.0f), "");
-		objects.push_back(Object::createDice(wrdln));
-		wrdln = new GeodeticLine(vec3(-10.0f, -6.0f + i * 3, 9.0f), vec3(0.0f, 0.0f, 0.0f), "");
-		objects.push_back(Object::createDice(wrdln));
-	}
+		for (int i = 0; i < 10; i++) {
+			wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+			objects.push_back(Object::createEarth(wrdln));
+		}
+		*/
 
-	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 10.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
-	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 12.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
-	*/
+		//Dice:
+		/*
+		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.50f, 0.0f), "");
+		objects.push_back(Object::createDice(wrdln));
+		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.5f, 0.0f), "");
+		objects.push_back(Object::createDice(wrdln));
+		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.50f, 0.0f), "");
+		objects.push_back(Object::createDice(wrdln));
+		*/
+		for (int j = 0; j < 4; j++) {
+			for (int i = 0; i < 20; i++) {
+				wrdln = new GeodeticLine(vec3(-10.0f + j * 3, -30.0f + i * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+				objects.push_back(Object::createDice(wrdln));
+				wrdln = new GeodeticLine(vec3(-10.0f + j * 3, -30.0f + i * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+				objects.push_back(Object::createDice(wrdln));
+			}
+		}
+
+		//objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 10.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
+		//objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 12.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
+		system = new CoordinateSystem();
+	}
 
 
 	// Captions:-------------------------------------------------------
 
 	// Load from file:-------------------------------------------------
-	load("defaultSave01.txt");
+	if (initFromFile) {
+		load("defaultSave01.txt");
+	}
 	/*
 	WorldLine* wrdln = new GeodeticLine(vec3(-10.0f, -9.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "");
 	observers.push_back(new Observer(wrdln));
@@ -110,7 +119,9 @@ void Scene::Initialise()
 	background = new Background();
 
 	// Other:----------------------------------------------------------
-	//toggleActiveObserver();
+	if (!initFromFile) {
+		toggleActiveObserver();
+	}
 	hud->updateSettings(settings);
 }
 
@@ -293,6 +304,19 @@ void Scene::toggleTransformToProperFrame()
 	hud->updateSettings(settings);
 }
 
+void Scene::toogleSimultaneBoost()
+{
+	settings.simultaneBoost = !settings.simultaneBoost;
+	std::string str;
+	if (settings.simultaneBoost) {
+		str = "Simultane boost set";
+	}
+	else {
+		str = "Absolute boost set";
+	}
+	hud->pushMessage(str.c_str());
+}
+
 void Scene::toggleIntersectionMode() {
 	settings.intersectionMode = (IntersectionMode)((2 > settings.intersectionMode.get() + 1) ? (settings.intersectionMode.get() + 1) : 0);
 	std::string str("Intersection mode: ");
@@ -351,6 +375,13 @@ void Scene::toggleShading()
 		str = std::string("Shading disabled");
 	}
 	hud->pushMessage(str.c_str());
+}
+
+void Scene::toggleHUD()
+{
+	static bool visible = true;
+	visible = !visible;
+	hud->setVisible(visible);
 }
 
 void Scene::togglePause() {
