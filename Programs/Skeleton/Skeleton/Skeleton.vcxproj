@@ -306,6 +306,8 @@
     <Image Include="..\..\..\Resources\lowRes\stars_milky_way.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Resources\shaders\fragmentShader.frag" />
+    <None Include="..\..\..\Resources\shaders\vertexShader.vert" />
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
