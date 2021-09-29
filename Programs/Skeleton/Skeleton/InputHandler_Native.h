@@ -10,7 +10,7 @@ public:
 		if (coreThread == nullptr) {
 			std::remove_const<const char**>::type t;
 			t = argv;
-			coreThread = new std::thread(main, argc, (char**)t);
+			coreThread = new std::thread(mainSym, argc, (char**)t);
 		}
 	}
 

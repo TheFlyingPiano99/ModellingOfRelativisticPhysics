@@ -71,7 +71,6 @@ struct Settings {
 	int diagramZ;
 	int diagramNotVisualised;
 	bool editorMode = false;
-	bool simultaneBoost = true;		// World line boostsing is applied in simultaneity.
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(false, "textMode");
@@ -96,8 +95,6 @@ struct Settings {
 		gpuProgram.setUniform(diagramX, "diagramX");
 		gpuProgram.setUniform(diagramY, "diagramY");
 		gpuProgram.setUniform(diagramZ, "diagramZ");
-
-		gpuProgram.setUniform(simultaneBoost, "simultaneBoost");
 	}
 };
 

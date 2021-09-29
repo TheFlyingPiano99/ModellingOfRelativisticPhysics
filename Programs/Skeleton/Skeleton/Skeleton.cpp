@@ -1,4 +1,4 @@
-#include "OpenGLCallbacks.h"
+#include "Skeleton.h"
 #include <map>
 
 
@@ -33,7 +33,6 @@ void onInitialization() {
 	controlEvents.push_back(new ToggleEditorEvent());
 	controlEvents.push_back(new ClearSceneEvent());
 	controlEvents.push_back(new DeleteSelectedEvent());
-	controlEvents.push_back(new ToggleSimultaneBoost());
 
 
 	glViewport(0, 0, windowWidth, windowHeight);

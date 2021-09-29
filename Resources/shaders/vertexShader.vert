@@ -40,8 +40,6 @@
 	uniform bool interpolateIntersectionMode;
 	uniform float tIntersectionMode;
 
-	uniform bool simultaneBoost;
-
 	//WorldLine:
 	uniform int worldLineType;	// 0 = geodetic
 
@@ -204,10 +202,14 @@
 		// Find tLorentz:
 		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
 			tangentVelocityLorentz = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
+			vec4 nextTangentVelocityLorentz = tangentVelocityLorentz;
+			if (i < noOfWorldLineNodes - 2) {
+				nextTangentVelocityLorentz = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]) * speedOfLight;
+			}
 			if (i > 0) {							// Get geodeticSectionStart:
 				geodeticSectionStart = geodeticSectionEnd;
 			}
-			else {			// if i == 0	(First section start is calculated from vertex data, offset by the reference worldLine's start location and length contraction)
+			else {			// if i == 0
 				vec3 v = To3DVelocity(tangentVelocityLorentz);
 				if (length(v) > 0) {
 					float gamma = lorentzFactor(length(v));
@@ -225,24 +227,10 @@
 
 			// Get geodeticSectionEnd:
 			vec4 boostPlaneLocation = worldLineNodes[i + 1];
-			vec4 boostPlaneNormal;
-			if (i < noOfWorldLineNodes - 2) {
-				vec4 nextTangent = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]);
-				if (simultaneBoost) {
-					boostPlaneNormal = vec4(-(nextTangent.xyz), nextTangent.w);
-				}
-				else {
-					boostPlaneNormal = vec4(0, 0, 0, 1);
-				}
-			}
-			else {
-				if (simultaneBoost) {
-					boostPlaneNormal = normalize(vec4(-(tangentVelocityLorentz.xyz), tangentVelocityLorentz.w));\
-				}
-				else {
-					boostPlaneNormal = vec4(0, 0, 0, 1);
-				}
-			}
+			vec3 tangentVel3 = To3DVelocity(tangentVelocityLorentz);
+			vec3 nextTangentVel3 = To3DVelocity(nextTangentVelocityLorentz);
+			vec4 halfTangent = ToFourVelocity((tangentVel3 + nextTangentVel3) / 2);
+			vec4 boostPlaneNormal = normalize(vec4(-(halfTangent.xyz), halfTangent.w));
 			float tSectionEnd = GeodeticIntersectHyperplane(offsetedStartPosLorentz, tangentVelocityLorentz, boostPlaneLocation, boostPlaneNormal);
 			geodeticSectionEnd = GeodeticLocationAtAbsoluteTime(offsetedStartPosLorentz, tangentVelocityLorentz, tSectionEnd);					// <- To make Wigner rotation happen.
 
