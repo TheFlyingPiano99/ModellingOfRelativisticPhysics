@@ -29,6 +29,8 @@ void onInitialization() {
 	controlEvents.push_back(new MoveCameraBackwardEvent());
 	controlEvents.push_back(new MoveCameraLeftEvent());
 	controlEvents.push_back(new MoveCameraRightEvent());
+	controlEvents.push_back(new MoveCameraUpEvent());
+	controlEvents.push_back(new MoveCameraDownEvent());
 	controlEvents.push_back(new SaveEvent());
 	controlEvents.push_back(new LoadEvent());
 	controlEvents.push_back(new ToggleEditorEvent());

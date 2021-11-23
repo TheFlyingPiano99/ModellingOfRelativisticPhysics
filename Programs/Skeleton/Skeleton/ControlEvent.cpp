@@ -133,3 +133,8 @@ void ToggleDisplayIntersectableEvent::performAction(const float dt)
 {
 	Scene::getInstance()->toggleDisplayIntersectable();
 }
+
+void MoveCameraDownEvent::performAction(const float dt)
+{
+	Scene::getInstance()->moveCamera(vec3(0, 0, -1) * dt * Scene::getInstance()->getCameraVelocity());
+}

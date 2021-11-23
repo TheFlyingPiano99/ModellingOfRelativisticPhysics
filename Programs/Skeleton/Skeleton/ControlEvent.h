@@ -150,6 +150,17 @@ public:
 	virtual void performAction(const float dt) override;
 };
 
+class MoveCameraDownEvent : public ControlEvent {
+public:
+	MoveCameraDownEvent()
+	{
+		keyShortcut = '.';
+	}
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+
 class MoveCameraLeftEvent : public ControlEvent {
 public:
 	MoveCameraLeftEvent()

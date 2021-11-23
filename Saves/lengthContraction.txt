@@ -33,7 +33,7 @@ GeodeticLine
 ID 4
 name Traveling
 description 
-locationAtZeroT 0.000000 -5.000000 1.500000 0.000000
+locationAtZeroT -5.000000 -5.000000 1.500000 0.000000
 fourVelocity 0.668965 0.000000 0.000000 0.743294
 !GeodeticLine
 

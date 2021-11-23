@@ -30,7 +30,7 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = false;
+const bool fullScreenMode = true;
 #define WINDOW_TITLE "RelativisticPhysics"
 const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!
 
@@ -125,6 +125,7 @@ struct mat4 { // row-major matrix 4x4
 //---------------------------
 	vec4 rows[4];
 public:
+
 	mat4() {}
 	mat4(float m00, float m01, float m02, float m03,
 		float m10, float m11, float m12, float m13,

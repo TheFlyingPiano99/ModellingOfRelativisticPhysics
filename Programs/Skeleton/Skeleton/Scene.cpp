@@ -305,7 +305,9 @@ void Scene::zoomCamera(float delta) {
 
 void Scene::moveCamera(vec3 delta)
 {
-	activeCamera->move(delta);
+	if (settings.viewMode == ViewMode::diagram) {
+		activeCamera->move(delta);
+	}
 }
 
 

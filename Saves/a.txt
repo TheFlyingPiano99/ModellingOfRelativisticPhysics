@@ -15,49 +15,33 @@ worldLine 0
 
 GeodeticLine
 ID 2
-name Speeding dice world line v = 0.75c
+name Staying
 description 
-locationAtZeroT 10.000000 -6.000000 0.000000 0.000000
-fourVelocity 0.000000 0.600000 0.000000 0.800000
+locationAtZeroT 0.000000 -5.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
 !GeodeticLine
 
 Object
-type 1
+type 0
 ID 3
-name Fast dice
-description v = 0.75c
+name Earth
+description Inhabited planet
 worldLine 2
 !Object
 
 GeodeticLine
 ID 4
-name Standing dice world line no 1
+name Traveling
 description 
-locationAtZeroT 10.000000 0.000000 3.000000 0.000000
-fourVelocity 0.000000 0.000000 0.000000 1.000000
+locationAtZeroT -5.000000 -5.000000 1.500000 0.000000
+fourVelocity 0.668965 0.000000 0.000000 0.743294
 !GeodeticLine
 
 Object
-type 1
+type 0
 ID 5
-name Standing dice
-description 
+name Earth
+description Inhabited planet
 worldLine 4
-!Object
-
-GeodeticLine
-ID 6
-name Standing dice world line no 2
-description 
-locationAtZeroT 10.000000 0.000000 -3.000000 0.000000
-fourVelocity 0.000000 0.000000 0.000000 1.000000
-!GeodeticLine
-
-Object
-type 1
-ID 7
-name Standing dice
-description 
-worldLine 6
 !Object
 
