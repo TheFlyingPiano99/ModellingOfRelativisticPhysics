@@ -31,7 +31,7 @@ protected:
 	WorldLine(std::string _name = "", std::string _desc = "");
 
 	virtual void genGeometry() = 0;
-
+	
 public:
 
 	~WorldLine();

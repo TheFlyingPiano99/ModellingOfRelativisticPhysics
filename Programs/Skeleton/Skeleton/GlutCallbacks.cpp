@@ -1,5 +1,6 @@
 #include "GlutCallbacks.h"
 #include <map>
+#include <queue>
 
 
 
@@ -35,6 +36,7 @@ void onInitialization() {
 	controlEvents.push_back(new DeleteSelectedEvent());
 	controlEvents.push_back(new ToggleSimultaneBoostEvent());
 	controlEvents.push_back(new ToggleHUDEvent());	
+	controlEvents.push_back(new ToggleDisplayIntersectableEvent());
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
@@ -84,6 +86,9 @@ void onDisplay() {
 
 }
 
+
+bool escDown = false;
+
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
 
@@ -100,15 +105,22 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 			scene->pushBackControlEvent(event);
 		}
 	}
+
 	if (key == 27) {
-		if (scene->askToQuit())
-			glutDestroyWindow(windowID);
+		if (!escDown) {
+			escDown = true;
+			if (scene->askToQuit())
+				glutDestroyWindow(windowID);
+		}
 	}
 
 }
 
 // Key of ASCII code released
 void onKeyboardUp(unsigned char key, int pX, int pY) {
+	if (key == 27) {
+		escDown = false;
+	}
 }
 
 MouseState mouseState;
@@ -182,13 +194,38 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 }
 
 
-static float dt = 1;
-static float dtLimit = 3;
+static float dt = 1.0f;
+static float dtLimit = 3.0f;
+
+static std::vector<float> fpsBuffer;
+static float fpsTimer = 0.0f;
+static int fpsIterCount = 0;
+
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
 	static float tEnd = 0;	// init only once
 	float tStart = tEnd;
 	tEnd = glutGet(GLUT_ELAPSED_TIME);
+
+	fpsTimer += tEnd - tStart;
+	fpsIterCount++;
+	if (fpsTimer > 500) {
+		float fps = (float)fpsIterCount / fpsTimer * 1000.0f;
+		fpsBuffer.push_back(fps);
+		if (fpsBuffer.size() > 50) {
+			fpsBuffer.erase(fpsBuffer.begin());
+		}
+
+		float sum = 0;
+		for (int i = 0; i < fpsBuffer.size(); i++) {
+			sum += fpsBuffer[i];
+		}
+		float averageFPS = sum / (float)fpsBuffer.size();
+		glutSetWindowTitle(std::string(WINDOW_TITLE).append("   FPS: ").append(std::to_string(fps))
+			.append(" Average FPS: ").append(std::to_string(averageFPS)).c_str());
+		fpsTimer = 0.0f;
+		fpsIterCount = 0;
+	}
 
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;

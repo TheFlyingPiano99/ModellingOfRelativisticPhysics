@@ -101,8 +101,8 @@ namespace RelPhysics
 			vec3 r = vec3(toTransform.x, toTransform.y, toTransform.z);
 			float t = toTransform.w;
 			vec3 n = normalize(v);
-			float tTrans = gamma * (t - dot(vLength * n, r) / speedOfLight / speedOfLight);
-			vec3 rTrans = r + (gamma - 1) * dot(r, n) * n - gamma * t * vLength * n;
+			float tTrans = gamma * (t - dot(v, r) / speedOfLight / speedOfLight);
+			vec3 rTrans = r + (gamma - 1) * dot(r, n) * n - gamma * t * v;
 			return vec4(rTrans.x, rTrans.y, rTrans.z, tTrans);
 		}
 		else {

@@ -57,6 +57,7 @@ public:
 	}
 
 	void erease() {
+		setVisible(false);
 		ereaseCaption(sharedThis);
 	}
 

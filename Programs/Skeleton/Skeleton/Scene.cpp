@@ -7,7 +7,13 @@
 #include "Assets.h"
 #include "Plane.h"
 
+
+const bool initFromFile = false;
+
+
 Scene* Scene::instance = NULL;
+
+
 
 void Scene::Initialise()
 {
@@ -31,7 +37,7 @@ void Scene::Initialise()
 
 	//Camera:
 	realTime3DCamera = new Camera();
-	realTime3DCamera->initBasic(vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
+	realTime3DCamera->initBasic(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 0.5f, 130.0f);
 	diagramCamera = new Camera();
 	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
 
@@ -43,70 +49,36 @@ void Scene::Initialise()
 	}
 
 	//LightSources:----------------------------------------------
+	/*
 	lights.push_back(new LightSource(vec3(70, 50, 50), vec3(1000, 1000, 1000), 0));
 	lights.push_back(new LightSource(vec3(-60, -10, 10), vec3(500, 500, 500), 1));
 	lights.push_back(new LightSource(vec3(-1, 1, 1), vec3(0.01, 0.01, 0.01), 2));
 	//diagramLights.push_back(new LightSource(vec3(-100, -100, -100), vec3(100000, 100000, 100000), 0));
 	diagramLights.push_back(new LightSource(vec3(100, 100, 100), vec3(100000, 100000, 100000), 1));
 	diagramLights.push_back(new LightSource(vec3(-1, -1, 1), vec3(1, 1, 1), 2));
-	
-	if (!initFromFile) {
-		//Observers:-------------------------------------------------
-	//1.:
-		WorldLine* wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
-		Observer* observer = new Observer(wrdln, "Obs1", "An observer");
-		observers.push_back(observer);
+	*/
 
-		//2.:
-		wrdln = new GeodeticLine(vec3(0.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obs2's world line");
-		observer = new Observer(wrdln, "Obs2", "An observer");
-		observers.push_back(observer);
+	lights.push_back(new LightSource(vec3(-70, 50, 50), vec3(1000, 1000, 1000), 0));
 
-		//3.:
-		wrdln = new GeodeticLine(vec3(-20.0f, 10.0f, 0.0f), vec3(0.93f, 0.0f, 0.0f), "Obs3's world line");
-		observer = new Observer(wrdln, "Obs3", "An observer");
-		observers.push_back(observer);
+	lights.push_back(new LightSource(vec3(70, -50, 50), vec3(1000, 1000, 1000), 1));
 
-		//Objects:----------------------------------------------------
-		/*
-		wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
-		objects.push_back(Object::createEarth(wrdln));
+	lights.push_back(new LightSource(vec3(-1, 1, -1), vec3(0.01, 0.01, 0.01), 2));
 
-		for (int i = 0; i < 10; i++) {
-			wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
-			objects.push_back(Object::createEarth(wrdln));
-		}
-		*/
+	//-----------------------------------------------------------------
 
-		//Dice:
-		/*
-		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 0.0f), vec3(0.0f, 0.50f, 0.0f), "");
-		objects.push_back(Object::createDice(wrdln));
-		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 3.0f), vec3(0.0f, 0.5f, 0.0f), "");
-		objects.push_back(Object::createDice(wrdln));
-		wrdln = new CompositeLine(vec3(-10.0f, -6.0f, 6.0f), vec3(0.0f, 0.50f, 0.0f), "");
-		objects.push_back(Object::createDice(wrdln));
-		*/
-		for (int j = 0; j < 4; j++) {
-			for (int i = 0; i < 20; i++) {
-				wrdln = new GeodeticLine(vec3(-10.0f + j * 3, -30.0f + i * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
-				objects.push_back(Object::createDice(wrdln));
-				wrdln = new GeodeticLine(vec3(-10.0f + j * 3, -30.0f + i * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
-				objects.push_back(Object::createDice(wrdln));
-			}
-		}
+	diagramLights.push_back(new LightSource(vec3(-70, 50, 50), vec3(1000, 1000, 1000), 0));
 
-		//objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 10.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
-		//objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 12.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), "")));
-		system = new CoordinateSystem();
-	}
+	diagramLights.push_back(new LightSource(vec3(70, -50, 50), vec3(10000, 10000, 10000), 1));
 
+	diagramLights.push_back(new LightSource(vec3(-1, 1, -1), vec3(0.02, 0.02, 0.02), 2));
 
-	// Captions:-------------------------------------------------------
 
 	// Load from file:-------------------------------------------------
 	if (initFromFile) {
 		load("defaultSave01.txt");
+	}
+	else {
+		loadDefault();
 	}
 	/*
 	WorldLine* wrdln = new GeodeticLine(vec3(-10.0f, -9.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "");
@@ -119,10 +91,96 @@ void Scene::Initialise()
 	background = new Background();
 
 	// Other:----------------------------------------------------------
-	if (!initFromFile) {
-		toggleActiveObserver();
-	}
 	hud->updateSettings(settings);
+}
+
+void Scene::loadDefault()
+{
+	WorldLine* wrdln;
+	Observer* observer;
+
+	//Observers:-------------------------------------------------
+	//1.
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	observer = new Observer(wrdln, "Obs1", "An observer");
+	observers.push_back(observer);
+
+	//2.:
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(-0.9f, 0.0f, 0.0f), "Obs2's world line");
+	observer = new Observer(wrdln, "Obs2", "An observer");
+	observers.push_back(observer);
+
+	//3.:
+	/*
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.9f, 0.0f, 0.0f), "Obs3's world line");
+	observer = new Observer(wrdln, "Obs3", "An observer");
+	observers.push_back(observer);
+	*/
+
+	//Objects:----------------------------------------------------
+	/*
+	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
+	objects.push_back(Object::createEarth(wrdln));
+
+	for (int i = 0; i < 10; i++) {
+		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		objects.push_back(Object::createEarth(wrdln));
+	}
+	*/
+
+	/*
+	//Dice:
+	wrdln = new GeodeticLine(vec3(10.0f, -6.0f, 0.0f), vec3(0.0f, 0.75f, 0.0f), "Speeding dice world line v = 0.75c");
+	Object* dice = Object::createDice(wrdln);
+	dice->setName("Fast dice");
+	dice->setDescription("v = 0.75c");
+	objects.push_back(dice);
+
+	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, 3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 1");
+	dice = Object::createDice(wrdln);
+	dice->setName("Standing dice");
+	dice->setDescription("");
+	objects.push_back(dice);
+
+	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, -3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 2");
+	dice = Object::createDice(wrdln);
+	dice->setName("Standing dice");
+	dice->setDescription("");
+	objects.push_back(dice);
+	*/
+
+	/*
+	for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < 10; i++) {
+			wrdln = new GeodeticLine(vec3(10.0f + j * 3, -15.0f + (i) * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			objects.push_back(Object::createDice(wrdln));
+			wrdln = new GeodeticLine(vec3(10.f + j * 3, -15.0f + (i) * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			objects.push_back(Object::createDice(wrdln));
+		}
+	}
+	*/
+	
+	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 0, 0), vec3(0.0f, 0.0f, 0.0f), "Staying ship")));
+	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 0, 0), vec3(0.0f, 0.0f, 0.0f), "Traveling ship")));
+	
+	/*
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(0, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(2, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(4, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(6, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(8, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(10, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-2, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-4, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-6, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-8, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-10, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
+	*/
+
+
+	system = new CoordinateSystem();
+	toggleActiveObserver();
 }
 
 void Scene::Control(float dt) {
@@ -174,9 +232,11 @@ void Scene::Animate(float dt) {
 	if (settings.running) {
 
 		dt *= timeScale;					// Scale time to symulation speed.
+		
 		if (activeObserver != nullptr) {
 			activeObserver->syncCamera(realTime3DCamera, settings);
 		}
+		
 		for each (Object * obj in objects)
 		{
 			obj->Animate(dt);
@@ -245,9 +305,7 @@ void Scene::zoomCamera(float delta) {
 
 void Scene::moveCamera(vec3 delta)
 {
-	if (settings.viewMode == ViewMode::diagram) {
-		activeCamera->move(delta);
-	}
+	activeCamera->move(delta);
 }
 
 
@@ -382,6 +440,11 @@ void Scene::toggleHUD()
 	static bool visible = true;
 	visible = !visible;
 	hud->setVisible(visible);
+}
+
+void Scene::toggleDisplayIntersectable()
+{
+	settings.displayIntersectable = !settings.displayIntersectable;
 }
 
 void Scene::togglePause() {
@@ -579,11 +642,11 @@ void Scene::deleteSelected()
 		int i = 0;
 		for (; i < objects.size(); i++) {
 			if (objects[i] == selected) {
+				delete objects[i];
+				objects.erase(objects.begin() + i);
 				break;
 			}
 		}
-		objects.erase(objects.begin() + i);
-		delete selected;
 	}
 }
 

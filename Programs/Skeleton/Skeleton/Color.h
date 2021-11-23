@@ -79,7 +79,7 @@ static vec3 waveLengthToRGB(double Wavelength) {
         factor = 1.0;
     }
     else if ((Wavelength >= 701) && (Wavelength < 781)) {
-        factor = 0.3 + 0.7 * (780 - Wavelength) / (double)(780 - 700);
+        factor = 0.3 + 0.7 * (double)(780 - Wavelength) / (double)(780 - 700);
     }
     else {
         factor = 0.0;

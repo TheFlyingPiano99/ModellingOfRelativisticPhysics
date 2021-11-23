@@ -61,7 +61,7 @@ Object* Object::createSpaceship(WorldLine* wrdln)
 		vec3(0, 0, 1),
 		wrdln,
 		Assets::getSpaceshipGeometry(),
-		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 80),		// RealTime3D material
+		new Material(vec3(3, 3, 3), vec3(10, 10, 10), vec3(5, 6, 5), 80),		// RealTime3D material
 		diagramM,		// Diagram material
 		new AdvancedTexture(Assets::getTexturePath().append("spaceship.bmp").c_str(), "", ""),
 		"Spaceship",
@@ -93,7 +93,7 @@ void Object::Animate(float dt) {
 	//Todo
 }
 
-void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings) {
+void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const ObserverProperties& observerProperties, const Settings& settings) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
@@ -136,7 +136,10 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 		else {
 			tau = t;
 		}
-		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m").c_str());
+		float vLorentz = length(RelPhysics::lorentzTransformationOfVelocity(RelPhysics::To3DVelocity(worldLine->getVelocityAtAbsoluteTime(t)), RelPhysics::To3DVelocity(observerProperties.velocity)));
+		float vGalilean = length(RelPhysics::galileanTransformationOfVelocity(RelPhysics::To3DVelocity(worldLine->getVelocityAtAbsoluteTime(t)), RelPhysics::To3DVelocity(observerProperties.velocity)));
+		float v = interpolate(settings.doLorentz, true, false, vLorentz, vGalilean);
+		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m\n").append("v = ").append(std::to_string(v)).append("c").c_str());
 	}
 	else {
 		(*diagramCaption)->setVisible(false);
@@ -193,7 +196,8 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 		else {
 			tau = t;
 		}
-		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m").c_str());
+		float v = length(RelPhysics::To3DVelocity(observerProperties.velocity) - RelPhysics::To3DVelocity(worldLine->getVelocityAtAbsoluteTime(t)));
+		(*diagramCaption)->changeText(getName().append("\n").append("age = ").append(std::to_string(tau)).append(" m\n").append("v = ").append(std::to_string(v)).append("c").c_str());
 	}
 	else {
 		(*diagramCaption)->setVisible(false);

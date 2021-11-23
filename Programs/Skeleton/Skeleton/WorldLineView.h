@@ -14,7 +14,7 @@ protected:
 
 public:
 	WorldLineView(const WorldLine* _model);
-	~WorldLineView();
+	virtual ~WorldLineView();
 
 	virtual void Draw() = 0;
 	virtual void DrawDiagram() = 0;
@@ -40,6 +40,8 @@ public:
 	}
 
 	~GeodeticLineView() {
+		glDeleteBuffers(1, &vbo);
+		glDeleteVertexArrays(1, &vao);
 		(**locationAtZeroTCaption).erease();
 		(**velocityCaption).erease();
 	}
@@ -69,6 +71,8 @@ public:
 	}
 
 	~CompositeLineView() {
+		glDeleteBuffers(1, &vbo);
+		glDeleteVertexArrays(1, &vao);
 		for (int i = 0; i < controlPoints.size(); i++) {
 			(**pointCaptions[i]).erease();
 		}

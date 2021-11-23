@@ -128,3 +128,8 @@ void ToggleHUDEvent::performAction(const float dt)
 {
 	Scene::getInstance()->toggleHUD();
 }
+
+void ToggleDisplayIntersectableEvent::performAction(const float dt)
+{
+	Scene::getInstance()->toggleDisplayIntersectable();
+}

@@ -1,0 +1,55 @@
+GeodeticLine
+ID 0
+name Obs1's world line
+description 
+locationAtZeroT 0.000000 0.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Observer
+ID 1
+name Obs1
+description An observer
+worldLine 0
+!Observer
+
+CompositeLine
+ID 2
+name Staying twin
+description 
+noOfControlPoints 3
+controlPoints
+0.000000 -10.000000 0.000000 0.000000
+0.000000 -10.000000 0.000000 25.000000
+0.000000 -10.000000 0.000000 50.000000
+!controlPoints
+!CompositeLine
+
+Object
+type 2
+ID 3
+name Spaceship
+description Wruuuhm!!!
+worldLine 2
+!Object
+
+CompositeLine
+ID 4
+name Traveling twin
+description 
+noOfControlPoints 3
+controlPoints
+0.000000 -10.000000 0.000000 0.000000
+22.500000 -10.000000 0.000000 25.000000
+0.000000 -10.000000 0.000000 50.000000
+!controlPoints
+!CompositeLine
+
+Object
+type 2
+ID 5
+name Spaceship
+description Wruuuhm!!!
+worldLine 4
+!Object
+

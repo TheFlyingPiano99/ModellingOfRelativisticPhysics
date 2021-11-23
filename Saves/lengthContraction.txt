@@ -1,0 +1,47 @@
+GeodeticLine
+ID 0
+name Obs1's world line
+description 
+locationAtZeroT 0.000000 0.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Observer
+ID 1
+name Obs1
+description An observer
+worldLine 0
+!Observer
+
+GeodeticLine
+ID 2
+name Staying
+description 
+locationAtZeroT 0.000000 -5.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Object
+type 0
+ID 3
+name Earth
+description Inhabited planet
+worldLine 2
+!Object
+
+GeodeticLine
+ID 4
+name Traveling
+description 
+locationAtZeroT 0.000000 -5.000000 1.500000 0.000000
+fourVelocity 0.668965 0.000000 0.000000 0.743294
+!GeodeticLine
+
+Object
+type 0
+ID 5
+name Earth
+description Inhabited planet
+worldLine 4
+!Object
+

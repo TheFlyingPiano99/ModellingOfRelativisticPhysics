@@ -12,7 +12,6 @@ void GeodeticLineView::DrawDiagram()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glLineWidth(3);
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
-
 }
 
 void GeodeticLineView::disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const Settings& settings)

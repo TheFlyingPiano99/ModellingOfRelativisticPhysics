@@ -30,9 +30,8 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 1920, windowHeight = 1080;
-const bool fullScreenMode = true;
-const bool initFromFile = true;
-
+const bool fullScreenMode = false;
+#define WINDOW_TITLE "RelativisticPhysics"
 const unsigned int shaderWorldLineResolution = 1000;		// Hardcoded in shader!
 
 #include "ControlEventInterface.h"

@@ -111,7 +111,7 @@ public:
 
 	void Animate(float dt);
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const Settings& settings);
+	void Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const ObserverProperties& observerProperties, const Settings& settings);
 
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone& cone, const Hyperplane& plane, const ObserverProperties& observerProperties, const Settings& settings);
 

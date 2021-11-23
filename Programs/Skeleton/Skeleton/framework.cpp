@@ -77,6 +77,8 @@ int main(int argc, char * argv[]) {
 	HWND hWnd = GetConsoleWindow();
 	ShowWindow(hWnd, SW_HIDE);
 
+	glutSetWindowTitle(WINDOW_TITLE);
+
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 	glutMainLoop();
 

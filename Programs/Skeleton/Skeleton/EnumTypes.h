@@ -72,6 +72,7 @@ struct Settings {
 	int diagramNotVisualised;
 	bool editorMode = false;
 	bool simultaneBoost = true;
+	bool displayIntersectable = true;
 
 	void loadOnGPU(GPUProgram& gpuProgram) {
 		gpuProgram.setUniform(false, "textMode");

@@ -23,7 +23,8 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *lightCone, *hyperplane, scene->getSettings());	// Objects
+		Settings settings = scene->getSettings();
+		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *lightCone, *hyperplane, scene->getActiveObserver()->getProperties(settings), settings);	// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{

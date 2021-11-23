@@ -167,6 +167,9 @@ void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const Settings& 
 
 void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const ObserverProperties& observerProperties, const Settings& settings)
 {
+	if (!settings.displayIntersectable) {
+		return;
+	}
 	if (settings.intersectionMode.get() == IntersectionMode::lightCone) {
 		DrawLightCone(gpuProgram, camera, settings);
 	}

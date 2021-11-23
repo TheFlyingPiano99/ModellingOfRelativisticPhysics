@@ -306,3 +306,14 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ToggleDisplayIntersectableEvent : public ControlEvent {
+public:
+	ToggleDisplayIntersectableEvent()
+	{
+		keyShortcut = 'p';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

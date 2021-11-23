@@ -91,7 +91,6 @@ WorldLine::WorldLine(std::string _name, std::string _desc) : Entity(_name, _desc
 }
 
 WorldLine::~WorldLine() {
-
 }
 
 /*

@@ -22,7 +22,7 @@
 
 class Scene {
 	static Scene* instance;
-	float timeScale = 0.002f; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
+	float timeScale = 0.005f; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float cameraVelocity = 1;
 	View* view;
 	Camera* realTime3DCamera = NULL;
@@ -109,6 +109,8 @@ public:
 	*/
 	void Initialise();
 
+	void loadDefault();
+
 	void Control(float dt);
 
 	void Animate(float dt);
@@ -149,6 +151,8 @@ public:
 	void toggleShading();
 	
 	void toggleHUD();
+
+	void toggleDisplayIntersectable();
 
 	// Time manipulation:
 
@@ -203,6 +207,10 @@ public:
 		return &lights;
 	}
 
+	std::vector<LightSource*>* getDiagramLights() {
+		return &diagramLights;
+	}
+
 	Background* getBackground() {
 		return background;
 	}
@@ -213,10 +221,6 @@ public:
 
 	std::vector<Object*>* getObjects() {
 		return &objects;
-	}
-
-	std::vector<LightSource*>* getDiagramLights() {
-		return &diagramLights;
 	}
 
 	std::vector<Observer*>* getObservers() {
@@ -269,6 +273,11 @@ public:
 	* Returns true if quiting is permitted.
 	*/
 	bool askToQuit() {
+		if (selected != nullptr) {
+			selected->deselect();
+			selected = nullptr;
+			return false;
+		}
 		return allowQuit;
 	}
 

@@ -1,0 +1,63 @@
+GeodeticLine
+ID 0
+name Obs1's world line
+description 
+locationAtZeroT 0.000000 0.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Observer
+ID 1
+name Obs1
+description An observer
+worldLine 0
+!Observer
+
+GeodeticLine
+ID 2
+name Speeding dice world line v = 0.75c
+description 
+locationAtZeroT 10.000000 -6.000000 0.000000 0.000000
+fourVelocity 0.000000 0.600000 0.000000 0.800000
+!GeodeticLine
+
+Object
+type 1
+ID 3
+name Fast dice
+description v = 0.75c
+worldLine 2
+!Object
+
+GeodeticLine
+ID 4
+name Standing dice world line no 1
+description 
+locationAtZeroT 10.000000 0.000000 3.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Object
+type 1
+ID 5
+name Standing dice
+description 
+worldLine 4
+!Object
+
+GeodeticLine
+ID 6
+name Standing dice world line no 2
+description 
+locationAtZeroT 10.000000 0.000000 -3.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Object
+type 1
+ID 7
+name Standing dice
+description 
+worldLine 6
+!Object
+
