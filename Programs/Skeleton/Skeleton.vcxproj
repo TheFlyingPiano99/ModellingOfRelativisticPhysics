@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B83E48F-726D-48E2-93F3-06B9AEE4BF72}</ProjectGuid>
+    <RootNamespace>ModellingOfRelativisticPhysics</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ModellingOfRelativisticPhysics</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\glew-1.13.0\include\;$(SolutionDir)..\Libs\freeglut\include\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\Libs\freeglut\lib;$(SolutionDir)..\..\Libs\glew-1.13.0\lib\Release\Win32\;$(SolutionDir)..\..\Libs\devil-1.7.8\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\Libs\glew-1.13.0\include\;$(SolutionDir)..\..\Libs\freeglut\include\;$(SolutionDir)..\..\Libs\devil-1.7.8\include\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\Libs\freeglut\lib;$(SolutionDir)..\..\Libs\glew-1.13.0\lib\Release\Win32\;$(SolutionDir)..\..\Libs\devil-1.7.8\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>NotSet</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AdvancedTexture.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ControlEvent.cpp" />
+    <ClCompile Include="CoordinateSystem.cpp" />
+    <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="framework.cpp" />
+    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="Hyperplane.cpp" />
+    <ClCompile Include="ImGUIAdapter.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_glut.cpp" />
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Interpolatable.cpp" />
+    <ClCompile Include="Lamp.cpp" />
+    <ClCompile Include="LightCone.cpp" />
+    <ClCompile Include="MenuSystem.cpp" />
+    <ClCompile Include="MessageQueue.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="RelPhysics.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SettingsBar.cpp" />
+    <ClCompile Include="GlutCallbacks.cpp" />
+    <ClCompile Include="StringOperations.cpp" />
+    <ClCompile Include="Caption.cpp" />
+    <ClCompile Include="TextEntry.cpp" />
+    <ClCompile Include="View.cpp" />
+    <ClCompile Include="WorldLine.cpp" />
+    <ClCompile Include="WorldLineView.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AdvancedTexture.h" />
+    <ClInclude Include="Background.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="ControlEvent.h" />
+    <ClInclude Include="CoordinateSystem.h" />
+    <ClInclude Include="Assets.h" />
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EnumTypes.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="IControlEvent.h" />
+    <ClInclude Include="HUD.h" />
+    <ClInclude Include="ImGUIAdapter.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_glut.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Interpolatable.h" />
+    <ClInclude Include="Lamp.h" />
+    <ClInclude Include="LightSource.h" />
+    <ClInclude Include="MenuSystem.h" />
+    <ClInclude Include="MessageQueue.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="SettingsBar.h" />
+    <ClInclude Include="GlutCallbacks.h" />
+    <ClInclude Include="StringOperations.h" />
+    <ClInclude Include="Caption.h" />
+    <ClInclude Include="Intersectable.h" />
+    <ClInclude Include="LightCone.h" />
+    <ClInclude Include="Hyperplane.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="RelPhysics.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Shaders.h" />
+    <ClInclude Include="TextEntry.h" />
+    <ClInclude Include="View.h" />
+    <ClInclude Include="WorldLine.h" />
+    <ClInclude Include="WorldLineView.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Resources\shaders\fragmentShader.frag" />
+    <None Include="..\..\..\Resources\shaders\vertexShader.vert" />
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

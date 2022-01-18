@@ -13,51 +13,43 @@ description An observer
 worldLine 0
 !Observer
 
-GeodeticLine
+CompositeLine
 ID 2
-name Speeding dice world line v = 0.75c
+name Staying twin
 description 
-locationAtZeroT 10.000000 -6.000000 0.000000 0.000000
-fourVelocity 0.000000 0.600000 0.000000 0.800000
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+0.000000 -10.000000 0.000000 0.000000
+0.000000 -10.000000 0.000000 25.000000
+0.000000 -10.000000 0.000000 50.000000
+!controlPoints
+!CompositeLine
 
 Object
-type 1
+type 2
 ID 3
-name Fast dice
-description v = 0.75c
+name Spaceship
+description Wruuuhm!!!
 worldLine 2
 !Object
 
-GeodeticLine
+CompositeLine
 ID 4
-name Standing dice world line no 1
+name Traveling twin
 description 
-locationAtZeroT 10.000000 0.000000 3.000000 0.000000
-fourVelocity 0.000000 0.000000 0.000000 1.000000
-!GeodeticLine
+noOfControlPoints 3
+controlPoints
+0.000000 -10.000000 0.000000 0.000000
+22.500000 -10.000000 0.000000 25.000000
+0.000000 -10.000000 0.000000 50.000000
+!controlPoints
+!CompositeLine
 
 Object
-type 1
+type 2
 ID 5
-name Standing dice
-description 
+name Spaceship
+description Wruuuhm!!!
 worldLine 4
-!Object
-
-GeodeticLine
-ID 6
-name Standing dice world line no 2
-description 
-locationAtZeroT 10.000000 0.000000 -3.000000 0.000000
-fourVelocity 0.000000 0.000000 0.000000 1.000000
-!GeodeticLine
-
-Object
-type 1
-ID 7
-name Standing dice
-description 
-worldLine 6
 !Object
 
