@@ -71,14 +71,14 @@ public:
 
 	static Material* getSelectedObjectMaterial() {
 		if (selectedObjectMaterial == nullptr) {
-			selectedObjectMaterial = new Material(vec3(3, 3, 3), vec3(8, 14, 8), vec3(2, 2, 2), 3, 1.0f);
+			selectedObjectMaterial = new Material(vec3(3.0f, 3.0f, 3.0f), vec3(8.0f, 14.0f, 8.0f), vec3(2.0f, 2.0f, 2.0f), 3.0f, 1.0f);
 		}
 		return selectedObjectMaterial;
 	}
 
 	static Material* getSelectedWorldLineMaterial() {
 		if (selectedWorldLineMaterial == nullptr) {
-			selectedWorldLineMaterial = new Material(vec3(3, 1.5, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), 3, 1.0f);
+			selectedWorldLineMaterial = new Material(vec3(3.0f, 1.5f, 1.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.2f, 0.2f, 0.2f), 3, 1.0f);
 			selectedWorldLineMaterial->setGlow(true);
 		}
 		return selectedWorldLineMaterial;

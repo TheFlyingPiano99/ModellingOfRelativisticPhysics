@@ -93,7 +93,7 @@ namespace RelTypes {
 
 			gpuProgram.setUniform(doShading, "doShading");
 			gpuProgram.setUniform(viewMode, "viewMode");
-			gpuProgram.setUniform(vec3(0.05, 0.05, 0.05), "La");
+			gpuProgram.setUniform(vec3(0.05f, 0.05f, 0.05f), "La");
 
 			gpuProgram.setUniform(diagramX, "diagramX");
 			gpuProgram.setUniform(diagramY, "diagramY");

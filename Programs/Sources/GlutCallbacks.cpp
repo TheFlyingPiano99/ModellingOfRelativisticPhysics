@@ -61,7 +61,7 @@ void onInitialization() {
 		vertexSource.close();
 	}
 	else {
-		throw std::exception("Failed to read vertex shader!");
+		throw RelTypes::CannotLoadShader("vertex shader");
 	}
 	// Fragment shader:
 	std::ifstream fragmentSource;
@@ -71,7 +71,7 @@ void onInitialization() {
 		fragmentSource.close();
 	}
 	else {
-		throw std::exception("Failed to read fragment shader!");
+		throw RelTypes::CannotLoadShader("fragment shader");
 	}
 	gpuProgram.create(vSourceString.c_str(), fSourceString.c_str(), "outColor");
 

@@ -74,7 +74,7 @@ void OBJGeometry::load(const char* route) {
 		file.close();
 	}
 	else {
-		throw CannotLoadGeometry();
+		throw RelTypes::CannotLoadGeometry();
 	}
 
 

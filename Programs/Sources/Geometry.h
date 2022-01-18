@@ -1,9 +1,11 @@
 #pragma once
 
+#include <fstream>
+
 #include "framework.h"
 #include "Color.h"
 #include "WorldLine.h"
-#include <fstream>
+#include "Dnum.h"
 
 struct VertexData {
 	vec4 pos;
@@ -100,7 +102,7 @@ public:
 	}
 
 	void Eval(float u, float v, vec4& pos, vec3& norm) {
-		Dnum<vec2> U = Dnum<vec2>(u * 2.0 * M_PI, vec2(1.0f, 0.0f));
+		Dnum<vec2> U = Dnum<vec2>(u * 2.0f * M_PI, vec2(1.0f, 0.0f));
 		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0.0f, 1.0f));
 		Dnum<vec2> X = R * Cos(U) * Sin(V);
 		Dnum<vec2> Y = R * Sin(U) * Sin(V);
@@ -148,16 +150,16 @@ public:
 		Dnum<vec2> AxisY = Dnum<vec2>(axis.y, vec2(0, 0));
 		Dnum<vec2> AxisZ = Dnum<vec2>(axis.z, vec2(0, 0));
 		Dnum<vec2> Height = Dnum<vec2>(height, vec2(0, 0));
-		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
-		Dnum<vec2> V = Dnum<vec2>(v * 2 * height - height, vec2(0, 1));
+		Dnum<vec2> U = Dnum<vec2>(u * 2.0 * M_PI, vec2(1, 0));
+		Dnum<vec2> V = Dnum<vec2>(v * 2.0 * height - height, vec2(0, 1));
 		Dnum<vec2> Z = V;
 		Dnum<vec2> X =  V * Cos(U) + AxisX / AxisZ * V;
 		Dnum<vec2> Y = V * Sin(U) + AxisY / AxisZ * V;
 
-		pos = vec4(X.f, Y.f, Z.f, 0);
+		pos = vec4(X.f, Y.f, Z.f, 0.0f);
 		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
 		if (isnan(norm.x) || isnan(norm.y) || isnan(norm.z)) {		// Handle singularity in origo
-			norm = normalize(vec3(1, 0, 0));
+			norm = normalize(vec3(1, 0.0f, 0.0f));
 		}
 	}
 };
@@ -172,7 +174,7 @@ public:
 	}
 
 	void Eval(float u, float v, vec4& pos, vec3& norm) {
-		Dnum<vec2> U = Dnum<vec2>(u * 2 * M_PI, vec2(1, 0));
+		Dnum<vec2> U = Dnum<vec2>(u * 2.0 * M_PI, vec2(1, 0));
 		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
 		Dnum<vec2> X = R * Cos(U) * Sin(V);
 		Dnum<vec2> Y = R * Sin(U) * Sin(V);

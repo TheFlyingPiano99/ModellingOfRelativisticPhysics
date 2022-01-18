@@ -274,51 +274,19 @@ class GPUProgram {
 	unsigned int vertexShader = 0, geometryShader = 0, fragmentShader = 0;
 	bool waitError = true;
 
-	void getErrorInfo(unsigned int handle) { // shader error report
-		int logLen, written;
-		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLen);
-		if (logLen > 0) {
-			std::string log(logLen, '\0');
-			glGetShaderInfoLog(handle, logLen, &written, &log[0]);
-			printf("Shader log:\n%s", log.c_str());
-			if (waitError) getchar();
-		}
-	}
+	void getErrorInfo(unsigned int handle);
 
-	bool checkShader(unsigned int shader, std::string message) { // check if shader could be compiled
-		int OK;
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &OK);
-		if (!OK) {
-			printf("%s!\n", message.c_str());
-			getErrorInfo(shader);
-			return false;
-		}
-		return true;
-	}
+	bool checkShader(unsigned int shader, std::string message);
 
-	bool checkLinking(unsigned int program) { 	// check if shader could be linked
-		int OK;
-		glGetProgramiv(program, GL_LINK_STATUS, &OK);
-		if (!OK) {
-			printf("Failed to link shader program!\n");
-			getErrorInfo(program);
-			return false;
-		}
-		return true;
-	}
+	bool checkLinking(unsigned int program);
 
-	int getLocation(const std::string& name) {	// get the address of a GPU uniform variable
-		int location = glGetUniformLocation(shaderProgramId, name.c_str());
-		if (location < 0) printf("uniform %s cannot be set\n", name.c_str());
-		return location;
-	}
+	// Get the address of a GPU uniform variable
+	int getLocation(const std::string& name);
 
 public:
 	GPUProgram(bool _waitError = true) { shaderProgramId = 0; waitError = _waitError; }
 
-	GPUProgram(const GPUProgram& program) {
-		if (program.shaderProgramId > 0) printf("\nError: GPU program is not copied on GPU!!!\n");
-	}
+	GPUProgram(const GPUProgram& program);
 
 	void operator=(const GPUProgram& program) {
 		if (program.shaderProgramId > 0) printf("\nError: GPU program is not copied on GPU!!!\n");
@@ -328,61 +296,7 @@ public:
 
 	bool create(const char * const vertexShaderSource,
 		        const char * const fragmentShaderSource, const char * const fragmentShaderOutputName,
-		        const char * const geometryShaderSource = nullptr)
-	{
-		// Create vertex shader from string
-		if (vertexShader == 0) vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		if (!vertexShader) {
-			printf("Error in vertex shader creation\n");
-			exit(1);
-		}
-		glShaderSource(vertexShader, 1, (const GLchar**)&vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
-		if (!checkShader(vertexShader, "Vertex shader error")) return false;
-
-		// Create geometry shader from string if given
-		if (geometryShaderSource != nullptr) {
-			if (geometryShader == 0) geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-			if (!geometryShader) {
-				printf("Error in geometry shader creation\n");
-				exit(1);
-			}
-			glShaderSource(geometryShader, 1, (const GLchar**)&geometryShaderSource, NULL);
-			glCompileShader(geometryShader);
-			if (!checkShader(geometryShader, "Geometry shader error")) return false;
-		}
-
-		// Create fragment shader from string
-		if (fragmentShader == 0) fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		if (!fragmentShader) {
-			printf("Error in fragment shader creation\n");
-			exit(1);
-		}
-
-		glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
-		if (!checkShader(fragmentShader, "Fragment shader error")) return false;
-
-		shaderProgramId = glCreateProgram();
-		if (!shaderProgramId) {
-			printf("Error in shader program creation\n");
-			exit(1);
-		}
-		glAttachShader(shaderProgramId, vertexShader);
-		glAttachShader(shaderProgramId, fragmentShader);
-		if (geometryShader > 0) glAttachShader(shaderProgramId, geometryShader);
-
-		// Connect the fragmentColor to the frame buffer memory
-		glBindFragDataLocation(shaderProgramId, 0, fragmentShaderOutputName);	// this output goes to the frame buffer memory
-
-		// program packaging
-		glLinkProgram(shaderProgramId);
-		if (!checkLinking(shaderProgramId)) return false;
-
-		// make this program run
-		glUseProgram(shaderProgramId);
-		return true;
-	}
+		const char* const geometryShaderSource = nullptr);
 
 	void Use() { 		// make this program run
 		glUseProgram(shaderProgramId);
@@ -435,76 +349,6 @@ public:
 	~GPUProgram() { if (shaderProgramId > 0) glDeleteProgram(shaderProgramId); }
 };
 
-/*
-* Dual number representation.
-* Automatically calculates derivative of value.
-*/
-template<class T> struct Dnum {
-
-	float f;
-	T d;
-
-	Dnum(float f0, T d0 = T()) {
-		f = f0, d = d0;
-	}
-
-	Dnum() {
-		f = 0;
-		d = T();
-	}
-
-	Dnum operator=(Dnum r) {
-		if (this != &r) {
-			this->f = r.f;
-			this->d = r.d;
-		}
-		return *this;
-	}
-
-
-	Dnum operator+(Dnum r) {
-		return Dnum(f + r.f, d + r.d);
-	}
-
-	Dnum operator-(Dnum r) {
-		return Dnum(f - r.f, d - r.d);
-	}
-
-	Dnum operator*(Dnum r) {
-		return Dnum(f * r.f, f * r.d + d * r.f);
-	}
-
-	Dnum operator*(float s) {
-		return Dnum(f * s, d * s);
-	}
-
-	Dnum operator/(Dnum r) {
-		return Dnum(f / r.f, (d * r.f - f * r.d) / r.f / r.f);
-	}
-
-	Dnum operator-() {
-		return Dnum(-f, -d);
-	}
-};
-
-template<class T>
-Dnum<T> operator*(float s, Dnum<T> g) {
-	return Dnum<T>(g.f * s, g.d * s);
-}
-
-template<class T> Dnum<T> Sin(Dnum<T> g) {
-	return Dnum<T>(sinf(g.f), cosf(g.f) * g.d);
-}
-
-template<class T>
-Dnum<T> Cos(Dnum<T> g) {
-	return Dnum<T>(cosf(g.f), -sinf(g.f) * g.d);
-}
-
-template<class T>
-Dnum<T> Pow(Dnum<T> g, float n) {
-	return Dnum<T>(powf(g.f, n), n * powf(g.f, n - 1) * g.d);
-}
 
 static vec2 solveQuadraticFunction(float a, float b, float c, int& noOfRealSolutions) {
 	if (a == 0.0f && b != 0.0f) {

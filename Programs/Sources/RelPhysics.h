@@ -71,7 +71,7 @@ namespace RelPhysics
 	*/
 	static vec4 tangentFourVelocity(vec4 event1, vec4 event2) {
 		vec4 dir = event2 - event1;
-		return normalize(dir) * speedOfLight * ((dir.w > 0.0f)? 1 : -1);
+		return normalize(dir) * speedOfLight * ((dir.w > 0.0f)? 1.0f : -1.0f);
 	}
 
 	/*
@@ -84,7 +84,7 @@ namespace RelPhysics
 	*/
 	static float lorentzFactor(float relVelocity) {
 		if (relVelocity > speedOfLight) {
-			throw new LightspeedExceededException;
+			throw new RelTypes::LightspeedExceededException;
 		}
 		return 1.0f / sqrtf(1.0f - (relVelocity * relVelocity) / (speedOfLight * speedOfLight));
 	}

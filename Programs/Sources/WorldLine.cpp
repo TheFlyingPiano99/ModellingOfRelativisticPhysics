@@ -153,7 +153,7 @@ float WorldLine::getAbsoluteTimeAtProperTime(float tau)
         try {
             gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[i + 1], vds4D[i])));
         }
-        catch (LightspeedExceededException e) {
+        catch (RelTypes::LightspeedExceededException e) {
             std::cerr << e.what() << std::endl;
         }
         if (i == noOfVds4D - 2 || (spentTau + (vds4D[i + 1].w - vds4D[i].w) / gamma) >= tau) {                                      // Tau is reached in this section!
@@ -203,7 +203,7 @@ float WorldLine::getProperTimeAtAbsoluteTime(float t)
         try {
             gamma = lorentzFactor(relativeVelocity(absObservers4Velocity, tangentFourVelocity(vds4D[i], vds4D[i + 1])));
         }
-        catch (LightspeedExceededException e) {
+        catch (RelTypes::LightspeedExceededException e) {
             std::cerr << e.what() << std::endl;
         }
         if (i == noOfVds4D - 2 || (spentT + (vds4D[i + 1].w - vds4D[i].w)) >= t) {                                      // Tau is reached in this section!
@@ -380,7 +380,7 @@ float WorldLine::intersectLightCone(const LightCone& cone)
             t = solutions.x * tangentVelocity.w;
         }
         else {
-            throw DoesNotIntersectException();
+            throw RelTypes::DoesNotIntersectException();
         }
         if (
             (i == 0 && t < vds4D[1].w)                                          // First section
