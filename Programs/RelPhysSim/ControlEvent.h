@@ -328,3 +328,14 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ToggleImGUIEvent : public ControlEvent {
+public:
+	ToggleImGUIEvent()
+	{
+		keyShortcut = 'g';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

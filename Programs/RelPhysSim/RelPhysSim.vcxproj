@@ -83,7 +83,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Caption.cpp" />
     <ClCompile Include="ControlEventManager.cpp" />
+    <ClCompile Include="GlobalVariables.cpp" />
     <ClCompile Include="GPUProgram.cpp" />
+    <ClCompile Include="ImGUIObserver.cpp" />
     <ClCompile Include="PersistenceHelper.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ControlEvent.cpp" />
@@ -127,6 +129,7 @@
     <ClInclude Include="ControlEventManager.h" />
     <ClInclude Include="GlobalVariables.h" />
     <ClInclude Include="GPUProgram.h" />
+    <ClInclude Include="ImGUIObserver.h" />
     <ClInclude Include="PersistenceHelper.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Geometry.h" />

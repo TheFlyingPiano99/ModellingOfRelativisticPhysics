@@ -49,7 +49,9 @@ int main(int argc, char * argv[]) {
 #if !defined(__APPLE__)
 	glutInitContextVersion(majorVersion, minorVersion);
 #endif
-	glutInitWindowSize(windowWidth, windowHeight);				// Application window is initially of resolution 600x600
+	glutInitWindowSize(
+		GlobalVariables::windowWidth, 
+		GlobalVariables::windowHeight);				// Application window is initially of resolution 600x600
 	glutInitWindowPosition(100, 100);							// Relative location of the application window
 #if defined(__APPLE__)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);  // 8 bit R,G,B,A + double buffer + depth buffer
@@ -57,8 +59,13 @@ int main(int argc, char * argv[]) {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
 	glutCreateWindow(argv[0]);
-	if (fullScreenMode) {
-		glutFullScreen();							// Full screen
+	if (GlobalVariables::fullScreenMode) {	// Full screen
+		glutFullScreen();
+		HWND hDesktop = GetDesktopWindow();
+		RECT rect;
+		GetWindowRect(hDesktop, &rect);
+		GlobalVariables::windowWidth = rect.right;
+		GlobalVariables::windowHeight = rect.bottom;
 	}
 
 #if !defined(__APPLE__)

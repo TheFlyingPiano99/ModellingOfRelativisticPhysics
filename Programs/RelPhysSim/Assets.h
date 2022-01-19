@@ -49,7 +49,7 @@ public:
 
 	static Material* getHoveredWorldLineMaterial();
 
-	static std::string& getGeometryPath();
+	static std::string getGeometryPath();
 
 	static std::string getTexturePath();
 

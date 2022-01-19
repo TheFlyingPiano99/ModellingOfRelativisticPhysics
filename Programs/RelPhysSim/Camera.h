@@ -52,7 +52,7 @@ public:
 	/*
 	* Transforms a camera space vector to world space so, that the world space position represented by the vector is in the "lookat plane".
 	*/
-	vec3 cameraSpaceToWorldSpace(vec2 cPos);
+	vec3 calculateRayStart(vec2 cPos);
 
 	/*
 	* Load camera on GPU.

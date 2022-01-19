@@ -9,7 +9,7 @@
 using namespace RelPhysics;
 
 void GeodeticLine::genGeometry() {
-    vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
+    vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
         vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * (i - noOfVds4D / 2.0f) * 50;
         vds4D[i] = pos;
@@ -399,7 +399,11 @@ void WorldLine::loadOnGPU(GPUProgram& gpuProgram)
     gpuProgram.setUniform((int)noOfVds4D, "noOfWorldLineNodes");
 }
 
-float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings, vec4& closestLocation)
+float WorldLine::distanceBetweenRayAndDiagram(
+    const Ray& ray,
+    const RelTypes::ObserverProperties& observerProperties,
+    const RelTypes::Settings& settings,
+    vec4& closestLocation)
 {
     float distance = -1;
     closestLocation = vds4D[0];
@@ -409,9 +413,11 @@ float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::Ob
         vec4 pos2 = vds4D[i + 1];
         if (settings.transformToProperFrame.get()) {
             // !!! Eucleadian is not correct !!!
-            pos1 = (settings.doLorentz.get()) ? lorentzTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
+            pos1 = (settings.doLorentz.get()) 
+                ? lorentzTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
                 : galileanTransformation(pos1 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
-            pos2 = (settings.doLorentz.get()) ? lorentzTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
+            pos2 = (settings.doLorentz.get()) 
+                ? lorentzTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity))
                 : galileanTransformation(pos2 - observerProperties.locationAtZero, To3DVelocity(observerProperties.velocity));
         }
         vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);
@@ -419,24 +425,21 @@ float WorldLine::distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::Ob
         vec3 diagramStartPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
         vec3 diagramDir = normalize(vec3(tangentVelocity[settings.diagramX], tangentVelocity[settings.diagramY], tangentVelocity[settings.diagramZ]));
         float temp = abs(dot(ray.pos - diagramStartPos, cross(diagramDir, ray.dir)));
-        //vec3 cn = normalize(cross(diagramDir, ray.dir));
-        //vec3 projected = dot(diagramPos - ray.pos, ray.dir) * ray.dir;
-        //vec3 rejected = diagramPos - ray.pos - projected - dot(diagramPos - ray.pos, cn) * cn;
-        //closestPoint = diagramPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
-        vec3 endPoint1 = vec3(pos1[settings.diagramX], pos1[settings.diagramY], pos1[settings.diagramZ]);
-        vec3 endPoint2 = vec3(pos2[settings.diagramX], pos2[settings.diagramY], pos2[settings.diagramZ]);
+        vec3 cn = normalize(cross(diagramDir, ray.dir));
+        vec3 projected = dot(diagramStartPos - ray.pos, ray.dir) * ray.dir;
+        vec3 rejected = diagramStartPos - ray.pos - projected - dot(diagramStartPos - ray.pos, cn) * cn;
+        vec3 closestPoint = diagramStartPos - diagramDir * normalize(rejected) / dot(diagramDir, normalize(rejected));
+        float distanceAlongRay = length(closestPoint - ray.pos);
+        //vec3 endPoint1 = vec3(pos1[settings.diagramX], pos1[settings.diagramY], pos1[settings.diagramZ]);
+        //vec3 endPoint2 = vec3(pos2[settings.diagramX], pos2[settings.diagramY], pos2[settings.diagramZ]);
         if (/*dot(endPoint2 - endPoint1, closestPoint - endPoint1) > 0.0f && dot(endPoint1 - endPoint2, closestPoint - endPoint2) > 0.0f && */
-            (distance == -1 || temp < RelTypes::ViewMode::diagram)) {
+            temp > 0 && (distance < 0 || temp / distanceAlongRay < distance)) {
             distance = temp;
             closestLocation = pos1;
         }
     }
     return distance;
 }
-
-/*
-*
-*/
 
 float WorldLine::intersect(const Intersectable& intersectable) {
     float t;
@@ -508,7 +511,7 @@ vec4 GeodeticLine::getVelocity() {
 
 void CompositeLine::genGeometry()
 {
-    vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
+    vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     vec4 velocity;
     int countVDS = 0;
     velocity = RelPhysics::tangentFourVelocity(controlPoints[0], controlPoints[1]);
@@ -667,12 +670,18 @@ void SpiralLine::genGeometry()
 {
     vec3 startPos = vec3(locationAtZeroT.x, locationAtZeroT.y, locationAtZeroT.z);
     vec3 center = vec3(centerOfRotation.x, centerOfRotation.y, centerOfRotation.z);
+    vec3 velocity = RelPhysics::To3DVelocity(fourVelocityAtZeroT);
+    float speed = length(velocity);
+    vec3 up = normalize(cross(startPos - center, velocity));
     float radius = length(startPos - center);
-    float angularVelocity = atanf(length(RelPhysics::To3DVelocity(fourVelocityAtZeroT)) / radius);
-    vds4D.resize(shaderWorldLineResolution);     // Size given in shader.
+    vec3 currentPos = startPos;
+        //float angularVelocity = atanf(length(RelPhysics::To3DVelocity(fourVelocityAtZeroT)) / radius);
+    vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
-        vec4 pos = i * vec4(0.0f, 0.0f, 0.0f, 1.0f) + centerOfRotation + radius * vec4(sinf(angularVelocity * i), cosf(angularVelocity * i), 0.0f, 0.0f);
-        vds4D[i] = pos;
+        vds4D[i] = vec4(currentPos.x, currentPos.y, currentPos.z, i);
+        vec3 centrifugalDir = currentPos - center;
+        vec3 tangentDir = normalize(cross(up, centrifugalDir));
+        currentPos = currentPos + tangentDir * speed;
     }
 }
 

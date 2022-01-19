@@ -18,7 +18,7 @@ void onInitialization() {
 	// Controls:
 	ControlEventManager::getInstance().buildDefaultControlScheme();
 
-	glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, GlobalVariables::windowWidth, GlobalVariables::windowHeight);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
@@ -56,6 +56,9 @@ void onInitialization() {
 	scene->Initialise();
 
 	guiAdapter = new ImGUIAdapter();
+	guiAdapter->initGUI();
+	guiAdapter->initBindings(scene);
+	guiAdapter->setVisible(true);
 }
 
 // Window has become invalid: Redraw
@@ -86,15 +89,19 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	
 	ControlEventManager::getInstance().handlePressedEvents(*scene, key);
 
+	bool windowDestroyed = false;
 	if (key == 27) {
 		if (!escDown) {
 			escDown = true;
 			if (scene->askToQuit())
 				delete guiAdapter;
 				glutDestroyWindow(windowID);
+				windowDestroyed = true;
 		}
 	}
-
+	if (!windowDestroyed) {
+		ImGui_ImplGLUT_KeyboardFunc(key, pX, pY);
+	}
 }
 
 // Key of ASCII code released
@@ -102,6 +109,7 @@ void onKeyboardUp(unsigned char key, int pX, int pY) {
 	if (key == 27) {
 		escDown = false;
 	}
+	ImGui_ImplGLUT_KeyboardUpFunc(key, pX, pY);
 }
 
 RelTypes::MouseState mouseState;
@@ -110,8 +118,8 @@ static float prevCX, prevCY;
 // Move mouse with key pressed
 void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the cursor in the coordinate system of the operation system
 	// Convert to normalized device space
-	float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
-	float cY = 1.0f - 2.0f * pY / windowHeight;
+	float cX = 2.0f * pX / GlobalVariables::windowWidth - 1;	// flip y axis
+	float cY = 1.0f - 2.0f * pY / GlobalVariables::windowHeight;
 
 
 	if (!mouseState.mouseRightPrevDown && mouseState.mouseRightDown) {
@@ -135,13 +143,14 @@ void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the 
 
 	prevCX = cX;
 	prevCY = cY;
+	ImGui_ImplGLUT_MotionFunc(pX, pY);
 }
 
 // Mouse click event
 void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel coordinates of the cursor in the coordinate system of the operation system
 	// Convert to normalized device space
-	float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
-	float cY = 1.0f - 2.0f * pY / windowHeight;
+	float cX = 2.0f * pX / GlobalVariables::windowWidth - 1;
+	float cY = 1.0f - 2.0f * pY / GlobalVariables::windowHeight;	// flip y axis
 
 	char * buttonStat;
 
@@ -171,7 +180,7 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 			break;
 		default: break;
 	}
-
+	ImGui_ImplGLUT_MouseFunc(button, state, pX, pY);
 }
 
 
@@ -207,6 +216,8 @@ void onIdle() {
 		fpsTimer = 0.0f;
 		fpsIterCount = 0;
 	}
+
+	guiAdapter->checkChanges();
 
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;

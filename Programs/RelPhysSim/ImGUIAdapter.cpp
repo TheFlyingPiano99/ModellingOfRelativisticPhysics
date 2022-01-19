@@ -7,11 +7,28 @@
 void ImGUIAdapter::initGUI() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	io = ImGui::GetIO();
 	ImGui::StyleColorsDark();
 	ImGui_ImplGLUT_Init();
 
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+}
+
+void ImGUIAdapter::initBindings(Scene* scene)
+{
+	guiObserver.addBinding(
+		new ImGUIObserver::ObservedVariable<bool>(&variables.running, 
+			std::function<void(bool)>([scene](bool _) {
+				scene->togglePause();
+				})
+			)
+	);
+
+}
+
+void ImGUIAdapter::checkChanges()
+{
+	guiObserver.checkChanges();
 }
 
 void ImGUIAdapter::destroyGUI() {
@@ -25,9 +42,17 @@ void ImGUIAdapter::preDrawInit()
 	if (!visible) {
 		return;
 	}
+	int w, h;
+	w = glutGet(GLUT_WINDOW_WIDTH);
+	h = glutGet(GLUT_WINDOW_HEIGHT);
+	ImGuiIO* io = &ImGui::GetIO();
+	if (io == nullptr) {
+		return;
+	}
+	io->DisplaySize = ImVec2((float)w, (float)h);
+	//io.DisplayFramebufferScale = ImVec2();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGLUT_NewFrame();
-	ImGui::NewFrame();
 }
 
 float tempX = 0.0f;
@@ -38,6 +63,8 @@ void ImGUIAdapter::configToScene(Scene& scene)
 		return;
 	}
 	ImGui::Begin("Relativistic settings");
+	ImGui::Text("GUI text.");
+	ImGui::Checkbox("Running:", &variables.running);
 
 	//ImGui::SliderFloat("Temporary setting01", &tempX, 0.0f, 10.0f);
 

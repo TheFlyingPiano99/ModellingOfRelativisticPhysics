@@ -52,13 +52,13 @@ mat4 Camera::P() {
 		0, 0, b, 0);
 }
 
-vec3 Camera::cameraSpaceToWorldSpace(vec2 cPos)
+vec3 Camera::calculateRayStart(vec2 cPos)
 {
-	float l = length(lookat - eye);
-	return 
+	float scale = tanf(fov / 2.0f) * length(lookat - eye);
+	return
 		lookat
-		+ vRight * cPos.x * tanf(fov / 2.0f) * asp * l
-		+ vUp * cPos.y * tanf(fov / 2.0f) * l;
+		+ vRight * asp * scale * cPos.x
+		+ vUp * scale * cPos.y;
 }
 
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
@@ -140,7 +140,7 @@ void Camera::zoom(float delta) {
 
 Ray Camera::getRayFromCameraCoord(vec2 cPos) {
 	
-	vec3 wPos = cameraSpaceToWorldSpace(cPos);
+	vec3 rayStart = calculateRayStart(cPos);
 
-	return Ray(eye, normalize(wPos - eye));
+	return Ray(eye, normalize(rayStart - eye));
 }

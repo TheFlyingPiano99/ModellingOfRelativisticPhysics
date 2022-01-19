@@ -138,3 +138,8 @@ void MoveCameraDownEvent::performAction(const float dt)
 {
 	Scene::getInstance()->moveCamera(vec3(0, 0, -1) * dt * Scene::getInstance()->getCameraVelocity());
 }
+
+void ToggleImGUIEvent::performAction(const float dt)
+{
+
+}

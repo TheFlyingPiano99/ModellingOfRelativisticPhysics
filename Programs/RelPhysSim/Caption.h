@@ -1,11 +1,12 @@
 #pragma once
 
+#include <vector>
+#include <memory>
+
 #include "Font.h"
 #include "Camera.h"
 #include "Geometry.h"
 #include "Assets.h"
-#include <vector>
-#include <memory>
 
 class CaptionAnimation {
 
@@ -44,6 +45,7 @@ class Caption {
 		sharedThis = std::make_shared<Caption*>(this);
 		pushCaption(sharedThis);
 	}
+	Caption() {};
 
 public:
 

@@ -114,6 +114,9 @@ public:
 
 	void loadOnGPU(GPUProgram& gpuProgram);
 
+	/*
+	* Used to select line when hovered over by mouse.
+	*/
 	float distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings, vec4& closestLocation = vec4());
 
 	/*
@@ -157,7 +160,10 @@ public:
 	static GeodeticLine* loadFromFile(std::ifstream& file);
 
 	void draggedTo(vec4 location) override;
-	vec4 getClosestLocation (const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings) override;
+	vec4 getClosestLocation (
+		const Ray& ray, 
+		const RelTypes::ObserverProperties& observerProperties,
+		const RelTypes::Settings& settings) override;
 	void* createView() override;
 
 	vec4 getLocationAtZeroT();
@@ -186,6 +192,9 @@ public:
 	*/
 	static CompositeLine* loadFromFile(std::ifstream& file);
 
+	/*
+	* 
+	*/
 	virtual vec4 getClosestLocation(
 		const Ray& ray,
 		const RelTypes::ObserverProperties& observerProperties,
@@ -223,7 +232,8 @@ public:
 	static GeodeticLine* loadFromFile(std::ifstream& file);
 
 	void draggedTo(vec4 location) override;
-	vec4 getClosestLocation(const Ray& ray, 
+	vec4 getClosestLocation(
+		const Ray& ray, 
 		const RelTypes::ObserverProperties& observerProperties,
 		const RelTypes::Settings& settings) override;
 	void* createView() override;

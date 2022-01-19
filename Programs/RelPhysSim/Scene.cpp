@@ -41,9 +41,9 @@ void Scene::Initialise()
 
 	//Camera:
 	realTime3DCamera = new Camera();
-	realTime3DCamera->initBasic(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 0.5f, 130.0f);
+	realTime3DCamera->initBasic(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)GlobalVariables::windowWidth / (float)GlobalVariables::windowHeight, 0.5f, 130.0f);
 	diagramCamera = new Camera();
-	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)windowWidth / (float)windowHeight, 1.0f, 130.0f);
+	diagramCamera->initBasic(-20 * vec3(1,1,1), vec3(0, 0, 0), vec3(0.0f, 0.0f, 1.0f), (M_PI / 2.0f), (float)GlobalVariables::windowWidth / (float)GlobalVariables::windowHeight, 1.0f, 130.0f);
 
 	if (settings.viewMode == RelTypes::ViewMode::realTime3D) {
 		activeCamera = realTime3DCamera;
@@ -110,7 +110,7 @@ void Scene::loadDefault()
 	observers.push_back(observer);
 
 	//2.:
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(-0.9f, 0.0f, 0.0f), "Obs2's world line");
+	wrdln = new SpiralLine(vec3(10, 0, 0), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.8f, 0.0f), "Obs2's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
@@ -159,9 +159,19 @@ void Scene::loadDefault()
 	}
 	*/
 	
-	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 0, 0), vec3(0.0f, 0.0f, 0.0f), "Staying ship")));
-	objects.push_back(Object::createSpaceship(new CompositeLine(vec3(10.0f, 0, 0), vec3(0.0f, 0.0f, 0.0f), "Traveling ship")));
-	objects.push_back(Object::createSpaceship(new SpiralLine(vec3(20.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.8f, 0.0f), "Spiral worldline")));
+	objects.push_back(Object::createSpaceship(
+		new CompositeLine(vec3(10.0f, 0, 0), 
+		vec3(0.0f, 0.0f, 0.0f), 
+			"Staying ship")));
+	objects.push_back(Object::createSpaceship(
+		new CompositeLine(vec3(10.0f, 0, 0), 
+			vec3(0.0f, 0.0f, 0.0f), 
+			"Traveling ship")));
+	objects.push_back(Object::createSpaceship(
+		new SpiralLine(vec3(20.0f, 0.0f, 0.0f), 
+			vec3(0.0f, 0.0f, 0.0f), 
+			vec3(0.0f, 0.8f, 0.0f), 
+			"Spiral worldline")));
 	/*
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(0, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(2, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
@@ -176,7 +186,6 @@ void Scene::loadDefault()
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-8, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-10, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	*/
-
 
 	system = new CoordinateSystem();
 	toggleActiveObserver();
@@ -576,10 +585,9 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 {
 	if (!objects.empty()) {		// There are objects in the scene.
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
-
 		int selectionIdx = -1;			// index of the selected object
-		if (settings.viewMode == RelTypes::ViewMode::diagram) {								// Diagram view
-			float constraint = 0.2f;
+		if (settings.viewMode == RelTypes::ViewMode::diagram) {			// Diagram view
+			float constraint = 2.0f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
 				activeObserver->getProperties(settings),
 				settings);		// First item handled separately.

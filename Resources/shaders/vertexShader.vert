@@ -226,13 +226,7 @@
 			vec4 boostPlaneLocation = worldLineNodes[i + 1];
 			vec4 boostPlaneNormal;
 			if (simultaneBoost) {
-				if (i < noOfWorldLineNodes - 2) {
-					vec4 nextTangent = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]);
-					boostPlaneNormal = normalize(vec4(-(nextTangent.xyz), nextTangent.w));
-				}
-				else {
-					boostPlaneNormal = normalize(vec4(-(tangentVelocityLorentz.xyz), tangentVelocityLorentz.w));
-				}
+				boostPlaneNormal = normalize(vec4(-(tangentVelocityLorentz.xyz), tangentVelocityLorentz.w));
 			}
 			else {
 				boostPlaneNormal = vec4(0, 0, 0, 1);

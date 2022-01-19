@@ -47,7 +47,7 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	gpuProgram.setUniform(true, "directRenderMode");
 	fontTexture->loadOnGPU(gpuProgram);
 
-	vec3 wPos = (cameraSpace)? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) - camera.getEye() : pos;
+	vec3 wPos = (cameraSpace)? camera.calculateRayStart(vec2(pos.x, pos.y)) - camera.getEye() : pos;
 	vec3 normal = -camera.getLookDir();
 	float distance = length(dot(wPos, normal) * normal);
 	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
@@ -79,7 +79,7 @@ void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 	gpuProgram.setUniform(true, "directRenderMode");
 	fontTexture->loadOnGPU(gpuProgram);
 
-	vec3 wPos = (cameraSpace) ? camera.cameraSpaceToWorldSpace(vec2(pos.x, pos.y)) : pos;
+	vec3 wPos = (cameraSpace) ? camera.calculateRayStart(vec2(pos.x, pos.y)) : pos;
 	vec3 normal = -camera.getLookDir();
 	float distance = length(dot(camera.getEye() - wPos, normal) * normal);
 	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);

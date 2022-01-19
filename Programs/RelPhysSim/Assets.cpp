@@ -90,7 +90,7 @@ Material* Assets::getHoveredWorldLineMaterial() {
 	return hoveredWorldLineMaterial;
 }
 
-std::string& Assets::getGeometryPath() {
+std::string Assets::getGeometryPath() {
 	if (geometryPath == nullptr) {
 		int n = 0;
 		while (n < 5) {
