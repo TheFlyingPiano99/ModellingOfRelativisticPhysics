@@ -298,9 +298,6 @@ Object* Object::loadFromFile(std::ifstream& file)
 			default:
 				break;
 			}
-			if (retVal == nullptr) {
-				return nullptr;
-			}
 			retVal->setID(_ID);
 			retVal->setName(_name);
 			retVal->setDescription(_description);

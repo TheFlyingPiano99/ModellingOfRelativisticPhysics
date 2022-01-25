@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-int Entity::nextID = 0;
+int Entity::maxID = 0;
 
 void Entity::select()
 {
