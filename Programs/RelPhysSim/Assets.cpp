@@ -4,6 +4,7 @@ SphereSurface* Assets::observerNodeGeometry = NULL;
 LightConeSurface* Assets::lightConeGeometry = NULL;
 OBJGeometry* Assets::cubeGeometry = NULL;
 OBJGeometry* Assets::spaceshipGeometry = NULL;
+OBJGeometry* Assets::spikeGeometry = NULL;
 Material* Assets::observerMaterial = NULL;
 Material* Assets::selectedObjectMaterial = NULL;
 Material* Assets::selectedWorldLineMaterial = NULL;
@@ -44,9 +45,17 @@ Mesh* Assets::getSpaceshipGeometry() {
 	if (spaceshipGeometry == nullptr) {
 		spaceshipGeometry = new OBJGeometry();
 		spaceshipGeometry->load(getGeometryPath().append("spaceShip.obj").c_str());
-
 	}
 	return spaceshipGeometry;
+}
+
+Mesh* Assets::getSpikeGeometry()
+{
+	if (spikeGeometry == nullptr) {
+		spikeGeometry = new OBJGeometry();
+		spikeGeometry->load(getGeometryPath().append("spike.obj").c_str());
+	}
+	return spikeGeometry;
 }
 
 
@@ -181,18 +190,34 @@ Font* Assets::getDefaultFont() {
 * Must be called befor the application is closed!
 */
 void Assets::cleanUp() {
-	delete observerNodeGeometry;
-	delete lightConeGeometry;
-	delete observerMaterial;
-	delete selectedObjectMaterial;
-	delete selectedWorldLineMaterial;
-	delete cubeGeometry;
-	delete spaceshipGeometry;
-	delete geometryPath;
-	delete texturePath;
-	delete savesPath;
-	delete fontTexture;
-	delete defaultFont;
-	delete hoveredObjectMaterial;
-	delete hoveredWorldLineMaterial;
+	if (nullptr != observerNodeGeometry)
+		delete observerNodeGeometry;
+	if (nullptr != lightConeGeometry)
+		delete lightConeGeometry;
+	if (nullptr != observerMaterial)
+		delete observerMaterial;
+	if (nullptr != selectedObjectMaterial)
+		delete selectedObjectMaterial;
+	if (nullptr != selectedWorldLineMaterial)
+		delete selectedWorldLineMaterial;
+	if (nullptr != cubeGeometry)
+		delete cubeGeometry;
+	if (nullptr != spaceshipGeometry)
+		delete spaceshipGeometry;
+	if (nullptr != spikeGeometry)
+		delete spikeGeometry;
+	if (nullptr != geometryPath)
+		delete geometryPath;
+	if (nullptr != texturePath)
+		delete texturePath;
+	if (nullptr != savesPath)
+		delete savesPath;
+	if (nullptr != fontTexture)
+		delete fontTexture;
+	if (nullptr != defaultFont)
+		delete defaultFont;
+	if (nullptr != hoveredObjectMaterial)
+		delete hoveredObjectMaterial;
+	if (nullptr != hoveredWorldLineMaterial)
+		delete hoveredWorldLineMaterial;
 }

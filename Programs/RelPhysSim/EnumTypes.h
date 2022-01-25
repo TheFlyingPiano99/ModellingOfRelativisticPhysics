@@ -8,6 +8,7 @@ namespace RelTypes {
 		earth,
 		dice,
 		spaceship,
+		spike,
 		none
 	};
 

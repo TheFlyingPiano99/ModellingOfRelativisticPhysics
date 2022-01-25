@@ -17,9 +17,8 @@ void ImGUIAdapter::initGUI() {
 void ImGUIAdapter::initBindings(Scene* scene)
 {
 	guiObserver.addBinding(
-		new ImGUIObserver::ObservedVariable<bool>(&variables.running, 
+		new ImGUIObserver::ObservedVariable<bool>(&scene->getSettings().running,
 			std::function<void(bool)>([scene](bool _) {
-				scene->togglePause();
 				})
 			)
 	);
@@ -64,7 +63,7 @@ void ImGUIAdapter::configToScene(Scene& scene)
 	}
 	ImGui::Begin("Relativistic settings");
 	ImGui::Text("GUI text.");
-	ImGui::Checkbox("Running:", &variables.running);
+	ImGui::Checkbox("Running", &scene.getSettings().running);
 
 	//ImGui::SliderFloat("Temporary setting01", &tempX, 0.0f, 10.0f);
 

@@ -14,7 +14,7 @@ class ImGUIAdapter
 	bool visible = false;
 
 	struct Variables {
-		bool running;
+		bool paused;
 		float tempX;
 	} variables;
 	ImGUIObserver guiObserver;

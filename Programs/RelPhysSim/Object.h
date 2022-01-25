@@ -90,6 +90,11 @@ public:
 	*/
 	static Object* createSpaceship(WorldLine* wrdln);
 
+	/*
+	* Factory
+	*/
+	static Object* createSpike(WorldLine* wrdln);
+
 	mat4 M();
 
 	mat4 invM();

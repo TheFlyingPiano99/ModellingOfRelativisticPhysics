@@ -22,6 +22,7 @@ class Assets {
 	static Material* hoveredWorldLineMaterial;
 	static OBJGeometry* cubeGeometry;
 	static OBJGeometry* spaceshipGeometry;
+	static OBJGeometry* spikeGeometry;
 	static std::string* geometryPath;
 	static std::string* texturePath;
 	static std::string* savesPath;
@@ -38,6 +39,8 @@ public:
 	static Mesh* getCubeGeometry();
 
 	static Mesh* getSpaceshipGeometry();
+
+	static Mesh* getSpikeGeometry();
 
 	static Material* getObserverMaterial();
 

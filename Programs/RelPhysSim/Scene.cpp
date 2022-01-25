@@ -163,11 +163,8 @@ void Scene::loadDefault()
 		new CompositeLine(vec3(10.0f, 0, 0), 
 		vec3(0.0f, 0.0f, 0.0f), 
 			"Staying ship")));
-	objects.push_back(Object::createSpaceship(
-		new CompositeLine(vec3(10.0f, 0, 0), 
-			vec3(0.0f, 0.0f, 0.0f), 
-			"Traveling ship")));
-	objects.push_back(Object::createSpaceship(
+
+	objects.push_back(Object::createSpike(
 		new SpiralLine(vec3(20.0f, 0.0f, 0.0f), 
 			vec3(0.0f, 0.0f, 0.0f), 
 			vec3(0.0f, 0.8f, 0.0f), 

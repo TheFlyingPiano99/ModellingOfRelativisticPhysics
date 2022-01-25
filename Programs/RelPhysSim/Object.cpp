@@ -70,6 +70,26 @@ Object* Object::createSpaceship(WorldLine* wrdln)
 	return obj;
 }
 
+Object* Object::createSpike(WorldLine* wrdln)
+{
+	Material* diagramM = new Material(vec3(3, 1.5, 1), vec3(0.5, 0.3, 0.2), vec3(5, 6, 20), 50);
+	Object* obj = new Object(
+		vec3(1, 1, 1),
+		0.0f,
+		0.0f,
+		vec3(0, 0, 0),
+		vec3(0, 0, 1),
+		wrdln,
+		Assets::getSpikeGeometry(),
+		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
+		diagramM,		// Diagram material
+		new AdvancedTexture(Assets::getTexturePath().append("spike.bmp").c_str(), "", ""),
+		"Spike",
+		"Used to visualise Wigner rotation.");
+	obj->setType(RelTypes::ObjectType::spike);
+	return obj;
+}
+
 mat4 Object::M() {
 	return ScaleMatrix(scale)
 		* RotationMatrix(rotationAngle, rotationAxis)
@@ -270,10 +290,16 @@ Object* Object::loadFromFile(std::ifstream& file)
 			case RelTypes::ObjectType::spaceship:
 				retVal = createSpaceship(NULL);
 				break;
+			case RelTypes::ObjectType::spike:
+				retVal = createSpaceship(NULL);
+				break;
 			case RelTypes::ObjectType::none:
 				break;
 			default:
 				break;
+			}
+			if (retVal == nullptr) {
+				return nullptr;
 			}
 			retVal->setID(_ID);
 			retVal->setName(_name);
