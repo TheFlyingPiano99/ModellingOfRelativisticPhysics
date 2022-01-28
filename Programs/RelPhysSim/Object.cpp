@@ -343,14 +343,13 @@ float Object::rayDistanceToObject(const Ray& ray, const LightCone& lightCone, co
 {
 	vec4 location4 = intersect(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
 	vec3 wPos = vec3(location4.x, location4.y, location4.z);	// only space coordinates!
-	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
+	vec3 rayPos = ray.pos - vec3(observerCurrentLocation.x, observerCurrentLocation.y, observerCurrentLocation.z);
 	float d = length(wPos - rayPos - dot(ray.dir, wPos - rayPos) * ray.dir);
 	return (dot(wPos - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
 }
 
 vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
 {
-	//Intersect:
 	float t = 0;		// absolute time parametre
 	
 	float tLightCone = worldLine->intersect(lightCone);

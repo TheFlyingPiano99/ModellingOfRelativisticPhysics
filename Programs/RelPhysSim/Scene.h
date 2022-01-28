@@ -147,6 +147,8 @@ public:
 	*/
 	void toggleIntersectionMode();
 
+	void setIntersectionMode(RelTypes::IntersectionMode mode);
+
 	void toggleViewMode();
 
 	void toggleShading();

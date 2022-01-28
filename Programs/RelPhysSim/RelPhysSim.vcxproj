@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="AdvancedTexture.cpp" />
+    <ClCompile Include="Background.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Caption.cpp" />
     <ClCompile Include="ControlEventManager.cpp" />

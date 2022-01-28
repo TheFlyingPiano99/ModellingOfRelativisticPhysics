@@ -356,6 +356,9 @@ void Scene::toggleLorentzTransformation() {
 
 void Scene::toggleTransformToProperFrame()
 {
+	if (settings.viewMode != RelTypes::ViewMode::diagram) {
+		return;
+	}
 	if (settings.editorMode) {	// In editor mode no transformation is allowed!
 		settings.transformToProperFrame.get() = false;
 		return;
@@ -387,6 +390,25 @@ void Scene::toogleSimultaneBoost()
 
 void Scene::toggleIntersectionMode() {
 	settings.intersectionMode = (RelTypes::IntersectionMode)((2 > settings.intersectionMode.get() + 1) ? (settings.intersectionMode.get() + 1) : 0);
+	std::string str("Intersection mode: ");
+	switch (settings.intersectionMode.get())
+	{
+	case RelTypes::IntersectionMode::lightCone:
+		str.append("light cone");
+		break;
+	case RelTypes::IntersectionMode::hyperplane:
+		str.append("simultaneous hyperplane");
+		break;
+	default:
+		break;
+	}
+	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
+}
+
+void Scene::setIntersectionMode(RelTypes::IntersectionMode mode)
+{
+	settings.intersectionMode = mode;
 	std::string str("Intersection mode: ");
 	switch (settings.intersectionMode.get())
 	{
@@ -582,10 +604,10 @@ void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, co
 
 Entity* Scene::getUnderCursor(float cX, float cY)
 {
-	if (!objects.empty()) {		// There are objects in the scene.
+	if (!objects.empty()) {
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
 		int selectionIdx = -1;			// index of the selected object
-		if (settings.viewMode == RelTypes::ViewMode::diagram) {			// Diagram view
+		if (settings.viewMode == RelTypes::ViewMode::diagram) {
 			float constraint = 2.0f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
 				activeObserver->getProperties(settings),

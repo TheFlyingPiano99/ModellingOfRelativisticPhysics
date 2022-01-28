@@ -11,10 +11,10 @@ void Camera::updateDirections(vec3 updatedEye)
 	float d = dot(normalize(w), vec3(0, 0, 1));
 	if (abs(d) > 0.99f) {
 		if (d > 0) {
-			prefUp = vec3(0, -1, 0);
+			prefUp = vec3(0, 1, 0);
 		}
 		else {
-			prefUp = vec3(0, 1, 0);
+			prefUp = vec3(0, -1, 0);
 		}
 	}
 	else {
@@ -107,8 +107,10 @@ vec3 Camera::calculateRayStart(vec2 cPos)
 {
 	float scale = tanf(fov / 2.0f) * length(lookat - eye);
 	float sy = 1.0f / tanf(fov / 2.0f) * 20.0f;
+	vec3 center = (usePerspective) ? lookat 
+		: eye + normalize(lookat - eye) * nearPlane;
 	return
-		lookat
+		center
 		+ vRight * asp * ((usePerspective) ? scale : sy) * cPos.x
 		+ vUp * ((usePerspective) ? scale : sy) * cPos.y;
 }
@@ -116,7 +118,6 @@ vec3 Camera::calculateRayStart(vec2 cPos)
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
 	gpuProgram.setUniform(eye, "wEye");
 }
-
 void Camera::rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle) {
 	mat4 vRotationM = RotationMatrix(verticalAxisAngle / fov, prefUp);	// Scaled by fov, to avoid fast movement, while zoomed.
 	mat4 hRotationM = RotationMatrix(horizontalAxisAngle / fov, vRight);
@@ -202,7 +203,7 @@ Ray Camera::getRayFromCameraCoord(vec2 cPos) {
 	
 	vec3 rayStart = calculateRayStart(cPos);
 
-	return Ray(eye, normalize(rayStart - eye));
+	return Ray(rayStart, (usePerspective)? normalize(rayStart - eye) : normalize(lookat - eye));
 }
 
 void Camera::selectDirectionMode(RelTypes::DirectionMode mode)
