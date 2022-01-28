@@ -105,7 +105,7 @@ const mat4 Camera::getOrthographicProjectionMatrix() const {
 		0, 0, -2.0f / (farPlane - nearPlane), -(farPlane + nearPlane) / (farPlane - nearPlane),
 		0, 0, 0, 1
 	);
-	return Transpose(getModellMatrix);
+	return transpose(getModellMatrix);
 }
 
 const mat4 Camera::getActiveProjectionMatrix() const {

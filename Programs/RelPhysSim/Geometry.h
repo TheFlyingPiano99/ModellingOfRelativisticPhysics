@@ -151,27 +151,27 @@ inline mat4 RotationMatrix(float angle, vec3 w) {
 		vec4(0, 0, 0, 1));
 }
 
-inline mat4 Transpose(mat4 getModellMatrix) {
+inline mat4 transpose(mat4 m) {
 	mat4 transposed;
-	transposed[0][0] = getModellMatrix[0][0];
-	transposed[1][0] = getModellMatrix[0][1];
-	transposed[2][0] = getModellMatrix[0][2];
-	transposed[3][0] = getModellMatrix[0][3];
+	transposed[0][0] = m[0][0];
+	transposed[1][0] = m[0][1];
+	transposed[2][0] = m[0][2];
+	transposed[3][0] = m[0][3];
 
-	transposed[0][1] = getModellMatrix[1][0];
-	transposed[1][1] = getModellMatrix[1][1];
-	transposed[2][1] = getModellMatrix[1][2];
-	transposed[3][1] = getModellMatrix[1][3];
+	transposed[0][1] = m[1][0];
+	transposed[1][1] = m[1][1];
+	transposed[2][1] = m[1][2];
+	transposed[3][1] = m[1][3];
 
-	transposed[0][2] = getModellMatrix[2][0];
-	transposed[1][2] = getModellMatrix[2][1];
-	transposed[2][2] = getModellMatrix[2][2];
-	transposed[3][2] = getModellMatrix[2][3];
+	transposed[0][2] = m[2][0];
+	transposed[1][2] = m[2][1];
+	transposed[2][2] = m[2][2];
+	transposed[3][2] = m[2][3];
 
-	transposed[0][3] = getModellMatrix[3][0];
-	transposed[1][3] = getModellMatrix[3][1];
-	transposed[2][3] = getModellMatrix[3][2];
-	transposed[3][3] = getModellMatrix[3][3];
+	transposed[0][3] = m[3][0];
+	transposed[1][3] = m[3][1];
+	transposed[2][3] = m[3][2];
+	transposed[3][3] = m[3][3];
 	return transposed;
 }
 
