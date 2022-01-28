@@ -32,6 +32,7 @@ class Camera {
 
 	void restoreNormalCamera();
 
+
 public:
 
 	/*
@@ -52,27 +53,25 @@ public:
 	/*
 	* Return translate matrix.
 	*/
-	mat4 Translate() {
+	mat4 getTranslationMatrix() {
 		return TranslateMatrix(-eye);
 	}
 
 	/*
-	* Return view matrix (because of practical reasons: without the translate transformation).
+	* Return view matrix (Because of practical reasons: without the translate transformation!).
 	* In diagram view mode the translate matrix must be multiplied with the MVP matrix: M * Translate * V * P
 	*/
-	mat4 V();
+	mat4 getViewMatrix();
+	
+	mat4 getPerspectiveProjectionMatrix();
+
+	mat4 getOrthographicProjectionMatrix();
 	
 	/*
-	* Returns perspective projection matrix.
+	* Returns the currently selected projection matrix.
+	* This can be perspective or orthographic.
 	*/
-	mat4 P();
-
-	/*
-	* Returns orthographic projection matrix.
-	*/
-	mat4 OrtP();
-
-	mat4 getActiveProjection();
+	mat4 getActiveProjectionMatrix();
 	/*
 	* Transforms a camera space vector to world space so, that the world space position represented by the vector is in the "lookat plane".
 	*/

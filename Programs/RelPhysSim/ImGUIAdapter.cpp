@@ -22,6 +22,12 @@ void ImGUIAdapter::initBindings(Scene* scene)
 				})
 			)
 	);
+	guiObserver.addBinding(
+		new ImGUIObserver::ObservedVariable<bool>(&scene->getSettings().simultaneBoost,
+			std::function<void(bool)>([scene](bool _) {
+				})
+			)
+	);
 
 }
 
@@ -61,40 +67,18 @@ void ImGUIAdapter::configToScene(Scene& scene)
 	if (!visible) {
 		return;
 	}
-	ImGui::Begin("Relativistic settings");
-	ImGui::Text("GUI text.");
+	ImGui::Begin("Settings");
 	ImGui::Checkbox("Running", &scene.getSettings().running);
-
-	//ImGui::SliderFloat("Temporary setting01", &tempX, 0.0f, 10.0f);
-
-	/*
-	float minGamma = 0;
-	float maxGamma = 10;
-	float minExposure = 0;
-	float maxExposure = 1;
-
-	ImGui::BeginChild("Atmosphere properties");
-	ImGui::Text("HDR");
-	ImGui::SliderFloat("Gamma", scene.getPostprocessUnit()->getGamma(), minGamma, maxGamma);
-	ImGui::SliderFloat("Exposure", scene.getPostprocessUnit()->getExposure(), minExposure, maxExposure);
-	ImGui::EndChild();
-
-	ImGui::BeginChild("Atmosphere properties");
-	ImGui::Text("Rayleigh scattering");
-	float minRayleigh = 0;
-	float maxRayleigh = 0.5f;
-	ImGui::SliderFloat("Rayleigh R", &(scene.getPlanet()->getRayleighScattering()->x), minRayleigh, maxRayleigh);
-	ImGui::SliderFloat("Rayleigh G", &(scene.getPlanet()->getRayleighScattering()->y), minRayleigh, maxRayleigh);
-	ImGui::SliderFloat("Rayleigh B", &(scene.getPlanet()->getRayleighScattering()->z), minRayleigh, maxRayleigh);
-	ImGui::EndChild();
-
-	ImGui::BeginChild("Atmosphere properties");
-	ImGui::Text("Mie scattering");
-	float minMie = 0;
-	float maxMie = 0.02;
-	ImGui::SliderFloat("Mie", scene.getPlanet()->getMieScattering(), minMie, maxMie);
-	ImGui::EndChild();
-	*/
+	ImGui::Checkbox("Lorentz", &scene.getSettings().doLorentz.get());
+	if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode) {
+		ImGui::Checkbox("Shading", &scene.getSettings().doShading);
+		ImGui::Checkbox("Simultane boost", &scene.getSettings().simultaneBoost);
+	}
+	else if (RelTypes::ViewMode::diagram == scene.getSettings().viewMode) {
+		ImGui::Checkbox("Display intersectable", &scene.getSettings().displayIntersectable);
+		ImGui::Checkbox("Editor mode", &scene.getSettings().editorMode);
+		ImGui::Checkbox("Transform to proper frame", &scene.getSettings().transformToProperFrame.get());
+	}
 
 	ImGui::End();
 }

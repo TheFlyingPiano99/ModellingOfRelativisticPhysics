@@ -146,59 +146,35 @@ void ToggleImGUIEvent::performAction(const float dt)
 
 void SelectXCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::Xlocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(-25, 0, 0));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Xlocked);
 }
 
 void SelectYCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::Ylocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, -25, 0));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Ylocked);
 }
 
 void SelectZCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::Zlocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, -25));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Zlocked);
 }
 
 void SelectFreeCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::free);
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::free);
 }
 
 void SelectMinusXCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::minusXlocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(25, 0, 0));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusXlocked);
 }
 
 void SelectMinusYCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::minusYlocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 25, 0));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusYlocked);
 }
 
 void SelectMinusZCameraDirectionEvent::performAction(const float dt)
 {
-	Scene::getInstance()->getActiveCamera()->selectDirectionMode(RelTypes::DirectionMode::minusZlocked);
-	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
-		Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, 25));
-		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
-	}
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusZlocked);
 }

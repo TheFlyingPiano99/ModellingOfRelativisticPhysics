@@ -57,7 +57,7 @@ void Camera::setLookat(const vec3 lat) {
 	vUp = normalize(cross(w, vRight));
 }
 
-mat4 Camera::V() {
+mat4 Camera::getViewMatrix() {
 	vec3 w = normalize(eye - lookat);
 
 	return mat4(vRight.x, vUp.x, w.x, 0,
@@ -68,7 +68,7 @@ mat4 Camera::V() {
 
 
 
-mat4 Camera::P() {
+mat4 Camera::getPerspectiveProjectionMatrix() {
 	float sy = 1.0f / tanf(fov / 2.0f);
 	float a = -(nearPlane + farPlane) / (farPlane - nearPlane);
 	float b = -2.0f * nearPlane * farPlane / (farPlane - nearPlane);
@@ -78,7 +78,7 @@ mat4 Camera::P() {
 		0, 0, b, 0);
 }
 
-mat4 Camera::OrtP()
+mat4 Camera::getOrthographicProjectionMatrix()
 {
 	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale;
 	float r, l, t, b;
@@ -95,12 +95,12 @@ mat4 Camera::OrtP()
 	return Transpose(M);
 }
 
-mat4 Camera::getActiveProjection()
+mat4 Camera::getActiveProjectionMatrix()
 {
 	if (usePerspective) {
-		return P();
+		return getPerspectiveProjectionMatrix();
 	}
-	return OrtP();
+	return getOrthographicProjectionMatrix();
 }
 
 vec3 Camera::calculateRayStart(vec2 cPos)

@@ -139,7 +139,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	if (texture != nullptr) {
 		texture->loadOnGPU(gpuProgram);
 	}
-	gpuProgram.setUniform(camera.V() * camera.getActiveProjection(), "MVP");
+	gpuProgram.setUniform(camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	//gpuProgram.setUniform(M(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
@@ -193,7 +193,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 		diagramMaterial->loadOnGPU(gpuProgram);
 	}
 
-	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
+	gpuProgram.setUniform(camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
@@ -207,8 +207,8 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	
 	
 	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.Translate() * camera.V() 
-		* camera.getActiveProjection(), "MVP");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() 
+		* camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "directRenderMode");

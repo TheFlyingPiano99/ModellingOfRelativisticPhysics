@@ -849,6 +849,49 @@ vec4 Scene::getEditedLocation(const float cX, const float cY)
 	return invTransformed;
 }
 
+void Scene::setCameraDirectionMode(RelTypes::DirectionMode mode)
+{
+	if (activeCamera == nullptr) {
+		return;
+	}
+	activeCamera->selectDirectionMode(mode);
+	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
+		switch (mode)
+		{
+		case RelTypes::free:
+			hud->pushMessage("Free camera");
+			break;
+		case RelTypes::Xlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(-25, 0, 0));
+			hud->pushMessage("Camera locked to X");
+			break;
+		case RelTypes::Ylocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, -25, 0));
+			hud->pushMessage("Camera locked to Y");
+			break;
+		case RelTypes::Zlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, -25));
+			hud->pushMessage("Camera locked to Z");
+			break;
+		case RelTypes::minusXlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(25, 0, 0));
+			hud->pushMessage("Camera locked to -X");
+			break;
+		case RelTypes::minusYlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 25, 0));
+			hud->pushMessage("Camera locked to -Y");
+			break;
+		case RelTypes::minusZlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, 25));
+			hud->pushMessage("Camera locked to -Z");
+			break;
+		default:
+			break;
+		}
+		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
+	}
+}
+
 
 //Handlers:--------------------------------------------------------------
 

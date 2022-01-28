@@ -41,7 +41,7 @@ public:
 		material->loadOnGPU(gpuProgram);
 
 		gpuProgram.setUniform(*texture, "textureUnit");
-		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(camera.getViewMatrix() * camera.getPerspectiveProjectionMatrix(), "MVP");
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");
@@ -56,7 +56,7 @@ public:
 	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 		material->loadOnGPU(gpuProgram);
 		gpuProgram.setUniform(*texture, "textureUnit");
-		gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+		gpuProgram.setUniform(camera.getViewMatrix() * camera.getPerspectiveProjectionMatrix(), "MVP");
 		gpuProgram.setUniform(UnitMatrix(), "invM");
 		gpuProgram.setUniform(UnitMatrix(), "M");
 		gpuProgram.setUniform(texture == nullptr, "noTexture");

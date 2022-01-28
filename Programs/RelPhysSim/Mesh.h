@@ -103,10 +103,10 @@ public:
 
 	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		Dnum<vec2> U = Dnum<vec2>(u * 2.0f * M_PI, vec2(1.0f, 0.0f));
-		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0.0f, 1.0f));
-		Dnum<vec2> X = R * Cos(U) * Sin(V);
-		Dnum<vec2> Y = R * Sin(U) * Sin(V);
-		Dnum<vec2> Z = R * Cos(V);
+		Dnum<vec2> getViewMatrix = Dnum<vec2>(v * M_PI, vec2(0.0f, 1.0f));
+		Dnum<vec2> X = R * Cos(U) * Sin(getViewMatrix);
+		Dnum<vec2> Y = R * Sin(U) * Sin(getViewMatrix);
+		Dnum<vec2> Z = R * Cos(getViewMatrix);
 
 		pos = vec4(X.f, Y.f, Z.f, 0);
 		norm = -normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
@@ -151,10 +151,10 @@ public:
 		Dnum<vec2> AxisZ = Dnum<vec2>(axis.z, vec2(0, 0));
 		Dnum<vec2> Height = Dnum<vec2>(height, vec2(0, 0));
 		Dnum<vec2> U = Dnum<vec2>(u * 2.0 * M_PI, vec2(1, 0));
-		Dnum<vec2> V = Dnum<vec2>(v * 2.0 * height - height, vec2(0, 1));
-		Dnum<vec2> Z = V;
-		Dnum<vec2> X =  V * Cos(U) + AxisX / AxisZ * V;
-		Dnum<vec2> Y = V * Sin(U) + AxisY / AxisZ * V;
+		Dnum<vec2> getViewMatrix = Dnum<vec2>(v * 2.0 * height - height, vec2(0, 1));
+		Dnum<vec2> Z = getViewMatrix;
+		Dnum<vec2> X =  getViewMatrix * Cos(U) + AxisX / AxisZ * getViewMatrix;
+		Dnum<vec2> Y = getViewMatrix * Sin(U) + AxisY / AxisZ * getViewMatrix;
 
 		pos = vec4(X.f, Y.f, Z.f, 0.0f);
 		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
@@ -175,10 +175,10 @@ public:
 
 	void Eval(float u, float v, vec4& pos, vec3& norm) {
 		Dnum<vec2> U = Dnum<vec2>(u * 2.0 * M_PI, vec2(1, 0));
-		Dnum<vec2> V = Dnum<vec2>(v * M_PI, vec2(0, 1));
-		Dnum<vec2> X = R * Cos(U) * Sin(V);
-		Dnum<vec2> Y = R * Sin(U) * Sin(V);
-		Dnum<vec2> Z = R * Cos(V);
+		Dnum<vec2> getViewMatrix = Dnum<vec2>(v * M_PI, vec2(0, 1));
+		Dnum<vec2> X = R * Cos(U) * Sin(getViewMatrix);
+		Dnum<vec2> Y = R * Sin(U) * Sin(getViewMatrix);
+		Dnum<vec2> Z = R * Cos(getViewMatrix);
 
 		pos = vec4(X.f, Y.f, Z.f, 0);
 		norm = normalize(cross(vec3(X.d.x, Y.d.x, Z.d.x), vec3(X.d.y, Y.d.y, Z.d.y)));
