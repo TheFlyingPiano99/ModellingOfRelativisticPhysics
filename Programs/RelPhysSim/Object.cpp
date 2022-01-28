@@ -146,7 +146,7 @@ void Object::draw(GPUProgram& gpuProgram,
 	}
 	gpuProgram.setUniform(camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	//gpuProgram.setUniform(M(), "M");
-	gpuProgram.setUniform(UnitMatrix(), "getInverseModellMatrix");
+	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");
@@ -202,8 +202,8 @@ void Object::drawDiagram(GPUProgram& gpuProgram, const Camera& camera, const Lig
 	}
 
 	gpuProgram.setUniform(camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-	gpuProgram.setUniform(UnitMatrix(), "getModellMatrix");
-	gpuProgram.setUniform(UnitMatrix(), "getInverseModellMatrix");
+	gpuProgram.setUniform(UnitMatrix(), "M");
+	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");
@@ -217,8 +217,8 @@ void Object::drawDiagram(GPUProgram& gpuProgram, const Camera& camera, const Lig
 	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
 	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() 
 		* camera.getActiveProjectionMatrix(), "MVP");
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "getModellMatrix");
-	gpuProgram.setUniform(TranslateMatrix(-pos), "getInverseModellMatrix");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "directRenderMode");
 	gpuProgram.setUniform(false, "glow");
 
