@@ -49,10 +49,11 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 
 	vec3 wPos = (cameraSpace)? camera.calculateRayStart(vec2(pos.x, pos.y)) - camera.getEye() : pos;
 	vec3 normal = -camera.getLookDir();
-	float distance = length(dot(wPos, normal) * normal);
+	float distance = (camera.isPerspective())? length(dot(wPos, normal) * normal) 
+		: camera.getOrthographicScale();
 	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
 	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.V() * camera.P(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
+	gpuProgram.setUniform(M * camera.V() * camera.getActiveProjection(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
 
 	gpuProgram.setUniform(M, "M");
 	gpuProgram.setUniform(invM, "invM");
@@ -81,10 +82,11 @@ void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 
 	vec3 wPos = (cameraSpace) ? camera.calculateRayStart(vec2(pos.x, pos.y)) : pos;
 	vec3 normal = -camera.getLookDir();
-	float distance = length(dot(camera.getEye() - wPos, normal) * normal);
+	float distance = (camera.isPerspective()) ? length(dot(camera.getEye() - wPos, normal) * normal) 
+		: camera.getOrthographicScale();
 	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
 	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");		// With camera translation matrix.
+	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");		// With camera translation matrix.
 
 
 	gpuProgram.setUniform(M, "M");

@@ -88,7 +88,7 @@ void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
 
 void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "glow");
@@ -110,7 +110,7 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const RelT
 	vec3 normal = transformNormalToDiagramSpace(plane->getNormal(), settings);
 	
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
@@ -138,7 +138,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const RelTy
 	LightConeSurface* geometry = new LightConeSurface(axis);
 	geometry->GenSurface(100, 100);
 
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
@@ -156,7 +156,7 @@ void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const RelTypes::
 {
 	vec3 pos = transformPosToDiagramSpace(getLocation(settings), settings);
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "glow");

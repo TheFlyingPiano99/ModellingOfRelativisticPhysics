@@ -2,14 +2,43 @@
 
 #include <corecrt_math_defines.h>
 
+void Camera::updateDirections(vec3 updatedEye)
+{
+	vec3 delta = updatedEye - eye;
+	eye = updatedEye;
+	lookat = lookat + delta;
+	vec3 w = eye - lookat;
+	float d = dot(normalize(w), vec3(0, 0, 1));
+	if (abs(d) > 0.99f) {
+		if (d > 0) {
+			prefUp = vec3(0, -1, 0);
+		}
+		else {
+			prefUp = vec3(0, 1, 0);
+		}
+	}
+	else {
+		prefUp = vec3(0, 0, 1);
+	}
+
+	vRight = normalize(cross(prefUp, w));
+	vUp = normalize(cross(w, vRight));
+}
+
+void Camera::restoreNormalCamera() {
+	usePerspective = true;
+	directionMode = RelTypes::DirectionMode::free;
+	updateDirections(eye);
+}
+
 void Camera::initBasic(const vec3 _eye, const vec3 _lookat, const vec3 _prefUp, const float _fov, const float _asp, const float _fp, const float _bp) {
 	eye = _eye;
 	lookat = _lookat;
 	prefUp = normalize(_prefUp);
 	fov = _fov;
 	asp = _asp;
-	fp = _fp;
-	bp = _bp;
+	nearPlane = _fp;
+	farPlane = _bp;
 	setLookat(lookat);
 }
 
@@ -18,12 +47,7 @@ void Camera::syncToObserver(const RelTypes::ObserverProperties& observerProperti
 	velocityFV = observerProperties.velocity;
 	startPosFV = observerProperties.locationAtZero;
 	vec3 updatedEye = vec3(locationFV.x, locationFV.y, locationFV.z);
-	vec3 delta = updatedEye - eye;
-	eye = updatedEye;
-	lookat = lookat + delta;
-	vec3 w = eye - lookat;
-	vRight = normalize(cross(prefUp, w));
-	vUp = normalize(cross(w, vRight));
+	updateDirections(updatedEye);
 }
 
 void Camera::setLookat(const vec3 lat) {
@@ -42,23 +66,51 @@ mat4 Camera::V() {
 		0, 0, 0, 1);
 }
 
+
+
 mat4 Camera::P() {
 	float sy = 1.0f / tanf(fov / 2.0f);
-	float a = -(fp + bp) / (bp - fp);
-	float b = -2.0f * fp * bp / (bp - fp);
+	float a = -(nearPlane + farPlane) / (farPlane - nearPlane);
+	float b = -2.0f * nearPlane * farPlane / (farPlane - nearPlane);
 	return mat4(sy / asp, 0, 0, 0,
 		0, sy, 0, 0,
 		0, 0, a, -1,
 		0, 0, b, 0);
 }
 
+mat4 Camera::OrtP()
+{
+	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale;
+	float r, l, t, b;
+	t = sy;
+	b = -sy;
+	r = sy * asp;
+	l = -sy * asp;
+	mat4 M = mat4(
+		2.0f / (r - l), 0, 0, -(r + l) / (r - l),
+		0, 2.0f / (t - b), 0, -(t + b) / (t - b),
+		0, 0, -2.0f / (farPlane - nearPlane), -(farPlane + nearPlane) / (farPlane - nearPlane),
+		0, 0, 0, 1
+	);
+	return Transpose(M);
+}
+
+mat4 Camera::getActiveProjection()
+{
+	if (usePerspective) {
+		return P();
+	}
+	return OrtP();
+}
+
 vec3 Camera::calculateRayStart(vec2 cPos)
 {
 	float scale = tanf(fov / 2.0f) * length(lookat - eye);
+	float sy = 1.0f / tanf(fov / 2.0f) * 20.0f;
 	return
 		lookat
-		+ vRight * asp * scale * cPos.x
-		+ vUp * scale * cPos.y;
+		+ vRight * asp * ((usePerspective) ? scale : sy) * cPos.x
+		+ vUp * ((usePerspective) ? scale : sy) * cPos.y;
 }
 
 void Camera::loadOnGPU(GPUProgram& gpuProgram) {
@@ -77,6 +129,7 @@ void Camera::rotateAroundEye(float verticalAxisAngle, float horizontalAxisAngle)
 		return;
 	}
 	setLookat(rotated3 + eye);
+	restoreNormalCamera();
 }
 
 void Camera::rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAngle) {
@@ -92,6 +145,7 @@ void Camera::rotateAroundLookat(float verticalAxisAngle, float horizontalAxisAng
 	}
 	eye = rotated3 + lookat;
 	setLookat(lookat);
+	restoreNormalCamera();
 }
 
 void Camera::rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point) {
@@ -110,6 +164,12 @@ void Camera::rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngl
 	eye = vec3(rotatedEye.x, rotatedEye.y, rotatedEye.z) + point;
 	lookat = vec3(rotatedLookat.x, rotatedLookat.y, rotatedLookat.z) + point;
 	setLookat(lookat);
+	restoreNormalCamera();
+}
+
+void Camera::setLookDirection(vec3 dir)
+{
+	lookat = eye + normalize(dir) * length(lookat - eye);
 }
 
 void Camera::move(vec3 delta)
@@ -143,4 +203,44 @@ Ray Camera::getRayFromCameraCoord(vec2 cPos) {
 	vec3 rayStart = calculateRayStart(cPos);
 
 	return Ray(eye, normalize(rayStart - eye));
+}
+
+void Camera::selectDirectionMode(RelTypes::DirectionMode mode)
+{
+	directionMode = mode;
+	usePerspective = (mode == RelTypes::DirectionMode::free);
+	prefUp = vec3(0, 0, 1);
+	switch (directionMode)
+	{
+	case RelTypes::DirectionMode::Xlocked:
+			setLookDirection(vec3(1, 0, 0));
+			break;
+	case RelTypes::DirectionMode::Ylocked:
+			setLookDirection(vec3(0, 1, 0));
+			break;
+	case RelTypes::DirectionMode::Zlocked:
+			setLookDirection(vec3(0, 0, 1));
+			break;
+	case RelTypes::DirectionMode::minusXlocked:
+			setLookDirection(vec3(-1, 0, 0));
+			break;
+	case RelTypes::DirectionMode::minusYlocked:
+			setLookDirection(vec3(0, -1, 0));
+			break;
+	case RelTypes::DirectionMode::minusZlocked:
+			setLookDirection(vec3(0, 0, -1));
+			break;
+	case RelTypes::DirectionMode::free:
+		break;
+	default:
+		break;
+	}
+	updateDirections(eye);
+}
+
+void Camera::translateTo(vec3 pos)
+{
+	vec3 w = lookat - eye;
+	eye = pos;
+	lookat = eye + w;
 }

@@ -19,7 +19,7 @@ void HUD::Draw(GPUProgram& gpuProgram, Camera& camera)
 	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
-		(*cap)->Draw(gpuProgram, camera);
+		(*cap)->DrawDiagram(gpuProgram, camera);
 	}
 }
 

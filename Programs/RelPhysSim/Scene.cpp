@@ -96,6 +96,9 @@ void Scene::Initialise()
 
 	// Other:----------------------------------------------------------
 	hud->updateSettings(settings);
+	if (activeObserver != nullptr) {
+		activeObserver->syncCamera(activeCamera, settings);
+	}
 }
 
 void Scene::loadDefault()
@@ -105,7 +108,7 @@ void Scene::loadDefault()
 
 	//Observers:-------------------------------------------------
 	//1.
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 20.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
@@ -115,7 +118,7 @@ void Scene::loadDefault()
 	observers.push_back(observer);
 
 	//3.:
-
+	//...
 	//Objects:----------------------------------------------------
 	/*
 	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
@@ -259,7 +262,6 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.loadOnGPU(settings);
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
-
 		view->Draw(gpuProgram);
 	}
 }

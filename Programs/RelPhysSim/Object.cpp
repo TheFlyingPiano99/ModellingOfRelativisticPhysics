@@ -81,7 +81,7 @@ Object* Object::createSpike(WorldLine* wrdln)
 		vec3(0, 0, 1),
 		wrdln,
 		Assets::getSpikeGeometry(),
-		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
+		new Material(vec3(1, 1, 1), vec3(10, 10, 10), vec3(5, 5, 5), 50),		// RealTime3D material
 		diagramM,		// Diagram material
 		new AdvancedTexture(Assets::getTexturePath().append("spike.bmp").c_str(), "", ""),
 		"Spike",
@@ -139,7 +139,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	if (texture != nullptr) {
 		texture->loadOnGPU(gpuProgram);
 	}
-	gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.V() * camera.getActiveProjection(), "MVP");
 	//gpuProgram.setUniform(M(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
@@ -193,7 +193,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 		diagramMaterial->loadOnGPU(gpuProgram);
 	}
 
-	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
@@ -207,7 +207,8 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	
 	
 	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.Translate() * camera.V() 
+		* camera.getActiveProjection(), "MVP");
 	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "directRenderMode");

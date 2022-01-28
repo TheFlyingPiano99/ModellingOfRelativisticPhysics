@@ -6,7 +6,7 @@ void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, Camera& camera, const un
     glBindBuffer(GL_ARRAY_BUFFER, vbo[idx]);
     mat4 M = TranslateMatrix(center);
     mat4 invM = TranslateMatrix(-center);
-    gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");
+    gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.getActiveProjection(), "MVP");
     gpuProgram.setUniform(M, "M");
     gpuProgram.setUniform(invM, "invM");
     gpuProgram.setUniform(false, "outline");

@@ -4,22 +4,40 @@
 #include "GPUProgram.h"
 #include "Geometry.h"
 
+namespace RelTypes {
+	enum DirectionMode {
+		free,
+		Xlocked,
+		Ylocked,
+		Zlocked,
+		minusXlocked,
+		minusYlocked,
+		minusZlocked
+	};
+}
+
 /*
 * Viewing camera.
 */
 class Camera {
 	vec3 eye, lookat, vUp, vRight, prefUp;
-	float fov, asp, fp, bp;
+	float fov, asp, nearPlane, farPlane;
+	float orthographicScale = 20;
 	//4-vectors:
 	vec4 locationFV, velocityFV, startPosFV;
+	bool usePerspective = true;
+	RelTypes::DirectionMode directionMode = RelTypes::DirectionMode::free;
 
+	void updateDirections(vec3 eye);
+
+	void restoreNormalCamera();
 
 public:
 
 	/*
 	* Must be called after construction, to set the necessary variables.
 	*/
-	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float fp, const float bp);
+	void initBasic(const vec3 eye, const vec3 lookat, const vec3 prefUp, const float fov, const float asp, const float nearPlane, const float farPlane);
 
 	/*
 	* Update camera to allignt with the observer.
@@ -45,10 +63,16 @@ public:
 	mat4 V();
 	
 	/*
-	* Returns projection matrix.
+	* Returns perspective projection matrix.
 	*/
 	mat4 P();
 
+	/*
+	* Returns orthographic projection matrix.
+	*/
+	mat4 OrtP();
+
+	mat4 getActiveProjection();
 	/*
 	* Transforms a camera space vector to world space so, that the world space position represented by the vector is in the "lookat plane".
 	*/
@@ -106,6 +130,8 @@ public:
 
 	void rotateAroundPoint(float verticalAxisAngle, float horizontalAxisAngle, vec3 point);
 
+	void setLookDirection(vec3 dir);
+
 	/*
 	* X...forward
 	* Y...right
@@ -117,4 +143,15 @@ public:
 
 	Ray getRayFromCameraCoord(vec2 cPos);
 
+	void selectDirectionMode(RelTypes::DirectionMode mode);
+
+	void translateTo(vec3 pos);
+
+	bool isPerspective() {
+		return usePerspective;
+	}
+
+	float getOrthographicScale() {
+		return orthographicScale;
+	}
 };

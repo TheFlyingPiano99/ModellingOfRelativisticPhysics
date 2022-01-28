@@ -151,6 +151,30 @@ inline mat4 RotationMatrix(float angle, vec3 w) {
 		vec4(0, 0, 0, 1));
 }
 
+inline mat4 Transpose(mat4 M) {
+	mat4 transposed;
+	transposed[0][0] = M[0][0];
+	transposed[1][0] = M[0][1];
+	transposed[2][0] = M[0][2];
+	transposed[3][0] = M[0][3];
+
+	transposed[0][1] = M[1][0];
+	transposed[1][1] = M[1][1];
+	transposed[2][1] = M[1][2];
+	transposed[3][1] = M[1][3];
+
+	transposed[0][2] = M[2][0];
+	transposed[1][2] = M[2][1];
+	transposed[2][2] = M[2][2];
+	transposed[3][2] = M[2][3];
+
+	transposed[0][3] = M[3][0];
+	transposed[1][3] = M[3][1];
+	transposed[2][3] = M[3][2];
+	transposed[3][3] = M[3][3];
+	return transposed;
+}
+
 inline vec2 solveQuadraticFunction(float a, float b, float c, int& noOfRealSolutions) {
 	if (a == 0.0f && b != 0.0f) {
 		noOfRealSolutions = 1;
