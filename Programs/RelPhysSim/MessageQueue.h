@@ -26,7 +26,7 @@ public:
 
 	void push(const char* text);
 
-	void Animate(float dt);
+	void animate(float dt);
 
 	void clearQueue();
 

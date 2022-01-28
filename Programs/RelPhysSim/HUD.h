@@ -59,17 +59,17 @@ public:
 	/*
 	* Responsible for movement and fading of captions.
 	*/
-	void Animate(float dt);
+	void animate(float dt);
 
 	/*
 	* DrawDiagram every caption and other in RealTime3D view mode.
 	*/
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
+	void draw(GPUProgram& gpuProgram, const Camera& camera);
 
 	/*
-	* DrawDiagram every caption and other in Diagram view mode.
+	* Draw every caption and other in Diagram view mode.
 	*/
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera);
 
 	/*
 	* Push a new caption in the message queue.

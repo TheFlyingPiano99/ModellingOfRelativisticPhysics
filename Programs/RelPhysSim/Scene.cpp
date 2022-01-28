@@ -226,11 +226,11 @@ void Scene::Control(float dt) {
 	}
 }
 
-void Scene::Animate(float dt) {
+void Scene::animate(float dt) {
 	if (loadingScene) {
 		return;
 	}
-	hud->Animate(dt);						// Always animate!
+	hud->animate(dt);						// Always animate!
 	settings.intersectionMode.animate(dt);
 	settings.dopplerMode.animate(dt);
 	settings.doLorentz.animate(dt);
@@ -247,12 +247,12 @@ void Scene::Animate(float dt) {
 		
 		for each (Object * obj in objects)
 		{
-			obj->Animate(dt);
+			obj->animate(dt);
 		}
 	}
 }
 
-void Scene::Draw(GPUProgram& gpuProgram) {
+void Scene::draw(GPUProgram& gpuProgram) {
 	if (loadingScene) {
 		return;
 	}
@@ -262,7 +262,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.loadOnGPU(settings);
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
-		view->Draw(gpuProgram);
+		view->draw(gpuProgram);
 	}
 }
 
@@ -498,7 +498,7 @@ void Scene::setTime(float t) {
 	}
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 }
 
@@ -506,7 +506,7 @@ void Scene::reset() {
 	setTime(0.0f);
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 	hud->pushMessage("Reset");
 }
@@ -515,7 +515,7 @@ void Scene::windTime(float deltaTau) {
 	float realDelta = activeObserver->changeTimeByDelta(deltaTau, settings);
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 	std::string str("Time shifted by tau = ");
 	hud->pushMessage(str.append(std::to_string(realDelta)).append(" m").c_str());
@@ -629,12 +629,21 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 			LightCone* lightCone = activeObserver->getLightCone(settings);
 			Hyperplane* hyperplane = activeObserver->getHyperplane(settings);
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, 
+				*lightCone,
+				*hyperplane,
+				settings,
+				activeObserver->getProperties(settings));
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+				float d = objects[i]->rayDistanceToObject(
+					ray, 
+					*lightCone, 
+					*hyperplane, 
+					settings,
+					activeObserver->getProperties(settings));
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
@@ -844,9 +853,9 @@ vec4 Scene::getEditedLocation(const float cX, const float cY)
 	else if (settings.viewMode == RelTypes::ViewMode::realTime3D) {
 		throw std::exception("Unimplemented behaviour!");
 	}
-	vec3 prefUp = activeCamera->getPrefUp();
+	vec3 preferedUp = activeCamera->getPrefUp();
 	vec3 right = activeCamera->getRight();
-	vec3 planeNorm = cross(right, prefUp);
+	vec3 planeNorm = cross(right, preferedUp);
 	Plane plane = Plane(planePos, planeNorm);
 	vec3 diagramPos = intersect(plane, ray);
 	vec4 location;

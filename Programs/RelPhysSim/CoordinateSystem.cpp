@@ -1,19 +1,19 @@
 #include "CoordinateSystem.h"
 
-void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx, const vec3 center)
+void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, const Camera& camera, const unsigned int idx, const vec3 center)
 {
     glBindVertexArray(vao[idx]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[idx]);
-    mat4 M = TranslateMatrix(center);
-    mat4 invM = TranslateMatrix(-center);
-    gpuProgram.setUniform(M * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-    gpuProgram.setUniform(M, "M");
-    gpuProgram.setUniform(invM, "invM");
+    mat4 getModellMatrix = TranslateMatrix(center);
+    mat4 getInverseModellMatrix = TranslateMatrix(-center);
+    gpuProgram.setUniform(getModellMatrix * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
+    gpuProgram.setUniform(getModellMatrix, "getModellMatrix");
+    gpuProgram.setUniform(getInverseModellMatrix, "getInverseModellMatrix");
     gpuProgram.setUniform(false, "outline");
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
 
-void CoordinateSystem::drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center)
+void CoordinateSystem::drawGrid(GPUProgram& gpuProgram, const Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center)
 {
     glLineWidth(1);
     gpuProgram.setUniform(vec3(0.4f, 0.4f, 0.4f), "kd");
@@ -42,7 +42,7 @@ void CoordinateSystem::genGeometry(vec3 base, unsigned int* vao, unsigned int* v
     glBufferData(GL_ARRAY_BUFFER, noOfVds * sizeof(vec3), &vds[0], GL_STATIC_DRAW);
 }
 
-void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
+void CoordinateSystem::draw(GPUProgram& gpuProgram, const Camera& camera)
 {
     for (int i = 0; i < 3; i++) {
         (*axisName[i])->setVisible(false);
@@ -55,10 +55,10 @@ void CoordinateSystem::Draw(GPUProgram& gpuProgram, Camera& camera)
     }
 }
 
-void CoordinateSystem::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
+void CoordinateSystem::drawDiagram(GPUProgram& gpuProgram, const Camera& camera)
 {
-    gpuProgram.setUniform(UnitMatrix(), "M");
-    gpuProgram.setUniform(UnitMatrix(), "invM");
+    gpuProgram.setUniform(UnitMatrix(), "getModellMatrix");
+    gpuProgram.setUniform(UnitMatrix(), "getInverseModellMatrix");
     gpuProgram.setUniform(true, "glow");
     gpuProgram.setUniform(true, "noTexture");
     gpuProgram.setUniform(false, "outline");

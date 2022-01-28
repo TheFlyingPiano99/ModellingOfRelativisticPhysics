@@ -34,7 +34,7 @@ void MessageQueue::push(const char* text)
 	}
 }
 
-void MessageQueue::Animate(float dt) {
+void MessageQueue::animate(float dt) {
 	if (queue.empty()) {
 		transitPhase = false;
 		return;

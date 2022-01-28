@@ -95,9 +95,9 @@ public:
 	*/
 	static Object* createSpike(WorldLine* wrdln);
 
-	mat4 M();
+	mat4 getModellMatrix();
 
-	mat4 invM();
+	mat4 getInverseModellMatrix();
 
 	void Control(float dt, float absoluteTimeSpent) {
 		//Todo
@@ -112,17 +112,18 @@ public:
 		const RelTypes::Settings& settings,
 		const RelTypes::ObserverProperties& observerProperties);
 
-	void Animate(float dt);
+	void animate(float dt);
 
-	void Draw(GPUProgram& gpuProgram, 
-		Camera& camera,
+	void draw(GPUProgram& gpuProgram, 
+		const Camera& camera,
 		const LightCone& lightCone, 
 		const Hyperplane& hyperplane, 
 		const RelTypes::ObserverProperties& observerProperties,
 		const RelTypes::Settings& settings);
 
-	void DrawDiagram(GPUProgram& gpuProgram, 
-		Camera& camera, const LightCone& cone,
+	void drawDiagram(GPUProgram& gpuProgram, 
+		const Camera& camera, 
+		const LightCone& cone,
 		const Hyperplane& plane, 
 		const RelTypes::ObserverProperties& observerProperties, 
 		const RelTypes::Settings& settings);
@@ -158,9 +159,7 @@ public:
 		const LightCone& lightCone, 
 		const Hyperplane& hyperplane,
 		const RelTypes::Settings& settings,
-		vec4 observerCurrentLocation, 
-		vec4 observerLocationAtZero, 
-		vec4 observersCurrentVelocity);
+		const RelTypes::ObserverProperties& observerProperties);
 
 	/*
 	* Returns location perceived by the observer expressed in observer's proper frame.
@@ -169,9 +168,7 @@ public:
 	vec4 intersect(const LightCone& lightCone, 
 		const Hyperplane& hyperplane, 
 		const RelTypes::Settings& settings,
-		vec4 observerCurrentLocation, 
-		vec4 observerLocationAtZero,
-		vec4 observersCurrentVelocity);
+		const RelTypes::ObserverProperties& observerProperties);
 
 	/*
 	* Sphere model for collision detection.

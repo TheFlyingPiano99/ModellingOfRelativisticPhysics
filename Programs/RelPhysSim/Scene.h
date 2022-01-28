@@ -114,12 +114,12 @@ public:
 
 	void Control(float dt);
 
-	void Animate(float dt);
+	void animate(float dt);
 
 	/*
 	* Renders everything on screen.
 	*/
-	void Draw(GPUProgram& gpuProgram);
+	void draw(GPUProgram& gpuProgram);
 
 	void toggleActiveObserver();
 

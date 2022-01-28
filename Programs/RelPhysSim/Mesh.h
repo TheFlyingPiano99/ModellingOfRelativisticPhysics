@@ -32,7 +32,7 @@ public:
 		glDeleteVertexArrays(1, &vao);
 	}
 
-	virtual void Draw() = 0;
+	virtual void draw() = 0;
 
 	float getOverallRadius() {
 		return overallRadius;
@@ -83,7 +83,7 @@ public:
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));		
 	}
 
-	virtual void Draw() {
+	virtual void draw() {
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		//gpuProgram.setUniform(depthShading, "depthShading");
@@ -217,6 +217,6 @@ public:
 
 	virtual void load(const char* route);
 
-	virtual void Draw();
+	virtual void draw();
 
 };

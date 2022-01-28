@@ -47,6 +47,12 @@ class Caption {
 	}
 	Caption() {};
 
+	mat4 getModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const;
+
+	mat4 getInverseModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const;
+
+	void genGeometry();
+
 public:
 
 	static void setPushCaptionFunction(void (*func)(std::shared_ptr<Caption*>)) {
@@ -99,21 +105,15 @@ public:
 		return caption->getSharedPtr();
 	}
 
-	mat4 M(vec3 pos, vec3 norm, vec3 prefUp, float distance);
+	void animate();
 
-	mat4 invM(vec3 pos, vec3 norm, vec3 prefUp, float distance);
+	void draw(GPUProgram& gpuProgram, const Camera& camera) const;
 
-	void Animate();
-
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
-
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
-
-	void genGeometry();
+	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera) const;
 
 	void changeText(const char* str);
 
-	vec3 getPos() {
+	const vec3 getPos() const {
 		return pos;
 	}
 
@@ -125,7 +125,7 @@ public:
 		fontSize = size;
 	}
 
-	float getFontSize() {
+	const float getFontSize() const {
 		return fontSize;
 	}
 
@@ -137,7 +137,7 @@ public:
 		color = _color;
 	}
 
-	vec3 getColor() {
+	const vec3 getColor() const {
 		return color;
 	}
 

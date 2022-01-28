@@ -4,8 +4,8 @@
 void (*Caption::pushCaption)(std::shared_ptr<Caption*>) = NULL;
 void (*Caption::ereaseCaption)(std::shared_ptr<Caption*>) = NULL;
 
-mat4 Caption::M(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
-	vec3 right = normalize(cross(prefUp, norm));
+mat4 Caption::getModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const {
+	vec3 right = normalize(cross(preferedUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
 	return ScaleMatrix(vec3(1, fontSize * distance, fontSize * distance))
@@ -17,8 +17,8 @@ mat4 Caption::M(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
 		* TranslateMatrix(pos);
 }
 
-mat4 Caption::invM(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
-	vec3 right = normalize(cross(prefUp, norm));
+mat4 Caption::getInverseModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const {
+	vec3 right = normalize(cross(preferedUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
 	return TranslateMatrix(-pos)
@@ -30,14 +30,14 @@ mat4 Caption::invM(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
 		* ScaleMatrix(vec3(1, 1 / fontSize / distance, 1 / fontSize / distance));
 }
 
-void Caption::Animate()
+void Caption::animate()
 {
 	if (animation != nullptr) {
 		//Todo
 	}
 }
 
-void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
+void Caption::draw(GPUProgram& gpuProgram, const Camera& camera) const
 {	
 	if (!visible) {
 		return;
@@ -51,12 +51,12 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	vec3 normal = -camera.getLookDir();
 	float distance = (camera.isPerspective())? length(dot(wPos, normal) * normal) 
 		: camera.getOrthographicScale();
-	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
+	mat4 getModellMatrix = this->getModellMatrix(wPos, normal, camera.getPrefUp(), distance);
+	mat4 getInverseModellMatrix = this->getInverseModellMatrix(wPos, normal, camera.getPrefUp(), distance);
+	gpuProgram.setUniform(getModellMatrix * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
 
-	gpuProgram.setUniform(M, "M");
-	gpuProgram.setUniform(invM, "invM");
+	gpuProgram.setUniform(getModellMatrix, "getModellMatrix");
+	gpuProgram.setUniform(getInverseModellMatrix, "getInverseModellMatrix");
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(vao);
@@ -69,7 +69,7 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	gpuProgram.setUniform(false, "textMode");
 }
 
-void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
+void Caption::drawDiagram(GPUProgram& gpuProgram, const Camera& camera) const
 {
 	this;
 	if (!visible) {
@@ -84,13 +84,13 @@ void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
 	vec3 normal = -camera.getLookDir();
 	float distance = (camera.isPerspective()) ? length(dot(camera.getEye() - wPos, normal) * normal) 
 		: camera.getOrthographicScale();
-	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");		// With camera translation matrix.
+	mat4 getModellMatrix = this->getModellMatrix(wPos, normal, camera.getPrefUp(), distance);
+	mat4 getInverseModellMatrix = this->getInverseModellMatrix(wPos, normal, camera.getPrefUp(), distance);
+	gpuProgram.setUniform(getModellMatrix * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");		// With camera translation matrix.
 
 
-	gpuProgram.setUniform(M, "M");
-	gpuProgram.setUniform(invM, "invM");
+	gpuProgram.setUniform(getModellMatrix, "getModellMatrix");
+	gpuProgram.setUniform(getInverseModellMatrix, "getInverseModellMatrix");
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(vao);
@@ -109,8 +109,8 @@ void Caption::genGeometry()
 	// X front, Z vUp, vRight handed system:
 	vec3 charPos;
 	vec3 vNorm = vec3(-1, 0, 0);		// Normal vector
-	vec3 vUp = vec3(0, 0, 1);
-	vec3 vRight = vec3(0, -1, 0);
+	vec3 up = vec3(0, 0, 1);
+	vec3 right = vec3(0, -1, 0);
 	//UVs:	(named in viewers orientation)
 	vec2 topLeftUV, topRightUV, bottomLeftUV, bottomRightUV;	
 
@@ -139,7 +139,7 @@ void Caption::genGeometry()
 			continue;
 		}
 		fontTexture->getCharUVs(text[i], topLeftUV, topRightUV, bottomRightUV, bottomLeftUV);
-		charPos = vRight * (posInLine++ - firstLineLength / 2.0f) + line * vec3(0, 0, -lineSpacing);		// Pos is in the center of the string.
+		charPos = right * (posInLine++ - firstLineLength / 2.0f) + line * vec3(0, 0, -lineSpacing);		// Pos is in the center of the string.
 
 		// (named in viewers orientation)
 		VertexData bottomLeft;

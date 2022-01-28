@@ -66,7 +66,7 @@ void onDisplay() {
 	guiAdapter->preDrawInit();
 	glClearColor(0, 0, 0.5f, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	scene->Draw(gpuProgram);
+	scene->draw(gpuProgram);
 	guiAdapter->configToScene(*scene);
 	guiAdapter->draw();
 	glutSwapBuffers();
@@ -222,7 +222,7 @@ void onIdle() {
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;
 		scene->Control(DT);
-		scene->Animate(DT);
+		scene->animate(DT);
 	}
 	glutPostRedisplay();
 }

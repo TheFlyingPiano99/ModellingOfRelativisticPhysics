@@ -3,7 +3,7 @@
 #include "Scene.h"
 
 
-void RealTime3DView::Draw(GPUProgram& gpuProgram) {
+void RealTime3DView::draw(GPUProgram& gpuProgram) {
 	glDisable(GL_CULL_FACE);
 	Scene* scene = reinterpret_cast<Scene*>(owner);
 	Camera* activeCamera = scene->getActiveCamera();
@@ -17,22 +17,22 @@ void RealTime3DView::Draw(GPUProgram& gpuProgram) {
 
 	gpuProgram.setUniform(false, "doLorentz");
 	gpuProgram.setUniform(1, "intersectionMode");
-	scene->getBackground()->Draw(gpuProgram, *(activeCamera));		// Background
+	scene->getBackground()->draw(gpuProgram, *(activeCamera));		// Background
 	gpuProgram.setUniform(scene->getSettings().doLorentz.get(), "doLorentz");
 	gpuProgram.setUniform(scene->getSettings().intersectionMode.get(), "intersectionMode");
 
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		RelTypes::Settings settings = scene->getSettings();
-		obj->Draw(gpuProgram, *(scene->getActiveCamera()), *lightCone, *hyperplane, scene->getActiveObserver()->getProperties(settings), settings);	// Objects
+		obj->draw(gpuProgram, *(scene->getActiveCamera()), *lightCone, *hyperplane, scene->getActiveObserver()->getProperties(settings), settings);	// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
-		obs->Draw(gpuProgram, *activeCamera);			// Observers
+		obs->draw(gpuProgram, *activeCamera);			// Observers
 	}
-	scene->getCoordinateSystem()->Draw(gpuProgram, *activeCamera);					// Coordinate system
+	scene->getCoordinateSystem()->draw(gpuProgram, *activeCamera);					// Coordinate system
 	
-	scene->getHUD()->Draw(gpuProgram, *activeCamera);				// HUD
+	scene->getHUD()->draw(gpuProgram, *activeCamera);				// HUD
 
 	delete lightCone;
 	delete hyperplane;
@@ -46,7 +46,7 @@ void RealTime3DView::transitionTo()
 {
 }
 
-void DiagramView::Draw(GPUProgram& gpuProgram) {
+void DiagramView::draw(GPUProgram& gpuProgram) {
 	Scene* scene = reinterpret_cast<Scene*>(owner);
 	for each (LightSource * lt in *(scene->getDiagramLights()))
 	{
@@ -57,22 +57,22 @@ void DiagramView::Draw(GPUProgram& gpuProgram) {
 	Camera* activeCamera = scene->getActiveCamera();
 	LightCone* lightCone = scene->getActiveObserver()->getLightCone(scene->getSettings());
 	Hyperplane* hyperplane = scene->getActiveObserver()->getHyperplane(scene->getSettings());
-	scene->getBackground()->DrawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
+	scene->getBackground()->drawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
 	for each (Object * obj in *(scene->getObjects()))
 	{
-		obj->DrawDiagram(gpuProgram, *activeCamera, *lightCone, *hyperplane,
+		obj->drawDiagram(gpuProgram, *activeCamera, *lightCone, *hyperplane,
 			scene->getActiveObserver()->getProperties(scene->getSettings()),
 			scene->getSettings());			// Objects
 	}
 	for each (Observer * obs in *(scene->getObservers()))
 	{
-		obs->DrawDiagram(gpuProgram, *activeCamera);			// Observers
+		obs->drawDiagram(gpuProgram, *activeCamera);			// Observers
 	}
-	((Scene*)owner)->getCoordinateSystem()->DrawDiagram(gpuProgram, *activeCamera);					// Coordinate system
+	((Scene*)owner)->getCoordinateSystem()->drawDiagram(gpuProgram, *activeCamera);					// Coordinate system
 
-	scene->getActiveObserver()->DrawExtras(gpuProgram, *activeCamera, scene->getActiveObserver()->getProperties(scene->getSettings()), scene->getSettings());
+	scene->getActiveObserver()->drawExtras(gpuProgram, *activeCamera, scene->getActiveObserver()->getProperties(scene->getSettings()), scene->getSettings());
 
-	scene->getHUD()->DrawDiagram(gpuProgram, *activeCamera);			// HUD
+	scene->getHUD()->drawDiagram(gpuProgram, *activeCamera);			// HUD
 	delete lightCone;
 	delete hyperplane;
 }

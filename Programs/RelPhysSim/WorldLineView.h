@@ -15,10 +15,10 @@ public:
 	WorldLineView(const WorldLine* _model);
 	virtual ~WorldLineView();
 
-	virtual void Draw() = 0;
-	virtual void DrawDiagram() = 0;
-	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) = 0;
-	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) = 0;
+	virtual void draw() const = 0;
+	virtual void drawDiagram() const = 0;
+	virtual void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
+	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
 	virtual void update() = 0;
 	void updateGeometry();
 
@@ -44,15 +44,15 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	virtual void Draw() override;
+	void draw() const override;
 
-	virtual void DrawDiagram() override;
+	void drawDiagram() const override;
 
-	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override;
+	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
-	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override;
+	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
-	virtual void update() override;
+	void update() override;
 
 };
 
@@ -77,15 +77,15 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	virtual void Draw() override;
+	void draw() const override;
 
-	virtual void DrawDiagram() override;
+	void drawDiagram() const override;
 
-	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override;
+	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
-	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override;
+	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
-	virtual void update() override;
+	void update() override;
 };
 
 class SpiralLineView : public WorldLineView {
@@ -107,18 +107,18 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	virtual void Draw() override;
+	void draw() const override;
 
-	virtual void DrawDiagram() override;
+	void drawDiagram() const override;
 
-	virtual void disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override
+	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override
 	{
 		(**locationAtZeroTCaption).setVisible(false);
 		(**velocityCaption).setVisible(false);
 	}
 
-	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings) override;
+	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
-	virtual void update() override;
+	void update() override;
 
 };

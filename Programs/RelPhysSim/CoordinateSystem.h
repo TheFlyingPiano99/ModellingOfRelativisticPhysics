@@ -18,8 +18,8 @@ class CoordinateSystem {
 	std::shared_ptr<Caption*> negAxisName[3];
 	std::vector<std::shared_ptr<Caption*>> axisScale[3];
 
-	void drawAxis(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx, const vec3 center);
-	void drawGrid(GPUProgram& gpuProgram, Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center);
+	void drawAxis(GPUProgram& gpuProgram, const Camera& camera, const unsigned int idx, const vec3 center);
+	void drawGrid(GPUProgram& gpuProgram, const Camera& camera, const unsigned int idx0, const unsigned int idx1, vec3 center);
 	void genGeometry(vec3 base, unsigned int* vao, unsigned int* vbo);
 
 public:
@@ -72,6 +72,6 @@ public:
 		}
 	}
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+	void draw(GPUProgram& gpuProgram, const Camera& camera);
+	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera);
 };

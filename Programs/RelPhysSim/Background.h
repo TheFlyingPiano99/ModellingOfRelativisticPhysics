@@ -27,9 +27,9 @@ public:
 
 
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
+	void draw(GPUProgram& gpuProgram, const Camera& camera);
 
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
+	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera);
 
 
 };

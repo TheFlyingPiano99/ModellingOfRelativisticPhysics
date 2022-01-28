@@ -16,7 +16,7 @@ public:
 
 	virtual void transitionFrom() = 0;
 	virtual void transitionTo() = 0;
-	virtual void Draw(GPUProgram& gpuProgram) = 0;
+	virtual void draw(GPUProgram& gpuProgram) = 0;
 };
 
 class RealTime3DView : public View {
@@ -24,7 +24,7 @@ class RealTime3DView : public View {
 public:
 	RealTime3DView(void* _owner): View(_owner) {}
 
-	void Draw(GPUProgram& gpuProgram);
+	void draw(GPUProgram& gpuProgram);
 	void transitionFrom();
 	void transitionTo();
 };
@@ -37,7 +37,7 @@ public:
 	~DiagramView() {
 	}
 
-	void Draw(GPUProgram& gpuProgram);
+	void draw(GPUProgram& gpuProgram);
 	void transitionFrom();
 	void transitionTo();
 };

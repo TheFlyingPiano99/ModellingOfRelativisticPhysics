@@ -3,34 +3,34 @@
 HUD* HUD::instance = NULL;
 
 
-void HUD::Animate(float dt)
+void HUD::animate(float dt)
 {
 	for each (std::shared_ptr<Caption*> cap in captions)
 	{
-		(*cap)->Animate();
+		(*cap)->animate();
 	}
-	messageQueue->Animate(dt);
+	messageQueue->animate(dt);
 }
 
-void HUD::Draw(GPUProgram& gpuProgram, Camera& camera)
+void HUD::draw(GPUProgram& gpuProgram, const Camera& camera)
 {
 	if (!visible) {
 		return;
 	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
-		(*cap)->DrawDiagram(gpuProgram, camera);
+		(*cap)->drawDiagram(gpuProgram, camera);
 	}
 }
 
-void HUD::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
+void HUD::drawDiagram(GPUProgram& gpuProgram, const Camera& camera)
 {
 	if (!visible) {
 		return;
 	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
-		(*cap)->DrawDiagram(gpuProgram, camera);
+		(*cap)->drawDiagram(gpuProgram, camera);
 	}
 }
 
