@@ -37,11 +37,12 @@ public:
 		name[2] = "t";
 
 		int nameDist = 50;
+		int interval = 5;
 		for (int i = -20; i <= 20; i++) {
-			if (i * 5 != nameDist) {
-				axisScale[0].push_back(Caption::createSmallCaption(base[0] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
-				axisScale[1].push_back(Caption::createSmallCaption(base[1] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
-				axisScale[2].push_back(Caption::createSmallCaption(base[2] * i * 5, std::to_string(i * 5).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+			if (i * interval != nameDist) {
+				axisScale[0].push_back(Caption::createSmallCaption(base[0] * i * interval, std::to_string(i * interval).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+				axisScale[1].push_back(Caption::createSmallCaption(base[1] * i * interval, std::to_string(i * interval).c_str(), vec3(0.4f, 0.4f, 0.4f)));
+				axisScale[2].push_back(Caption::createSmallCaption(base[2] * i * interval, std::to_string(i * interval).c_str(), vec3(0.4f, 0.4f, 0.4f)));
 			}
 		}
 

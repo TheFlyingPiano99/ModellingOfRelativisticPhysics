@@ -25,7 +25,7 @@ class ImGUIAdapter
 
 	void destroyGUI();
 
-	void buildCoordinateSelector(Scene& scene);
+	void buildCameraButtons(Scene& scene);
 	void buildIntersectionModeSelector(Scene& scene);
 	void buildDopplerModeSelector(Scene& scene);
 	void buildTransformationModeSelector(Scene& scene);

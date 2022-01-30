@@ -23,6 +23,7 @@ class Camera {
 	vec3 eye, lookat, up, right, preferedUp;
 	float fov, asp, nearPlane, farPlane;
 	float orthographicScale = 20;
+	float zoomFactor = 1.0f;
 
 	bool usePerspective = true;
 	RelTypes::DirectionMode directionMode = RelTypes::DirectionMode::free;
@@ -83,7 +84,7 @@ public:
 
 	float getAspectRatio() const;
 
-	const vec3 getPrefUp() const;
+	const vec3 getPreferedUp() const;
 
 	const vec3 getLookDir() const;
 
@@ -117,4 +118,8 @@ public:
 	const bool isPerspective() const;
 
 	const float getOrthographicScale() const;
+
+	const float getFOV() const;
+
+	const float getZoomFacor() const;
 };

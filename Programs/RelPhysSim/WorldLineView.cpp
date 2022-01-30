@@ -27,7 +27,7 @@ void GeodeticLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camer
     std::string str = std::string("(").append(std::to_string(pos.x)).append(", ").append(std::to_string(pos.y)).append(", ").append(std::to_string(pos.z)).append(")");
     (**locationAtZeroTCaption).setVisible(true);
     (**locationAtZeroTCaption).changeText(str.c_str());
-    (**locationAtZeroTCaption).drawDiagram(gpuProgram, camera);
+    (**locationAtZeroTCaption).draw(gpuProgram, camera);
 
 
     pos = vec3(locationAtZeroT[settings.diagramX], locationAtZeroT[settings.diagramY], locationAtZeroT[settings.diagramZ]) + vec3(fourVelocity[settings.diagramX], fourVelocity[settings.diagramY], fourVelocity[settings.diagramZ]) * 10.0f;

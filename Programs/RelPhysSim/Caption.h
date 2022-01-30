@@ -47,9 +47,7 @@ class Caption {
 	}
 	Caption() {};
 
-	mat4 getModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const;
-
-	mat4 getInverseModellMatrix(vec3 pos, vec3 norm, vec3 preferedUp, float distance) const;
+	mat4 getModellMatrix(vec2 cPos, vec3 preferedUp, float asp) const;
 
 	void genGeometry();
 
@@ -108,8 +106,6 @@ public:
 	void animate();
 
 	void draw(GPUProgram& gpuProgram, const Camera& camera) const;
-
-	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera) const;
 
 	void changeText(const char* str);
 

@@ -83,7 +83,7 @@ const mat4 Camera::getViewMatrix() const {
 
 
 const mat4 Camera::getPerspectiveProjectionMatrix() const {
-	float sy = 1.0f / tanf(fov / 2.0f);
+	float sy = 1.0f / tanf(fov / zoomFactor / 2.0f);
 	float a = -(nearPlane + farPlane) / (farPlane - nearPlane);
 	float b = -2.0f * nearPlane * farPlane / (farPlane - nearPlane);
 	return mat4(sy / asp, 0, 0, 0,
@@ -93,19 +93,19 @@ const mat4 Camera::getPerspectiveProjectionMatrix() const {
 }
 
 const mat4 Camera::getOrthographicProjectionMatrix() const {
-	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale;
+	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale / zoomFactor;
 	float r, l, t, b;
 	t = sy;
 	b = -sy;
 	r = sy * asp;
 	l = -sy * asp;
-	mat4 getModellMatrix = mat4(
+	mat4 m = mat4(
 		2.0f / (r - l), 0, 0, -(r + l) / (r - l),
 		0, 2.0f / (t - b), 0, -(t + b) / (t - b),
 		0, 0, -2.0f / (farPlane - nearPlane), -(farPlane + nearPlane) / (farPlane - nearPlane),
 		0, 0, 0, 1
 	);
-	return transpose(getModellMatrix);
+	return transpose(m);
 }
 
 const mat4 Camera::getActiveProjectionMatrix() const {
@@ -116,8 +116,8 @@ const mat4 Camera::getActiveProjectionMatrix() const {
 }
 
 const vec3 Camera::calculateRayStart(vec2 cPos) const {
-	float scale = tanf(fov / 2.0f) * length(lookat - eye);
-	float sy = 1.0f / tanf(fov / 2.0f) * 20.0f;
+	float scale = tanf(fov / zoomFactor / 2.0f) * length(lookat - eye);
+	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale / zoomFactor;
 	vec3 center = (usePerspective) ? lookat 
 		: eye + normalize(lookat - eye) * nearPlane;
 	return
@@ -135,7 +135,7 @@ vec3 Camera::getEye() const {
 float Camera::getAspectRatio() const {
 	return asp;
 }
-const vec3 Camera::getPrefUp() const {
+const vec3 Camera::getPreferedUp() const {
 	return preferedUp;
 }
 const vec3 Camera::getLookDir() const {
@@ -216,11 +216,7 @@ void Camera::move(vec3 delta)
 }
 
 void Camera::zoom(float delta) {
-	fov *= delta;
-	if (fov > M_PI)
-		fov = M_PI;
-	else if (fov < M_PI / 4.0f)
-		fov = M_PI / 4.0f;
+	zoomFactor *= delta;
 }
 
 const Ray Camera::getRayFromCameraCoord(vec2 cPos) {
@@ -276,4 +272,14 @@ const bool Camera::isPerspective() const {
 
 const float Camera::getOrthographicScale() const {
 	return orthographicScale;
+}
+
+const float Camera::getFOV() const
+{
+	return fov;
+}
+
+const float Camera::getZoomFacor() const
+{
+	return zoomFactor;
 }

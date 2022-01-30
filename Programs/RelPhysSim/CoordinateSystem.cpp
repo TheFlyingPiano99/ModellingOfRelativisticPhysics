@@ -4,11 +4,11 @@ void CoordinateSystem::drawAxis(GPUProgram& gpuProgram, const Camera& camera, co
 {
     glBindVertexArray(vao[idx]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[idx]);
-    mat4 getModellMatrix = TranslateMatrix(center);
-    mat4 getInverseModellMatrix = TranslateMatrix(-center);
-    gpuProgram.setUniform(getModellMatrix * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-    gpuProgram.setUniform(getModellMatrix, "getModellMatrix");
-    gpuProgram.setUniform(getInverseModellMatrix, "getInverseModellMatrix");
+    mat4 m = TranslateMatrix(center);
+    mat4 invM = TranslateMatrix(-center);
+    gpuProgram.setUniform(m * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
+    gpuProgram.setUniform(m, "m");
+    gpuProgram.setUniform(invM, "invM");
     gpuProgram.setUniform(false, "outline");
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds);
 }
@@ -57,8 +57,8 @@ void CoordinateSystem::draw(GPUProgram& gpuProgram, const Camera& camera)
 
 void CoordinateSystem::drawDiagram(GPUProgram& gpuProgram, const Camera& camera)
 {
-    gpuProgram.setUniform(UnitMatrix(), "getModellMatrix");
-    gpuProgram.setUniform(UnitMatrix(), "getInverseModellMatrix");
+    gpuProgram.setUniform(UnitMatrix(), "m");
+    gpuProgram.setUniform(UnitMatrix(), "invM");
     gpuProgram.setUniform(true, "glow");
     gpuProgram.setUniform(true, "noTexture");
     gpuProgram.setUniform(false, "outline");

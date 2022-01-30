@@ -853,7 +853,7 @@ vec4 Scene::getEditedLocation(const float cX, const float cY)
 	else if (settings.viewMode == RelTypes::ViewMode::realTime3D) {
 		throw std::exception("Unimplemented behaviour!");
 	}
-	vec3 preferedUp = activeCamera->getPrefUp();
+	vec3 preferedUp = activeCamera->getPreferedUp();
 	vec3 right = activeCamera->getRight();
 	vec3 planeNorm = cross(right, preferedUp);
 	Plane plane = Plane(planePos, planeNorm);

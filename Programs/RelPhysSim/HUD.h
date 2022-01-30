@@ -67,11 +67,6 @@ public:
 	void draw(GPUProgram& gpuProgram, const Camera& camera);
 
 	/*
-	* Draw every caption and other in Diagram view mode.
-	*/
-	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera);
-
-	/*
 	* Push a new caption in the message queue.
 	*/
 	void pushMessage(const char* text);

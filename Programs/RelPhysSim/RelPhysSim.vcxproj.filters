@@ -284,9 +284,6 @@
     <ClInclude Include="Color.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="CoordinateSystem.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
@@ -357,6 +354,9 @@
       <Filter>Header Files\Controller</Filter>
     </ClInclude>
     <ClInclude Include="ImGUIObserver.h">
+      <Filter>Header Files\View</Filter>
+    </ClInclude>
+    <ClInclude Include="CoordinateSystem.h">
       <Filter>Header Files\View</Filter>
     </ClInclude>
   </ItemGroup>

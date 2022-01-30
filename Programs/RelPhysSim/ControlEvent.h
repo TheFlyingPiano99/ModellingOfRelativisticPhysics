@@ -3,32 +3,6 @@
 #include "IControlEvent.h"
 
 /*
-* enum ControlEventEnum {
-	togglePause,
-	toggleObserver,
-	toggleViewMode,
-	toggleIntersectionMode,
-	toggleSelection,
-	toggleDopplerEffect,
-	toggleShading,
-	moveCameraForward,
-	moveCameraBackward,
-	moveCameraUp,
-	moveCameraLeft,
-	moveCameraRight,
-	zoomIn,
-	zoomOut,
-	windTime,
-	rewindTime,
-	toggleLorentz,
-	toggleTransformToProperFrame,
-	save,
-	load
-};
-
-*/
-
-/*
 * Used to handle user input.
 * Stores key shortcut.
 */

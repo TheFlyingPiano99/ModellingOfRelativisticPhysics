@@ -19,18 +19,7 @@ void HUD::draw(GPUProgram& gpuProgram, const Camera& camera)
 	}
 	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
 	{
-		(*cap)->drawDiagram(gpuProgram, camera);
-	}
-}
-
-void HUD::drawDiagram(GPUProgram& gpuProgram, const Camera& camera)
-{
-	if (!visible) {
-		return;
-	}
-	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
-	{
-		(*cap)->drawDiagram(gpuProgram, camera);
+		(*cap)->draw(gpuProgram, camera);
 	}
 }
 

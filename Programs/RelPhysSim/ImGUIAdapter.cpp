@@ -46,7 +46,7 @@ void ImGUIAdapter::destroyGUI() {
 	ImGui::DestroyContext();
 }
 
-void ImGUIAdapter::buildCoordinateSelector(Scene& scene)
+void ImGUIAdapter::buildCameraButtons(Scene& scene)
 {
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 100, 100, 255));
 	ImGui::Button("X", ImVec2(25, 25));
@@ -90,7 +90,15 @@ void ImGUIAdapter::buildCoordinateSelector(Scene& scene)
 		scene.setCameraDirectionMode(RelTypes::DirectionMode::minusZlocked);
 	}
 	ImGui::SameLine();
-	ImGui::Text("Snap cam to axis");
+	ImGui::Button("+", ImVec2(25, 25));
+	if (ImGui::IsItemClicked()) {
+		scene.zoomCamera(1.0f + 0.01f);
+	}
+	ImGui::SameLine();
+	ImGui::Button("-", ImVec2(25, 25));
+	if (ImGui::IsItemClicked()) {
+		scene.zoomCamera(1.0f - 0.01f);
+	}
 }
 
 void ImGUIAdapter::buildIntersectionModeSelector(Scene& scene)
@@ -176,7 +184,7 @@ void ImGUIAdapter::configToScene(Scene& scene)
 	}
 	if (ImGui::Begin("Settings")) {
 		ImGui::SetWindowSize(ImVec2(GlobalVariables::windowWidth / 4.0f, GlobalVariables::windowHeight / 2.0f));
-		buildCoordinateSelector(scene);
+		buildCameraButtons(scene);
 		ImGui::Button("Toggle view mode", ImVec2(150, 50));
 		if (ImGui::IsItemClicked()) {
 			scene.toggleViewMode();
@@ -199,7 +207,6 @@ void ImGUIAdapter::configToScene(Scene& scene)
 		}
 		ImGui::End();
 	}
-
 }
 
 

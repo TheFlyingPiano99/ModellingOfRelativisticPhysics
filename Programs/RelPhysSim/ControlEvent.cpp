@@ -62,12 +62,12 @@ void MoveCameraRightEvent::performAction(const float dt)
 
 void ZoomInEvent::performAction(const float dt)
 {
-	Scene::getInstance()->zoomCamera(1 - 0.01f * dt * Scene::getInstance()->getCameraVelocity());
+	Scene::getInstance()->zoomCamera(1 + 0.01f * dt * Scene::getInstance()->getCameraVelocity());
 }
 
 void ZoomOutEvent::performAction(const float dt)
 {
-	Scene::getInstance()->zoomCamera(1 + 0.01f * dt * Scene::getInstance()->getCameraVelocity());
+	Scene::getInstance()->zoomCamera(1 - 0.01f * dt * Scene::getInstance()->getCameraVelocity());
 }
 
 void WindTimeEvent::performAction(const float dt)

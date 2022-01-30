@@ -297,8 +297,6 @@ public:
 		finishedLoading = b;
 	}
 
-	/*
-	*/
 	vec4 getEditedLocation(const float cX, const float cY);
 
 	void setCameraDirectionMode(RelTypes::DirectionMode mode);

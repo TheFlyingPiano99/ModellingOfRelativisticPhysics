@@ -72,7 +72,7 @@ void DiagramView::draw(GPUProgram& gpuProgram) {
 
 	scene->getActiveObserver()->drawExtras(gpuProgram, *activeCamera, scene->getActiveObserver()->getProperties(scene->getSettings()), scene->getSettings());
 
-	scene->getHUD()->drawDiagram(gpuProgram, *activeCamera);			// HUD
+	scene->getHUD()->draw(gpuProgram, *activeCamera);			// HUD
 	delete lightCone;
 	delete hyperplane;
 }
