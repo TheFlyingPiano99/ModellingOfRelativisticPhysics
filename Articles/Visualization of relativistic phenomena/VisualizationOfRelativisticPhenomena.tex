@@ -71,10 +71,17 @@ These two constraints do not provide sufficient tools for the programmer on thei
 To simplify representation of world lines every event and velocity is described in the same frame of reference. In code this frame of reference is called absolute frame. This helps circumvent confusion when transforming between different observer's proper frames. Each value is stored as it is measured in absolute frame. When visualising a given value, than it gets transformed to a particular observers proper frame.
 
 \subsection{Representation of physical bodies}
-To model the journey of physical objects through space-time, it is convenient to assign a world line to each object. To be more precise, this is going to be the world line of the object's origin. For practical purposes this origin point is selected to be the same as the origin point in model space. Such world line can be stored as a set of events. Between the events we assume geodetic world lines. At this point it is necessary to note, that we also assume flat space-time. This method allows us to represent world lines consisting of few geodetic sections easily. World lines of accelerating objects appear curved in space-time diagrams. We can approximate these lines by a set of short geodetic sections. This approximation is useful, because along the small sections we can use the simple formulas of Lorentz transformation. The downside of this method is, that many calculations require iteration over the small sections. E. g. determining the age of an object without a priory information requires summing of ageing of the object along the geodetic sections. The other obvious downside of such approximation is, that the resulting world line is going to have low resolution. This is particularly noticeable, when we --as a viewer-- place ourselves in the proper frame of such accelerating object. In this case the violent jumping nature of the movement of surroundings is much more noticeable.
+To model the journey of physical objects through space-time, it is convenient to assign a world line to each object. To be more precise, this is going to be the world line of the object's origin. For practical purposes this origin point is selected to be the same as the origin point in model space. Such world line can be stored as a set of events. Between the events we assume geodetic world lines. At this point it is necessary to note, that we also assume flat space-time. This method allows us to represent world lines consisting of few geodetic sections easily. World lines of accelerating objects appear curved in space-time diagrams. We can approximate these lines by a set of short geodetic sections. This approximation is useful, because along the small sections we can use the simple formulas of Lorentz transformation . The downside of this method is, that many calculations require iteration over the small sections. E. g. determining the age of an object without a priory information requires summing of ageing of the object along the geodetic sections. The other obvious downside of such approximation is, that the resulting world line is going to have low resolution. This is particularly noticeable, when we --as a viewer-- place ourselves in the proper frame of such accelerating object. In this case the violent jumping nature of the movement of surroundings is much more noticeable.
 
 \section{View modes}
-The application supports multiple view modes. The two main modes are the real time three dimensional view and the diagram view. In the real time mode the scene is shown as regular three dimensional scene, changing over time. We can look around with the virtual camera to observe the moving objects. The objects appear
+The application supports multiple view modes. The two main modes are the \emph{real time} three dimensional view and the \emph{diagram view}. In the \emph{real time} mode the scene is shown as regular three dimensional scene, changing over time. We can look around with the virtual camera to observe the moving objects. The shape and colour of objects gets distorted in accordance with the relativistic effects. 
+
+In the \emph{diagram view} we can observe the world lines of objects present in the scene. This provides additional insight into the behaviour of objects. As a recent addition to the project now the user can switch to orthographic projection from the standard perspective projection. This improves the readability of the space-time diagram, and it's also useful in the \emph{real time} view.
+
+In order to help the user spot the differences between classic and relativistic physics, there is a way to switch between Galilean \cite{KHGalilei} and Lorentz transformation. A viewer can see the incoming light from an object, thus we can only see images showing the past. This is due to the finiteness of the speed of light. The application allows to toggle between visualisation of present event and past events in accordance with the incoming light beams.
+
+\section{Switching between observers}
+To compare the observations in different inertial frames of reference, we can toggle between multiple observers. In this implementation observers are independent from physical objects, however it's possible to make an observer follow an object. Every observer has it's own world line. These lines are also visible in \emph{diagram view}.
 
 
 
@@ -308,7 +315,17 @@ In \emph{Annalen der Physik}, \textbf{17}:891, June 1905.
 \newblock \emph{Relativity: The Special and General Theory}.
 Henry Holt and company, 1920.
 
+\bibitem{KHGalilei} Knudsen J.M., Hjorth P.G. The Galilei Transformation.
+In \emph{Elements of Newtonian Mechanics}. Advanced Texts in Physics. Springer, Berlin, Heidelberg, 2000.
+
+\bibitem{BRGPS} Buenker, Robert J.
+\newblock The Global Positioning System and the Lorentz Transformation.
+In \emph{Apeiron: Studies in Infinite Nature}, 15.3, 2008.
+
+
+
 % Template items:
+
 \bibitem{yll} Y. Le Lous,
 ``Report on the First Eurographics Workshop on Visualization in
 Scientific Computing'', \emph{Computer Graphics Forum\/}
