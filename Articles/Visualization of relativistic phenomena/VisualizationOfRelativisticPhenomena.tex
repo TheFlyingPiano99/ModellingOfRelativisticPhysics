@@ -63,13 +63,19 @@ The rules of simulation are based on Einstein's postulates~\cite{EinsteinElectro
 \begin{itemize}
 \item an observer can not differentiate between different inertial frames of reference by taking measurements in each frame of reference.
 \item the velocity of propagation of any physical effect can not exceed
-$c$~\footnote{~Speed of light in vacuum:
-$c=299792458 \frac{m}{s} \sim 3 \cdot 10^8 \frac{m}{s}$}.
+the speed of light in vacuum: $c=299792458 \frac{m}{s} \sim 3 \cdot 10^8 \frac{m}{s}$.
  \end{itemize}
 These two constraints do not provide sufficient tools for the programmer on their own. However, all the required formulas can be derived from these two postulates.
 
 \subsection{Usage of the term ,,absolute frame''}
-To simplify representation of world lines every event and velocity is described in the same frame of reference. In the code this frame of reference is called absolute frame. This helps circumvent confusion 
+To simplify representation of world lines every event and velocity is described in the same frame of reference. In code this frame of reference is called absolute frame. This helps circumvent confusion when transforming between different observer's proper frames. Each value is stored as it is measured in absolute frame. When visualising a given value, than it gets transformed to a particular observers proper frame.
+
+\subsection{Representation of physical bodies}
+To model the journey of physical objects through space-time, it is convenient to assign a world line to each object. To be more precise, this is going to be the world line of the object's origin. For practical purposes this origin point is selected to be the same as the origin point in model space. Such world line can be stored as a set of events. Between the events we assume geodetic world lines. At this point it is necessary to note, that we also assume flat space-time. This method allows us to represent world lines consisting of few geodetic sections easily. World lines of accelerating objects appear curved in space-time diagrams. We can approximate these lines by a set of short geodetic sections. This approximation is useful, because along the small sections we can use the simple formulas of Lorentz transformation. The downside of this method is, that many calculations require iteration over the small sections. E. g. determining the age of an object without a priory information requires summing of ageing of the object along the geodetic sections. The other obvious downside of such approximation is, that the resulting world line is going to have low resolution. This is particularly noticeable, when we --as a viewer-- place ourselves in the proper frame of such accelerating object. In this case the violent jumping nature of the movement of surroundings is much more noticeable.
+
+\section{View modes}
+The application supports multiple view modes. The two main modes are the real time three dimensional view and the diagram view. In the real time mode the scene is shown as regular three dimensional scene, changing over time. We can look around with the virtual camera to observe the moving objects. The objects appear
+
 
 
 
@@ -298,6 +304,9 @@ In \emph{Villamosmérnöki és Informatikai Kar 2021. évi TDK}, Szoftver, Novem
 \newblock On the Electrodynamics of Moving Bodies.
 In \emph{Annalen der Physik}, \textbf{17}:891, June 1905.
 
+\bibitem{AERelativity} Albert Einstein.
+\newblock \emph{Relativity: The Special and General Theory}.
+Henry Holt and company, 1920.
 
 % Template items:
 \bibitem{yll} Y. Le Lous,
