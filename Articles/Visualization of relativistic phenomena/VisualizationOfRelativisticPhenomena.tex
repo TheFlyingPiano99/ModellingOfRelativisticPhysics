@@ -17,6 +17,11 @@
 % prepare for electronic version of your document
 \usepackage{t1enc,dfadobe}
 
+%Graphics include path
+\graphicspath{ {./images} }
+\DeclareGraphicsExtensions{.png}
+
+
 % For backwards compatibility to old LaTeX type font selection.
 % Uncomment if your document adheres to LaTeX2e recommendations.
 \let\rm=\rmfamily    \let\sf=\sffamily    \let\tt=\ttfamily
@@ -43,7 +48,7 @@ Special relativity describes many phenomena, not observable in everyday life. Th
 \end{abstract}
 
 \section{Introduction}
-Theory of relativity is a key part of modern physics. There are many use cases of this theory. Despite of it's importance there is very little chance for people to experience relativistic phenomena in their everyday life, thus differences between Isaac Newton's classical and Albert Einstein's modern model remain unexplored. The application described in this article offers a way to visualise the most well-known phenomena associated with special relativity. The goal of this article is to showcase the algorithmic challenges surrounding this program and introduce solutions for these problems.
+Theory of relativity is a key part of modern physics. There are many use cases of this theory. Despite of it's importance there is very little chance for people to experience relativistic phenomena in their everyday life, thus differences between Isaac Newton's classical and Albert Einstein's modern model remain unexplored. The application described in this article offers a way to visualise the most well-known phenomena associated with special relativity. The goal of this article is to showcase the algorithmic challenges surrounding this program and introduce solutions for these problems. 
 
 
 \section{Previous Work}
@@ -80,11 +85,22 @@ In the \emph{diagram view} we can observe the world lines of objects present in 
 
 In order to help the user spot the differences between classic and relativistic physics, there is a way to switch between Galilean \cite{KHGalilei} and Lorentz transformation. A viewer can see the incoming light from an object, thus we can only see images showing the past. This is due to the finiteness of the speed of light. The application allows to toggle between visualisation of present event and past events in accordance with the incoming light beams.
 
-\section{Switching between observers}
+\subsection{Switching between observers}
 To compare the observations in different inertial frames of reference, we can toggle between multiple observers. In this implementation observers are independent from physical objects, however it's possible to make an observer follow an object. Every observer has it's own world line. These lines are also visible in \emph{diagram view}.
 
+When switching between frames of reference the origin of the frame also changes. The $\vec{O} =(0,0,0)$ in current proper frame gets assigned to the space coordinate vector of an event along the world line of the observer. The question is, how do we select the time component. In other words which event will be selected along the new world line. This implementation chooses the event from the new observers world line, which happened simultaneously whit the event of changing observers according to the previous observers. This method introduces a somewhat more realistic approach, however in real life still no object can travel from one event's location to an other's if these two events appear to be simultaneous. In defence of this approach in this computer simulation neither the user's perspective nor an observer is bound to a physical object.
+
+\begin{figure}[hbp]
+%\makebox[\textwidth]{\framebox[5cm]{\rule{0pt}{5cm}}}
+%\includegraphics[scale=1]{travelingTwin}
+\end{figure}
 
 
+
+
+
+
+%---------------------------------------------------------------------
 
 \section{Digitising Errors}
 \label{sec:digErr}
