@@ -9,7 +9,8 @@
 }
 
 %for including postscript figures
-\usepackage[dvips]{graphicx}
+\usepackage{graphics}
+
 % \usepackage[dvips,draft]{graphicx}% replace PS figure by framed file name
 
 \usepackage{amsmath}
@@ -150,235 +151,42 @@ When using the \emph{Galilean transformation}, generating world lines for the ve
 
 After obtaining the intersection event between the hyperplane or hypercone and the world line of a vertex, \emph{Galilean transformation} is applied, to obtain the coordinates of the event in the selected observers proper frame and the relative velocity between the object's and observer's proper frame.
 
-\section{Calculating Doppler shift}
-The ...
-
-
-
-
-
-
-
-
-
-
-
-
-%---------------------------------------------------------------------
-
-\section{Digitising Errors}
-\label{sec:digErr}
-
-Like most cartographic algorithms, the Douglas--Peucker algorithm does not
-fully address the issue of digitising errors. When estimating truth values,
-it is usually assumed that the true line (in this case the analogue line)
-lies within the error band of the digitised line. This band is also known as
-the Perkal epsilon band. In his review on issues relating to the accuracy of
-spatial databases, Goodchild\cite{Lev90} indicated that researchers have
-proposed uniform, normal and even bimodal distributions of error across this
-band. This concept provides some basis for estimating the position of the
-true line at locations between digitised points. Here, we are merely
-concerned with the accuracy of digitised points. Whilst it is probable that
-operators digitise points along high curvatures more carefully than at
-intermediate positions, there is at present no sound basis for modelling the
-distribution of error along the line. As in the Circular Map Accuracy
-Standard, it is usual to assume a bivariate normal distribution of error when
-estimating the position of the true point. In the context of line
-simplification, absolute positional accuracy is less important than the
-relative position of points describing the shape of features along the line.
-
-The DoE/SDD boundary data contain some gross digitising errors. For example,
-inlet X in Figure~2c does not feature on conventional Ordnance Survey
-1:\,50\,000 maps of the area. The data are also not very accurate where
-coastlines are convoluted. Even if we ignore these and other gross errors,
-such as spikes, there will always be an element of random error in digitised
-data. It is reasonable to assume that points digitised from 1:\,50\,000
-source material may only be accurate to within $+/-5$ metres. This algorithm
-does not lead to a substantial accumulation of rounding errors, hence the
-numerical errors discussed earlier tend to be very small compared with
-digitising errors.
-
-For the purposes of our argument, it is unnecessary to undertake an
-exhaustive evaluation of the consequences Douglas and Peucker have treated
-overhangs and closed loops as different problems, and have used different
-methods to cope with each case.
-
-\subsection{Numerical Problems}
-
-The FORTRAN programs by Douglas, White, and Wade use single precision REALS
-when computing offsets (see results in Table~\ref{tab:calcPrec}). Whilst
-double precision accuracy may be attained through the use of compiler
-options, we are unsure whether previous research has been based on programs
-compiled in this manner. Wade's program was so compiled for use in our
-previous evaluations. Forrest stated that Ramshaw (1982) had to adopt
-carefully tuned double and single precision floating point arithmetic to
-compute the intersection of line segments whose end points were defined as
-integers. Forrest exclaimed ``This is an object lesson to us all:
-constructing geometric objects defined on a grid of points, requiring ten
-bits for representation can lead to double precision floating point
-arithmetic!''.
-
-Most evaluative studies do not cite the co-ordinates in use. We do not know
-whether the published test lines were in original digitiser co-ordinates or
-whether they had been converted to geographic references. British National
-Grid co-ordinates for the administrative boundaries of England, Scotland and
-Wales (digitised by the Department of Environment (DoE) and Scottish
-Development Department (SDD)) are input to one metre accuracy and require
-seven decimal digits for representation if we include the northern islands of
-Scotland. At the South West Universities Regional Computer Centre these
-co-ordinates have been rounded to 10 metre resolution; even this requires six
-decimal digits. Seamless cartographic files at continental and global scales
-use much larger ranges of geographic co-ordinates.
-
-\begin{table}[htb]
-%\begin{center}
-\small
-\begin{tabular*}{\linewidth}%
-{@{}l@{}l@{}c@{}c@{}c@{}l@{}}
-\hline
-Machine\,\,\, & Points &
-\multicolumn{4}{@{}c}{\small Calculated squares of offset values}\\
- & & \multicolumn{2}{@{}c}{\small Single Precision}
-& \multicolumn{2}{c@{}}{\small Double Precision}\\
-\hline
-\multicolumn{6}{@{}l}{ICL 3980} \\
-& (C) & \multicolumn{2}{@{}c}{28199.351562500}
-& \multicolumn{2}{c@{}}{28143.490838958}\\
- & (D) & \multicolumn{2}{@{}c}{28171.789062500}
-& \multicolumn{2}{c@{}}{28143.490838961}\\
-\multicolumn{6}{@{}l}{VAX 8200} \\
-& (C) &\multicolumn{2}{@{}c}{28253.095703125}
-&\multicolumn{2}{c@{}}{28143.490838958}\\
-& (D) &\multicolumn{2}{@{}c}{28165.806640625}
-&\multicolumn{2}{c@{}}{28143.490838958}\\
-\multicolumn{6}{@{}l}{SEQUENT SYMMETRY}\\
-& (C) &\multicolumn{2}{@{}c}{28145.100000000}
-&\multicolumn{2}{c@{}}{28143.490838961}\\
-& (D) &\multicolumn{2}{@{}c}{28145.100000000}
-&\multicolumn{2}{c@{}}{28143.490838961}\\
-\multicolumn{6}{@{}l}{SUN 3/60} \\
-& (C) &\multicolumn{2}{@{}c}{28253.095703125}
-&\multicolumn{2}{c@{}}{28143.490838961}\\
-& (D) &\multicolumn{2}{@{}c}{28165.806640625}
-&\multicolumn{2}{c@{}}{28143.490838961}\\
-\hline
-\\
-\multicolumn{6}{@{}l}{\textsc{Notes}}\\[5pt]
-\multicolumn{6}{@{}p{\linewidth}@{}}
-{\emph{Offsets of points C and D from the anchor-floor line
-A--B as calculated using Wade's program. Points A, B, C and D are shown in
-Figure 5. The British National Grid coordinates (in metres) of the points
-are as follows:}}\\[9pt]
-\hline
-Point A & \multicolumn{2}{l}{238040\,\, (x1)}  &
-\multicolumn{2}{l}{205470\,\, (y1)}
-&  \multicolumn{1}{c}{ANCHOR}\\
-Point B  & \multicolumn{2}{l}{237890\,\, (x2)}
-& \multicolumn{2}{l}{205040\,\, (y2)}
-& \multicolumn{1}{c}{FLOATER}\\
-Point C & \multicolumn{2}{l}{237810\,\, (x3)} &
-\multicolumn{2}{l}{205320\,\, (y3)} & \\
-Point d  & \multicolumn{2}{l}{238120\,\, (x3)} &
-\multicolumn{2}{l}{205190\,\, (y3)} & \\
-\hline\\
-\multicolumn{6}{@{}p\linewidth@{}}{\emph{Note that the
-above co-ordinates may be used in conjunction
-with the expression presented in section 3.2.2a to check the tabulated
-results.}}
-\end{tabular*}
-%\end{center}
-\caption{\label{tab:calcPrec} The Precision of Calculations}
-\end{table}
-
-A limited number of papers actually described improved for new algorithms or
-methods for visual\-ization\cite{Lev90,PorDuf84,RonRos96}. This may be caused
-by the complexity of the environment in which a method is used; issues of
-system architecture, user interface, data handling, etc. must be dealt with
-before a new presentation technique can show its full advantage. But even so,
-we think the field can use more contributions of this type.
-
-There was also a discussion session on the merits of animation and special
-effects (such as sound) to support visualization. For example, in the area of
-flow visualization, it is quite common to use animation, and techniques for
-video registration have been developed.
-
-\section{Issues in Visualization}
-
-Scientific visualization is an interdisciplinary field, which can only
-flourish when computer graphics experts cooperate with specialists from
-application areas, and providers of computing, visualization, and data
-management facilities. Therefore, it is essential that all of these
-viewpoints are represented in research projects and also in meetings such as
-this workshop. It is not enough that suitable display algorithms, data
-structures, or user interfaces be developed, but also that these be
-integrated in usable systems and evaluated by expert users. This complex
-environment, and the complex systems it requires, call for a common language
-between different parties involved, and therefore \emph{a reference model}, or
-an abstract description summarizing the entire process of data visualization,
-is needed.
-
-At the Delft workshop, an attempt was made to continue the meetings of
-sub-groups as started in Clamart\cite{yll}, but it appeared that a useful
-description of sub-areas or sub-problems should be based on a stable
-conceptual framework. Except for the flow visualization group, the subgroup
-definitions were abandoned, and instead it was decided to concentrate on
-design of an initial reference model; a first attempt is currently being
-undertaken by Lesley Carpenter and Michel Grave. At the same time, the
-separate flow visualization sub-group (chaired by Hans-Georg Pagendarm)
-agreed to design a general model of the flow visualization process! In
-addition, arrangements were made for the exchange of test data sets for
-system evaluation, and the exchange of information on and experience with
-visualization software.
-
-Special discussion sessions were held about the practice the ``circle-brush''
-algorithm. In this algorithm a solid disk is assumed to move along a
-trajectory in $R^2$. This trajectory is then scan-converted into the raster
-plane. and experience of the Stardent AVS system, and about general
-evaluation methods for visualization software. There is an obvious need to
-share experience or even make a formal (comparative) evaluation of systems,
-but this is also hampered by lack of a common framework, and also by the
-continuing development of visualization systems.
-
-Interactive visualization was also an interesting subject for discussion,
-which yielded a lively debate\cite{yll}. In a session about visualization
-facilities, it was suggested from experience that large research institutes
-might well have to employ specialized `visualization experts', to bridge the
-gap between complex numerical simulations and sophisticated visualization
-facilities.
-
-
 \section{Results}
 \label{sec:results}
+This section showcases some images renderer by this application. These images show some of the more popular relativistic phenomena.
 
-This section only refers a table with some numerical results (see
-Table~\ref{tab:calcPrec}). \\
-Non-sense text follows text text text text text text text text text text text
-text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text
-text texttext text text text text.
+When an object passes by in front of the viewer, the object appears to be rotated. The rotation axis is perpendicular to the movement direction and the viewer's direction from the object. This is shown in Figure~\ref{fig:RotatingDice}. Top dice is moving to left in parallel with the viewing plane. The effect is the consequence of light beams travelling different distances from different points of the object.
+
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/rotatingDice.eps}
+}
+\caption{Rotating dice}
+\label{fig:RotatingDice}
+\end{figure}
+
+If we ignore the path travelled by photons towards the eye of the viewer, than simultaneous events can be seen. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
+
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/lengthContraction.eps}
+}
+\caption{Length contraction}
+\label{fig:lengthContraction}
+\end{figure}
+
+
 
 
 \section{Conclusions}
 \label{sec:concl}
-
-Here are conclusions and possible extensions. As shown by the results
-reported in Section~\ref{sec:results} and in Figure~\ref{fig:ex3} (see color
-plates), conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions. Conclusions conclusions conclusions
-conclusions conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions conclusions conclusions conclusions
-conclusions conclusions conclusions.
+The simulator application described in this article is capable of visualising of well known relativistic phenomena.
 
 
 \section*{Acknowledgements}
-
-Introduce here, if you would....
-
+I would like to thank Dr. Bokor Nándor and Dr. Szirmay Kalos László for their technical assistance and support.
 
 \begin{thebibliography}{1}
 
@@ -402,47 +210,6 @@ In \emph{Elements of Newtonian Mechanics}. Advanced Texts in Physics. Springer, 
 \newblock The Global Positioning System and the Lorentz Transformation.
 In \emph{Apeiron: Studies in Infinite Nature}, 15.3, 2008.
 
-
-
-% Template items:
-
-\bibitem{yll} Y. Le Lous,
-``Report on the First Eurographics Workshop on Visualization in
-Scientific Computing'', \emph{Computer Graphics Forum\/}
-\textbf{9}(4), pp. 371--372 (December 1990).
-
-\bibitem{FolDamFeiHug.etal93}
-J. Foley, A. van Dam, S. Feiner, J. Hugues, and R. Phillips.
-\newblock \emph{Introduction to Computer Graphics}.
-\newblock Addison Wesley, 1993.
-
-\bibitem{PosFel89}
-K.Ch. Posch and D.W. Fellner.
-\newblock The Circle-Brush Algorithm.
-\newblock \emph{Transactions on Graphics}, \textbf{18}(1):1--24, 1989.
-
-\bibitem{FolHagNie93}
-T.A. Foley, H.~Hagen, and G.M. Nielson.
-\newblock Visualizing and modeling unstructured data.
-\newblock \emph{The Visual Computer}, (9):439--449, 1993.
-
-\bibitem{Lev90}
-M.~Levoy.
-\newblock Efficient ray tracing of volume data.
-\newblock \emph{ACM Transactions on Graphics},
-          \textbf{9}(3):245--261, July 1990.
-
-\bibitem{PorDuf84}
-T.~Porter and T.~Duff.
-\newblock Compositing digital images.
-\newblock \emph{ACM Computer Graphics (Proc. of SIGGRAPH '84)},
-          \textbf{18}:253--259, 1984.
-
-\bibitem{RonRos96}
-R.~Ronfard and J.~Rossignac.
-\newblock Full-range approximation of triangulated polyhedra.
-\newblock \emph{Computer Graphics Forum (Eurographics'96 Proc.)},
-          \textbf{15}(3):67--76, 1996.
 
 \end{thebibliography}
 
