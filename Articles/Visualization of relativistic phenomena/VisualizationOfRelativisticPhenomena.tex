@@ -59,13 +59,6 @@ Theory of relativity is a key part of modern physics. There are many use cases o
 This article is a direct follow up of the work \cite{TDKreport}. It explains previously neglected details, e.g. implementation of Wigner-rotation. 
 
 
-
-\section{Our proposal in detail}
-
-%
-%Visualization of relativistic phenomena content:
-%
-
 \section{Implementation of physical models}
 The rules of simulation are based on Einstein's postulates~\cite{EinsteinElectrodynamics}. These suggest that
 \begin{itemize}
@@ -166,7 +159,7 @@ When an object passes by in front of the viewer, the object appears to be rotate
 \label{fig:RotatingDice}
 \end{figure}
 
-If we ignore the path travelled by photons towards the eye of the viewer, than simultaneous events can be seen. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
+If we ignore the path travelled by photons towards the eye, than simultaneous events can be seen. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
 
 \begin{figure}[h]
 \center
@@ -177,16 +170,50 @@ If we ignore the path travelled by photons towards the eye of the viewer, than s
 \label{fig:lengthContraction}
 \end{figure}
 
+The twin paradox as described by Albert Einstein can be demonstrated in \emph{diagram view}. This is seen in Figure~\ref{fig:twinParadox}.
 
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/twinParadox.eps}
+}
+\caption{Twin paradox}
+\label{fig:twinParadox}
+\end{figure}
+
+Take a look at the world lines of objects following circular trajectory. 
+In Figure~\ref{fig:circularWL}, the lines appear, to be wound up around the time axis.
+
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/circularWL.eps}
+}
+\caption{Circular world line}
+\label{fig:circularWL}
+\end{figure}
+
+When we switch to \emph{real time} mode, than we can observe the Thomas precession of the circulating object. This can be seen in Figure~\ref{fig:thomasPrec}. The object on the left is standing in the observer's frame. The right object is moving along a circular path. The path has radius of $r=20m$, and the tangential velocity of the object is $v=0,8$
+The time of the full rotation according the observer was $T=167m$.
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/ThomasPrecession.eps}
+}
+\caption{Thomas Precession after one full rotation}
+\label{fig:thomasPrec}
+\end{figure}
 
 
 \section{Conclusions}
 \label{sec:concl}
-The simulator application described in this article is capable of visualising of well known relativistic phenomena.
+The simulator described in this article is capable of visualising well known relativistic phenomena in a highly interactive manner. 
 
 
 \section*{Acknowledgements}
-I would like to thank Dr. Bokor Nándor and Dr. Szirmay Kalos László for their technical assistance and support.
+I would like to thank Dr. Nándor Bokor and Dr. László Szirmay Kalos for their valuable technical assistance and support.
+
+\newpage
 
 \begin{thebibliography}{1}
 

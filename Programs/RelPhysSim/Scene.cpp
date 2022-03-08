@@ -162,8 +162,8 @@ void Scene::loadDefault()
 	}
 	*/
 	
-	objects.push_back(Object::createSpaceship(
-		new CompositeLine(vec3(10.0f, 0, 0), 
+	objects.push_back(Object::createSpike(
+		new CompositeLine(vec3(0.0f, 0.0f, 0.0f), 
 		vec3(0.0f, 0.0f, 0.0f), 
 			"Staying ship")));
 
