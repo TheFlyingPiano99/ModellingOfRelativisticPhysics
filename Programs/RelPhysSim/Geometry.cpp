@@ -90,7 +90,7 @@ void OBJGeometry::load(const char* route) {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, uv));
 }
 
-void OBJGeometry::Draw() {
+void OBJGeometry::draw() {
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//gpuProgram.setUniform(depthShading, "depthShading");

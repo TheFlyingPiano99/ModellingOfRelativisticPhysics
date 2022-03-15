@@ -2,11 +2,11 @@
 
 #include "RelPhysics.h"
 
-void GeodeticLineView::Draw()
+void GeodeticLineView::draw() const
 {
 }
 
-void GeodeticLineView::DrawDiagram()
+void GeodeticLineView::drawDiagram() const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -14,20 +14,20 @@ void GeodeticLineView::DrawDiagram()
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
 }
 
-void GeodeticLineView::disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void GeodeticLineView::disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
     (**locationAtZeroTCaption).setVisible(false);
     (**velocityCaption).setVisible(false);
 }
 
-void GeodeticLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void GeodeticLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
     vec3 pos = vec3(locationAtZeroT[settings.diagramX], locationAtZeroT[settings.diagramY], locationAtZeroT[settings.diagramZ]);
     (**locationAtZeroTCaption).setPos(pos);
     std::string str = std::string("(").append(std::to_string(pos.x)).append(", ").append(std::to_string(pos.y)).append(", ").append(std::to_string(pos.z)).append(")");
     (**locationAtZeroTCaption).setVisible(true);
     (**locationAtZeroTCaption).changeText(str.c_str());
-    (**locationAtZeroTCaption).DrawDiagram(gpuProgram, camera);
+    (**locationAtZeroTCaption).draw(gpuProgram, camera);
 
 
     pos = vec3(locationAtZeroT[settings.diagramX], locationAtZeroT[settings.diagramY], locationAtZeroT[settings.diagramZ]) + vec3(fourVelocity[settings.diagramX], fourVelocity[settings.diagramY], fourVelocity[settings.diagramZ]) * 10.0f;
@@ -42,11 +42,11 @@ void GeodeticLineView::update()
     fourVelocity = ((GeodeticLine*)model)->getVelocity();
 }
 
-void CompositeLineView::Draw()
+void CompositeLineView::draw() const
 {
 }
 
-void CompositeLineView::DrawDiagram()
+void CompositeLineView::drawDiagram() const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -54,7 +54,7 @@ void CompositeLineView::DrawDiagram()
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
 }
 
-void CompositeLineView::disableEditorInfo(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void CompositeLineView::disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
     for (int i = 0; i < controlPoints.size(); i++) {
         (**pointCaptions[i]).setVisible(false);
@@ -64,7 +64,7 @@ void CompositeLineView::disableEditorInfo(GPUProgram& gpuProgram, Camera& camera
     }
 }
 
-void CompositeLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void CompositeLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
     // ControlPoint captions:
     for (int i = 0; i < controlPoints.size(); i++) {
@@ -140,11 +140,11 @@ WorldLineView::~WorldLineView() {
     glDeleteVertexArrays(1, &vao);
 }
 
-void SpiralLineView::Draw()
+void SpiralLineView::draw() const
 {
 }
 
-void SpiralLineView::DrawDiagram()
+void SpiralLineView::drawDiagram() const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -152,8 +152,9 @@ void SpiralLineView::DrawDiagram()
     glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
 }
 
-void SpiralLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void SpiralLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
+
 }
 
 void SpiralLineView::update()

@@ -66,7 +66,7 @@ void onDisplay() {
 	guiAdapter->preDrawInit();
 	glClearColor(0, 0, 0.5f, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	scene->Draw(gpuProgram);
+	scene->draw(gpuProgram);
 	guiAdapter->configToScene(*scene);
 	guiAdapter->draw();
 	glutSwapBuffers();
@@ -175,8 +175,10 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 			}
 			break;
 		case 3:			// Mouse wheel scroll
+			scene ->mouseScrolled(1.01);
+			break;
 		case 4:			// Mouse wheel scroll
-
+			scene->mouseScrolled(0.99);
 			break;
 		default: break;
 	}
@@ -222,7 +224,7 @@ void onIdle() {
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;
 		scene->Control(DT);
-		scene->Animate(DT);
+		scene->animate(DT);
 	}
 	glutPostRedisplay();
 }

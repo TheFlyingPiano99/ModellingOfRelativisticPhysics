@@ -96,6 +96,9 @@ void Scene::Initialise()
 
 	// Other:----------------------------------------------------------
 	hud->updateSettings(settings);
+	if (activeObserver != nullptr) {
+		activeObserver->syncCamera(activeCamera, settings);
+	}
 }
 
 void Scene::loadDefault()
@@ -105,7 +108,7 @@ void Scene::loadDefault()
 
 	//Observers:-------------------------------------------------
 	//1.
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 20.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
@@ -115,7 +118,7 @@ void Scene::loadDefault()
 	observers.push_back(observer);
 
 	//3.:
-
+	//...
 	//Objects:----------------------------------------------------
 	/*
 	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
@@ -159,8 +162,8 @@ void Scene::loadDefault()
 	}
 	*/
 	
-	objects.push_back(Object::createSpaceship(
-		new CompositeLine(vec3(10.0f, 0, 0), 
+	objects.push_back(Object::createSpike(
+		new CompositeLine(vec3(0.0f, 0.0f, 0.0f), 
 		vec3(0.0f, 0.0f, 0.0f), 
 			"Staying ship")));
 
@@ -223,11 +226,11 @@ void Scene::Control(float dt) {
 	}
 }
 
-void Scene::Animate(float dt) {
+void Scene::animate(float dt) {
 	if (loadingScene) {
 		return;
 	}
-	hud->Animate(dt);						// Always animate!
+	hud->animate(dt);						// Always animate!
 	settings.intersectionMode.animate(dt);
 	settings.dopplerMode.animate(dt);
 	settings.doLorentz.animate(dt);
@@ -244,12 +247,12 @@ void Scene::Animate(float dt) {
 		
 		for each (Object * obj in objects)
 		{
-			obj->Animate(dt);
+			obj->animate(dt);
 		}
 	}
 }
 
-void Scene::Draw(GPUProgram& gpuProgram) {
+void Scene::draw(GPUProgram& gpuProgram) {
 	if (loadingScene) {
 		return;
 	}
@@ -259,8 +262,7 @@ void Scene::Draw(GPUProgram& gpuProgram) {
 		gpuProgram.loadOnGPU(settings);
 		activeCamera->loadOnGPU(gpuProgram);
 		activeObserver->loadOnGPU(gpuProgram, settings);
-
-		view->Draw(gpuProgram);
+		view->draw(gpuProgram);
 	}
 }
 
@@ -354,6 +356,9 @@ void Scene::toggleLorentzTransformation() {
 
 void Scene::toggleTransformToProperFrame()
 {
+	if (settings.viewMode != RelTypes::ViewMode::diagram) {
+		return;
+	}
 	if (settings.editorMode) {	// In editor mode no transformation is allowed!
 		settings.transformToProperFrame.get() = false;
 		return;
@@ -385,6 +390,25 @@ void Scene::toogleSimultaneBoost()
 
 void Scene::toggleIntersectionMode() {
 	settings.intersectionMode = (RelTypes::IntersectionMode)((2 > settings.intersectionMode.get() + 1) ? (settings.intersectionMode.get() + 1) : 0);
+	std::string str("Intersection mode: ");
+	switch (settings.intersectionMode.get())
+	{
+	case RelTypes::IntersectionMode::lightCone:
+		str.append("light cone");
+		break;
+	case RelTypes::IntersectionMode::hyperplane:
+		str.append("simultaneous hyperplane");
+		break;
+	default:
+		break;
+	}
+	hud->pushMessage(str.c_str());
+	hud->updateSettings(settings);
+}
+
+void Scene::setIntersectionMode(RelTypes::IntersectionMode mode)
+{
+	settings.intersectionMode = mode;
 	std::string str("Intersection mode: ");
 	switch (settings.intersectionMode.get())
 	{
@@ -474,7 +498,7 @@ void Scene::setTime(float t) {
 	}
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 }
 
@@ -482,7 +506,7 @@ void Scene::reset() {
 	setTime(0.0f);
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 	hud->pushMessage("Reset");
 }
@@ -491,7 +515,7 @@ void Scene::windTime(float deltaTau) {
 	float realDelta = activeObserver->changeTimeByDelta(deltaTau, settings);
 	bool prevState = settings.running;
 	settings.running = true;
-	Animate(0.0f);
+	animate(0.0f);
 	settings.running = prevState;
 	std::string str("Time shifted by tau = ");
 	hud->pushMessage(str.append(std::to_string(realDelta)).append(" m").c_str());
@@ -565,6 +589,13 @@ void Scene::mouseMoved(float cX, float cY)
 	}
 }
 
+void Scene::mouseScrolled(float delta)
+{
+	if (activeCamera != nullptr) {
+		activeCamera->zoom(delta);
+	}
+}
+
 void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, const float deltaCY, const RelTypes::MouseState& mouseState)
 {
 	if (mouseState.mouseRightDown) {
@@ -580,10 +611,10 @@ void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, co
 
 Entity* Scene::getUnderCursor(float cX, float cY)
 {
-	if (!objects.empty()) {		// There are objects in the scene.
+	if (!objects.empty()) {
 		Ray ray = activeCamera->getRayFromCameraCoord(vec2(cX, cY));
 		int selectionIdx = -1;			// index of the selected object
-		if (settings.viewMode == RelTypes::ViewMode::diagram) {			// Diagram view
+		if (settings.viewMode == RelTypes::ViewMode::diagram) {
 			float constraint = 2.0f;
 			float shortestDistance = objects[0]->rayDistanceToDiagram(ray,
 				activeObserver->getProperties(settings),
@@ -605,12 +636,21 @@ Entity* Scene::getUnderCursor(float cX, float cY)
 			LightCone* lightCone = activeObserver->getLightCone(settings);
 			Hyperplane* hyperplane = activeObserver->getHyperplane(settings);
 			// First item handled separately:
-			float shortestDistance = objects[0]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+			float shortestDistance = objects[0]->rayDistanceToObject(ray, 
+				*lightCone,
+				*hyperplane,
+				settings,
+				activeObserver->getProperties(settings));
 			if (objects[0]->getOverallRadius() > shortestDistance && shortestDistance > 0) {
 				selectionIdx = 0;
 			}
 			for (int i = 1; i < objects.size(); i++) {
-				float d = objects[i]->rayDistanceToObject(ray, *lightCone, *hyperplane, settings, activeObserver->getLocation(settings), activeObserver->getLocationAtZero(settings), activeObserver->getVelocity(settings));
+				float d = objects[i]->rayDistanceToObject(
+					ray, 
+					*lightCone, 
+					*hyperplane, 
+					settings,
+					activeObserver->getProperties(settings));
 				if ((shortestDistance < 0 || shortestDistance > d) && d < objects[i]->getOverallRadius() && d > 0) {
 					shortestDistance = d;
 					selectionIdx = i;
@@ -820,9 +860,9 @@ vec4 Scene::getEditedLocation(const float cX, const float cY)
 	else if (settings.viewMode == RelTypes::ViewMode::realTime3D) {
 		throw std::exception("Unimplemented behaviour!");
 	}
-	vec3 prefUp = activeCamera->getPrefUp();
+	vec3 preferedUp = activeCamera->getPreferedUp();
 	vec3 right = activeCamera->getRight();
-	vec3 planeNorm = cross(right, prefUp);
+	vec3 planeNorm = cross(right, preferedUp);
 	Plane plane = Plane(planePos, planeNorm);
 	vec3 diagramPos = intersect(plane, ray);
 	vec4 location;
@@ -845,6 +885,49 @@ vec4 Scene::getEditedLocation(const float cX, const float cY)
 	);
 	invTransformed[settings.diagramNotVisualised] = referenceLocation[settings.diagramNotVisualised];
 	return invTransformed;
+}
+
+void Scene::setCameraDirectionMode(RelTypes::DirectionMode mode)
+{
+	if (activeCamera == nullptr) {
+		return;
+	}
+	activeCamera->selectDirectionMode(mode);
+	if (Scene::getInstance()->getSettings().viewMode == RelTypes::ViewMode::diagram) {
+		switch (mode)
+		{
+		case RelTypes::free:
+			hud->pushMessage("Free camera");
+			break;
+		case RelTypes::Xlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(-25, 0, 0));
+			hud->pushMessage("Camera locked to X");
+			break;
+		case RelTypes::Ylocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, -25, 0));
+			hud->pushMessage("Camera locked to Y");
+			break;
+		case RelTypes::Zlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, -25));
+			hud->pushMessage("Camera locked to Z");
+			break;
+		case RelTypes::minusXlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(25, 0, 0));
+			hud->pushMessage("Camera locked to -X");
+			break;
+		case RelTypes::minusYlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 25, 0));
+			hud->pushMessage("Camera locked to -Y");
+			break;
+		case RelTypes::minusZlocked:
+			Scene::getInstance()->getActiveCamera()->translateTo(vec3(0, 0, 25));
+			hud->pushMessage("Camera locked to -Z");
+			break;
+		default:
+			break;
+		}
+		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
+	}
 }
 
 

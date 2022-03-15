@@ -3,32 +3,6 @@
 #include "IControlEvent.h"
 
 /*
-* enum ControlEventEnum {
-	togglePause,
-	toggleObserver,
-	toggleViewMode,
-	toggleIntersectionMode,
-	toggleSelection,
-	toggleDopplerEffect,
-	toggleShading,
-	moveCameraForward,
-	moveCameraBackward,
-	moveCameraUp,
-	moveCameraLeft,
-	moveCameraRight,
-	zoomIn,
-	zoomOut,
-	windTime,
-	rewindTime,
-	toggleLorentz,
-	toggleTransformToProperFrame,
-	save,
-	load
-};
-
-*/
-
-/*
 * Used to handle user input.
 * Stores key shortcut.
 */
@@ -334,6 +308,83 @@ public:
 	ToggleImGUIEvent()
 	{
 		keyShortcut = 'g';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectXCameraDirectionEvent : public ControlEvent {
+public:
+	SelectXCameraDirectionEvent()
+	{
+		keyShortcut = '1';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectYCameraDirectionEvent : public ControlEvent {
+public:
+	SelectYCameraDirectionEvent()
+	{
+		keyShortcut = '2';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectZCameraDirectionEvent : public ControlEvent {
+public:
+	SelectZCameraDirectionEvent()
+	{
+		keyShortcut = '3';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectFreeCameraDirectionEvent : public ControlEvent {
+public:
+	SelectFreeCameraDirectionEvent()
+	{
+		keyShortcut = '`';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectMinusXCameraDirectionEvent : public ControlEvent {
+public:
+	SelectMinusXCameraDirectionEvent()
+	{
+		keyShortcut = '4';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectMinusYCameraDirectionEvent : public ControlEvent {
+public:
+	SelectMinusYCameraDirectionEvent()
+	{
+		keyShortcut = '5';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};
+
+class SelectMinusZCameraDirectionEvent : public ControlEvent {
+public:
+	SelectMinusZCameraDirectionEvent()
+	{
+		keyShortcut = '6';
 	}
 
 	// Inherited via ControlEvent

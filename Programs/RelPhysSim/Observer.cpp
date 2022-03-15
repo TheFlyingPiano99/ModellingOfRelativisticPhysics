@@ -80,15 +80,15 @@ vec3 Observer::transformConeAxisToDiagramSpace(const RelTypes::Settings& setting
 	return axis;
 }
 
-void Observer::Draw(GPUProgram& gpuProgram, Camera& camera)
+void Observer::draw(GPUProgram& gpuProgram, const Camera& camera)
 {
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);
 }
 
-void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
+void Observer::drawDiagram(GPUProgram& gpuProgram, const Camera& camera) {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "glow");
@@ -99,10 +99,10 @@ void Observer::DrawDiagram(GPUProgram& gpuProgram, Camera& camera) {
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);
 
-	worldLineView->DrawDiagram();
+	worldLineView->drawDiagram();
 }
 
-void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void Observer::drawHyperplane(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings)
 {
 	Hyperplane* plane = getHyperplane(settings);
 
@@ -110,7 +110,7 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const RelT
 	vec3 normal = transformNormalToDiagramSpace(plane->getNormal(), settings);
 	
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
@@ -121,13 +121,13 @@ void Observer::DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const RelT
 	PlaneSurface* geometry = new PlaneSurface(normal, 100, 100);
 	geometry->GenSurface(20, 20);
 	glDisable(GL_CULL_FACE);
-	geometry->Draw();
+	geometry->draw();
 	glEnable(GL_CULL_FACE);
 	delete geometry;
 	delete plane;
 }
 
-void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void Observer::drawLightCone(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings)
 {
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 
@@ -138,7 +138,7 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const RelTy
 	LightConeSurface* geometry = new LightConeSurface(axis);
 	geometry->GenSurface(100, 100);
 
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
@@ -146,37 +146,37 @@ void Observer::DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const RelTy
 	gpuProgram.setUniform(false, "textMode");
 	gpuProgram.setUniform(true, "directRenderMode");
 	glDisable(GL_CULL_FACE);
-	geometry->Draw();
+	geometry->draw();
 	glEnable(GL_CULL_FACE);
 	delete geometry;
 	delete cone;
 }
 
-void Observer::DrawNode(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings)
+void Observer::drawNode(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings)
 {
 	vec3 pos = transformPosToDiagramSpace(getLocation(settings), settings);
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
-	gpuProgram.setUniform(TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");
 	gpuProgram.setUniform(true, "directRenderMode");
-	Assets::getObserverNodeGeometry()->Draw();
+	Assets::getObserverNodeGeometry()->draw();
 }
 
-void Observer::DrawExtras(GPUProgram& gpuProgram, Camera& camera, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings)
+void Observer::drawExtras(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings)
 {
 	if (!settings.displayIntersectable) {
 		return;
 	}
 	if (settings.intersectionMode.get() == RelTypes::IntersectionMode::lightCone) {
-		DrawLightCone(gpuProgram, camera, settings);
+		drawLightCone(gpuProgram, camera, settings);
 	}
 	else if (settings.intersectionMode.get() == RelTypes::IntersectionMode::hyperplane) {
-		DrawHyperplane(gpuProgram, camera, settings);
+		drawHyperplane(gpuProgram, camera, settings);
 	}
-	DrawNode(gpuProgram, camera, settings);
+	drawNode(gpuProgram, camera, settings);
 	static int updateCounter = 0;
 	static float prevTau = 0.0f;
 	if (updateCounter++ > 30) {		// Reduced refresh rate.

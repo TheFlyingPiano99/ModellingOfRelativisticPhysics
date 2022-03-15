@@ -16,10 +16,20 @@ class ImGUIAdapter
 	struct Variables {
 		bool paused;
 		float tempX;
+		static const char* intersectionModeNames[2];
+		static const char* dopplerModeNames[3];
+		static const char* transformationModeNames[2];
 	} variables;
+
 	ImGUIObserver guiObserver;
 
 	void destroyGUI();
+
+	void buildCameraButtons(Scene& scene);
+	void buildIntersectionModeSelector(Scene& scene);
+	void buildDopplerModeSelector(Scene& scene);
+	void buildTransformationModeSelector(Scene& scene);
+
 public:
 	ImGUIAdapter() {}
 

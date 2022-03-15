@@ -4,40 +4,28 @@
 void (*Caption::pushCaption)(std::shared_ptr<Caption*>) = NULL;
 void (*Caption::ereaseCaption)(std::shared_ptr<Caption*>) = NULL;
 
-mat4 Caption::M(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
-	vec3 right = normalize(cross(prefUp, norm));
+mat4 Caption::getModellMatrix(vec2 cPos, vec3 preferedUp, float asp) const {
+	vec3 norm = vec3(0, 0, 1);
+	vec3 right = normalize(cross(preferedUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
-	return ScaleMatrix(vec3(1, fontSize * distance, fontSize * distance))
+	return ScaleMatrix(vec3(1, fontSize / asp, fontSize))
 		* mat4(
 			-norm.x, -norm.y, -norm.z, 0,
 			-right.x, -right.y, -right.z, 0,
 			up.x, up.y, up.z, 0,
 			0, 0, 0, 1)
-		* TranslateMatrix(pos);
+		* TranslateMatrix(vec3(cPos.x, cPos.y, 0));
 }
 
-mat4 Caption::invM(vec3 pos, vec3 norm, vec3 prefUp, float distance) {
-	vec3 right = normalize(cross(prefUp, norm));
-	vec3 up = normalize(cross(norm, right));
-
-	return TranslateMatrix(-pos)
-		* mat4(
-			-norm.x, -right.x, up.x, 0,
-			-norm.y, -right.y, up.y, 0,
-			-norm.z, -right.z, up.z, 0,
-			0, 0, 0, 1)
-		* ScaleMatrix(vec3(1, 1 / fontSize / distance, 1 / fontSize / distance));
-}
-
-void Caption::Animate()
+void Caption::animate()
 {
 	if (animation != nullptr) {
 		//Todo
 	}
 }
 
-void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
+void Caption::draw(GPUProgram& gpuProgram, const Camera& camera) const
 {	
 	if (!visible) {
 		return;
@@ -46,69 +34,44 @@ void Caption::Draw(GPUProgram& gpuProgram, Camera& camera)
 	gpuProgram.setUniform(color, "kd");
 	gpuProgram.setUniform(true, "directRenderMode");
 	fontTexture->loadOnGPU(gpuProgram);
-
-	vec3 wPos = (cameraSpace)? camera.calculateRayStart(vec2(pos.x, pos.y)) - camera.getEye() : pos;
-	vec3 normal = -camera.getLookDir();
-	float distance = length(dot(wPos, normal) * normal);
-	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.V() * camera.P(), "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
-
-	gpuProgram.setUniform(M, "M");
-	gpuProgram.setUniform(invM, "invM");
-
-	glDepthFunc(GL_ALWAYS);
-	glBindVertexArray(vao);
-	glBindBuffer(GL_VERTEX_ARRAY, vbo);
-
-	glDrawArrays(GL_TRIANGLES, 0, noOfVds);			// <- DrawDiagram call
-
-	//Reset to "normal":
-	glDepthFunc(GL_LESS);
-	gpuProgram.setUniform(false, "textMode");
-}
-
-void Caption::DrawDiagram(GPUProgram& gpuProgram, Camera& camera)
-{
-	this;
-	if (!visible) {
-		return;
-	}
-	gpuProgram.setUniform(true, "textMode");
-	gpuProgram.setUniform(color, "kd");
-	gpuProgram.setUniform(true, "directRenderMode");
-	fontTexture->loadOnGPU(gpuProgram);
-
-	vec3 wPos = (cameraSpace) ? camera.calculateRayStart(vec2(pos.x, pos.y)) : pos;
-	vec3 normal = -camera.getLookDir();
-	float distance = length(dot(camera.getEye() - wPos, normal) * normal);
-	mat4 M = this->M(wPos, normal, camera.getPrefUp(), distance);
-	mat4 invM = this->invM(wPos, normal, camera.getPrefUp(), distance);
-	gpuProgram.setUniform(M * camera.Translate() * camera.V() * camera.P(), "MVP");		// With camera translation matrix.
-
-
-	gpuProgram.setUniform(M, "M");
-	gpuProgram.setUniform(invM, "invM");
-
-	glDepthFunc(GL_ALWAYS);
-	glBindVertexArray(vao);
-	glBindBuffer(GL_VERTEX_ARRAY, vbo);
-
-	glDrawArrays(GL_TRIANGLES, 0, noOfVds);			// <- DrawDiagram call
 	
-	//Reset to "normal":
-	glDepthFunc(GL_LESS);
-	gpuProgram.setUniform(false, "textMode");
-}
+	vec2 cPos;
+	if (cameraSpace) {
+		cPos = vec2(pos.x, pos.y);
+	}
+	else {
+		vec4 cPos4D = vec4(pos.x, pos.y, pos.z, 1) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix();
+		cPos4D = cPos4D / cPos4D.w;
+		if (cPos4D.z > 1.0f || cPos4D.z < -1.0f || cPos4D.x > 1.0f || cPos4D.x < -1.0f || cPos4D.y > 1.0f || cPos4D.y < -1.0f) {
+			gpuProgram.setUniform(false, "textMode");
+			glDepthFunc(GL_LESS);
+			return;
+		}
+		cPos = vec2(cPos4D.x, cPos4D.y);
+	}
+	mat4 m = this->getModellMatrix(cPos, vec3(0, 1, 0), camera.getAspectRatio());
+	gpuProgram.setUniform(m, "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
 
+	gpuProgram.setUniform(m, "m");
+
+	glDepthFunc(GL_ALWAYS);
+	glBindVertexArray(vao);
+	glBindBuffer(GL_VERTEX_ARRAY, vbo);
+
+	glDrawArrays(GL_TRIANGLES, 0, noOfVds);			// <- DrawDiagram call
+
+	//Reset to "normal":
+	gpuProgram.setUniform(false, "textMode");
+	glDepthFunc(GL_LESS);
+}
 
 void Caption::genGeometry()
 {
 	// X front, Z vUp, vRight handed system:
 	vec3 charPos;
 	vec3 vNorm = vec3(-1, 0, 0);		// Normal vector
-	vec3 vUp = vec3(0, 0, 1);
-	vec3 vRight = vec3(0, -1, 0);
+	vec3 up = vec3(0, 0, 1);
+	vec3 right = vec3(0, -1, 0);
 	//UVs:	(named in viewers orientation)
 	vec2 topLeftUV, topRightUV, bottomLeftUV, bottomRightUV;	
 
@@ -137,7 +100,7 @@ void Caption::genGeometry()
 			continue;
 		}
 		fontTexture->getCharUVs(text[i], topLeftUV, topRightUV, bottomRightUV, bottomLeftUV);
-		charPos = vRight * (posInLine++ - firstLineLength / 2.0f) + line * vec3(0, 0, -lineSpacing);		// Pos is in the center of the string.
+		charPos = right * (posInLine++ - firstLineLength / 2.0f) + line * vec3(0, 0, -lineSpacing);		// Pos is in the center of the string.
 
 		// (named in viewers orientation)
 		VertexData bottomLeft;

@@ -62,12 +62,12 @@ void MoveCameraRightEvent::performAction(const float dt)
 
 void ZoomInEvent::performAction(const float dt)
 {
-	Scene::getInstance()->zoomCamera(1 - 0.01f * dt * Scene::getInstance()->getCameraVelocity());
+	Scene::getInstance()->zoomCamera(1 + 0.01f * dt * Scene::getInstance()->getCameraVelocity());
 }
 
 void ZoomOutEvent::performAction(const float dt)
 {
-	Scene::getInstance()->zoomCamera(1 + 0.01f * dt * Scene::getInstance()->getCameraVelocity());
+	Scene::getInstance()->zoomCamera(1 - 0.01f * dt * Scene::getInstance()->getCameraVelocity());
 }
 
 void WindTimeEvent::performAction(const float dt)
@@ -142,4 +142,39 @@ void MoveCameraDownEvent::performAction(const float dt)
 void ToggleImGUIEvent::performAction(const float dt)
 {
 
+}
+
+void SelectXCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Xlocked);
+}
+
+void SelectYCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Ylocked);
+}
+
+void SelectZCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::Zlocked);
+}
+
+void SelectFreeCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::free);
+}
+
+void SelectMinusXCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusXlocked);
+}
+
+void SelectMinusYCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusYlocked);
+}
+
+void SelectMinusZCameraDirectionEvent::performAction(const float dt)
+{
+	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusZlocked);
 }

@@ -24,7 +24,6 @@
 	uniform mat4 M;
 	uniform mat4 invM;
 
-	uniform bool textMode;
 	uniform bool directRenderMode;
 	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
@@ -184,145 +183,213 @@
 		return startVal * (1 - t) + endVal * t;
 	}
 
+	bool isInSection(float t, float sectionStart, float sectionEnd, int sectionStartIdx) {
+		return (sectionStartIdx == 0 && t < sectionEnd)											// First section
+            || (sectionStartIdx < noOfWorldLineNodes - 2 && t < sectionEnd && t >= sectionStart)	// Middle section
+            || (sectionStartIdx == noOfWorldLineNodes - 2 && t >= sectionStart);					// Last section
+	}
+
+	float interpolateT(out vec4 tangentVelocityLorentz, out vec4 offsetedStartPosLorentz, 
+						vec4 offsetedStartPosLorentzCone, vec4 offsetedStartPosLorentzHyperplane, 
+						vec4 tangentVelocityLorentzCone, vec4 tangentVelocityLorentzHyperplane,
+						float tConeLorentz, float tPlaneLorentz) {
+		float t;
+		if (interpolateIntersectionMode) {
+			if (intersectionMode == 0) {					// Light cone
+				t = lerp(tPlaneLorentz, tConeLorentz, tIntersectionMode);
+				offsetedStartPosLorentz = lerp(offsetedStartPosLorentzHyperplane, offsetedStartPosLorentzCone, tIntersectionMode);
+				tangentVelocityLorentz = lerp(tangentVelocityLorentzHyperplane, tangentVelocityLorentzCone, tIntersectionMode);
+			}
+			else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
+				t = lerp(tConeLorentz, tPlaneLorentz, tIntersectionMode);
+				offsetedStartPosLorentz = lerp(offsetedStartPosLorentzCone, offsetedStartPosLorentzHyperplane, tIntersectionMode);
+				tangentVelocityLorentz = lerp(tangentVelocityLorentzCone, tangentVelocityLorentzHyperplane, tIntersectionMode);
+			}
+		}
+		else {
+			if (intersectionMode == 0) {					// Light cone
+				t = tConeLorentz;
+				offsetedStartPosLorentz = offsetedStartPosLorentzCone;
+				tangentVelocityLorentz = tangentVelocityLorentzCone;
+			}
+			else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
+				t = tPlaneLorentz;
+				offsetedStartPosLorentz = offsetedStartPosLorentzHyperplane;
+				tangentVelocityLorentz = tangentVelocityLorentzHyperplane;
+			}
+		}
+		return t;
+	}
+
+	float findTLorentz(out vec4 tangentVelocity, out vec4 offsetedStartPos) {
+		float t;
+
+		vec4 geodeticSectionStart;					// <- To make Wigner rotation happen.
+		vec4 geodeticSectionEnd;					// <- To make Wigner rotation happen.
+
+		bool foundHyperplaneIntersection = false;
+		bool foundConeIntersection = false;
+
+		float tCone;
+		float tPlane;
+
+		vec4 offsetedStartPosCone;
+		vec4 offsetedStartPosHyperplane;
+
+		vec4 tangentVelocityCone;
+		vec4 tangentVelocityHyperplane;
+
+			// Find tLorentz:
+		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
+			// 1. Get geodetic section tangent velocity:
+			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
+			vec4 nextTangentVelocity;
+			if (i < noOfWorldLineNodes - 2) {
+				nextTangentVelocity = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]) * speedOfLight;
+			}
+			else {	// Last section
+				nextTangentVelocity = tangentVelocity;
+			}
+			// 2. Get geodetic section start event:
+			if (i > 0) {
+				geodeticSectionStart = geodeticSectionEnd;
+			}
+			else {			// First section
+				vec3 v = To3DVelocity(tangentVelocity);
+				float gamma = lorentzFactor(length(v));
+				vec3 n = normalize(v);
+				vec3 pParalel = dot(vp.xyz, n) * n;
+				vec3 pPerpend = vp.xyz - pParalel;
+				geodeticSectionStart = vec4(pPerpend + pParalel / gamma, 0)
+										+ worldLineNodes[0] - tangentVelocity / tangentVelocity.w * worldLineNodes[0].w;	// Length Contraction(vp) + object worldLine start pos;
+			}
+
+			// 3. Get geodetic section end event:
+			vec4 boostPlaneLocation = worldLineNodes[i + 1];
+			vec4 boostPlaneNormal;
+			if (simultaneBoost) {
+				boostPlaneNormal = normalize(vec4(-(tangentVelocity.xyz), tangentVelocity.w));
+			}
+			else {
+				boostPlaneNormal = vec4(0, 0, 0, 1);
+			}
+			offsetedStartPos = geodeticSectionStart - tangentVelocity 
+									/ tangentVelocity.w * geodeticSectionStart.w;
+			float tSectionEnd = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, boostPlaneLocation, boostPlaneNormal);	// <- To make Wigner rotation happen.
+			geodeticSectionEnd = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, tSectionEnd);
+
+			//---------------------------------------------------------------------------------------------------------------------------------
+			//Intersect:
+			
+			if (!foundConeIntersection) {
+				// Cone:
+				vec4 coneLocation = observersLocation;
+				tCone = GeodeticIntersectLightCone(offsetedStartPos, tangentVelocity, coneLocation);
+				if (isInSection(tCone, geodeticSectionStart.w, geodeticSectionEnd.w, i)) {
+					foundConeIntersection = true;
+					offsetedStartPosCone = offsetedStartPos;
+					tangentVelocityCone = tangentVelocity;
+				}
+			}		
+			if (!foundHyperplaneIntersection) {
+				// Hyperplane:
+				vec4 planeLocation = observersLocation;
+				vec4 planeNormal = normalize(vec4(-observersVelocity.xyz, observersVelocity.w));
+				tPlane = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);
+				if (isInSection(tPlane, geodeticSectionStart.w, geodeticSectionEnd.w, i)) {
+					foundHyperplaneIntersection = true;
+					offsetedStartPosHyperplane = offsetedStartPos;
+					tangentVelocityHyperplane = tangentVelocity;
+				}
+			}
+			if (foundConeIntersection && foundHyperplaneIntersection)
+            {
+	            break;
+		    }
+		}
+		return interpolateT(tangentVelocity, offsetedStartPos, 
+						offsetedStartPosCone, offsetedStartPosHyperplane, 
+						tangentVelocityCone, tangentVelocityHyperplane,
+						tCone, tPlane);
+	}
+
+	float findTGalilean(out vec4 tangentVelocity, out vec4 offsetedStartPos) {
+		float t;
+
+		bool foundHyperplaneIntersection = false;
+		bool foundConeIntersection = false;
+
+		float tCone;
+		float tPlane;
+
+		vec4 offsetedStartPosCone;
+		vec4 offsetedStartPosHyperplane;
+
+		vec4 tangentVelocityCone;
+		vec4 tangentVelocityHyperplane;
+
+
+		// Find tGalilean:
+		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
+			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
+			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
+			vec3 v = To3DVelocity(tangentVelocity);
+			float gamma = lorentzFactor(length(v));
+			vec3 n = normalize(v);
+			vec3 pParalel = dot(vp.xyz, n) * n;
+			vec3 pPerpend = vp.xyz - pParalel;
+			offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos	also no Wigner rotation (not using "sectorStart").
+
+			//---------------------------------------------------------------------------------------------------------------------------------
+			//Intersect:
+			
+			if (!foundConeIntersection) {
+			// Cone:
+				vec4 coneLocation = observersLocation;
+				tCone = GeodeticIntersectLightCone(offsetedStartPos, tangentVelocity, coneLocation);
+				if (isInSection(tCone, worldLineNodes[i].w, worldLineNodes[i + 1].w, i)) {
+					foundConeIntersection = true;
+					offsetedStartPosCone = offsetedStartPos;
+					tangentVelocityCone = tangentVelocity;
+				}
+			}		
+			if (!foundHyperplaneIntersection) {
+				// Hyperplane:
+				vec4 planeLocation = observersLocation;
+				vec4 planeNormal = vec4(0, 0, 0, 1);
+				tPlane = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, planeLocation, planeNormal);
+				if (isInSection(tPlane, worldLineNodes[i].w, worldLineNodes[i + 1].w, i)) {
+					foundHyperplaneIntersection = true;
+					offsetedStartPosHyperplane = offsetedStartPos;
+					tangentVelocityHyperplane = tangentVelocity;
+				}
+			}
+			if (foundConeIntersection && foundHyperplaneIntersection)
+            {
+	            break;
+		    }
+		}
+ 		return interpolateT(tangentVelocity, offsetedStartPos, 
+						offsetedStartPosCone, offsetedStartPosHyperplane, 
+						tangentVelocityCone, tangentVelocityHyperplane,
+						tCone, tPlane);
+	}
 
 	/*
 		Calculates the intersection of a hyperplane and world line of this vertex
 		Also calculates the Doppler shift for this vertex.
 	*/
 	void realTime() {
-		float tLorentz;						// absolute time parametre, where the world line of vertex intersects hyperplane or light cone.
-		float tGalilean;					// absolute time parametre, where the world line of vertex intersects hyperplane or light cone.
 		vec4 tangentVelocityLorentz;		// Velocity of geodetic world line tangent to the world line, where the hyperplane or light cone intersects it.
 		vec4 tangentVelocityGalilean;																		// Velocity of geodetic world line tangent to the world line, where the hyperplane or light cone intersects it.
-
-		vec4 geodeticSectionStart;					// <- To make Wigner rotation happen.
-		vec4 geodeticSectionEnd;					// <- To make Wigner rotation happen.
 
 		vec4 offsetedStartPosLorentz;
 		vec4 offsetedStartPosGalilean;
 
-		// Find tLorentz:
-		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
-			tangentVelocityLorentz = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
-			vec4 nextTangentVelocityLorentz = tangentVelocityLorentz;
-			vec3 v = To3DVelocity(tangentVelocityLorentz);
-			float gamma = lorentzFactor(length(v));
-			vec3 n = normalize(v);
-			vec3 pParalel = dot(vp.xyz, n) * n;
-			vec3 pPerpend = vp.xyz - pParalel;
-			if (i < noOfWorldLineNodes - 2) {
-				nextTangentVelocityLorentz = normalize(worldLineNodes[i + 2] - worldLineNodes[i + 1]) * speedOfLight;
-			}
-			if (i > 0) {							// Get geodeticSectionStart:
-				geodeticSectionStart = geodeticSectionEnd;
-			}
-			else {			// if i == 0
-				geodeticSectionStart = vec4(pPerpend + pParalel / gamma, 0) + worldLineNodes[0] - tangentVelocityLorentz / tangentVelocityLorentz.w * worldLineNodes[0].w;	// Length Contraction(vp) + object worldLine start pos;
-			}
-
-			offsetedStartPosLorentz = geodeticSectionStart - tangentVelocityLorentz / tangentVelocityLorentz.w * geodeticSectionStart.w;
-
-			// Get geodeticSectionEnd:
-			vec4 boostPlaneLocation = worldLineNodes[i + 1];
-			vec4 boostPlaneNormal;
-			if (simultaneBoost) {
-				boostPlaneNormal = normalize(vec4(-(tangentVelocityLorentz.xyz), tangentVelocityLorentz.w));
-			}
-			else {
-				boostPlaneNormal = vec4(0, 0, 0, 1);
-			}
-			float tSectionEnd = GeodeticIntersectHyperplane(offsetedStartPosLorentz, tangentVelocityLorentz, boostPlaneLocation, boostPlaneNormal);
-			geodeticSectionEnd = GeodeticLocationAtAbsoluteTime(offsetedStartPosLorentz, tangentVelocityLorentz, tSectionEnd);					// <- To make Wigner rotation happen.
-
-			//---------------------------------------------------------------------------------------------------------------------------------
-			//Intersect:
-			// Cone:
-			vec4 coneLocation = observersLocation;
-			
-			float tConeLorentz = GeodeticIntersectLightCone(offsetedStartPosLorentz, tangentVelocityLorentz, coneLocation);
-			
-			// Hyperplane:
-			vec4 planeLocation = observersLocation;
-			vec4 planeNormalLorentz = normalize(vec4(-(observersVelocity.xyz), observersVelocity.w));
-
-			float tPlaneLorentz = GeodeticIntersectHyperplane(offsetedStartPosLorentz, tangentVelocityLorentz, planeLocation, planeNormalLorentz);
-			
-			if (interpolateIntersectionMode) {
-				if (intersectionMode == 0) {					// Light cone
-					tLorentz = lerp(tPlaneLorentz, tConeLorentz, tIntersectionMode);
-				}
-				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
-					tLorentz = lerp(tConeLorentz, tPlaneLorentz, tIntersectionMode);
-				}
-			}
-			else {
-				if (intersectionMode == 0) {					// Light cone
-					tLorentz = tConeLorentz;
-				}
-				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
-					tLorentz = tPlaneLorentz;
-				}
-			}
-			if (
-            (i == 0 && tLorentz < geodeticSectionEnd.w)															// First section
-            || (i < noOfWorldLineNodes - 2 && tLorentz < geodeticSectionEnd.w && tLorentz >= geodeticSectionStart.w)		// Middle section
-            || (i == noOfWorldLineNodes - 2 && tLorentz >= geodeticSectionStart.w)											// Last section
-            ) {
-	            break;
-		    }
-		}
+		float tLorentz = findTLorentz(tangentVelocityLorentz, offsetedStartPosLorentz);		// absolute time parametre, where the world line of vertex intersects hyperplane or light cone.
+		float tGalilean = findTGalilean(tangentVelocityGalilean, offsetedStartPosGalilean);	// absolute time parametre, where the world line of vertex intersects hyperplane or light cone.
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-		// Find tGalilean:
-		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
-			tangentVelocityGalilean = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
-			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
-			vec3 v = To3DVelocity(tangentVelocityGalilean);
-			float gamma = lorentzFactor(length(v));
-			vec3 n = normalize(v);
-			vec3 pParalel = dot(vp.xyz, n) * n;
-			vec3 pPerpend = vp.xyz - pParalel;
-			offsetedStartPosGalilean = vp + worldLineNodes[i] - tangentVelocityGalilean / tangentVelocityGalilean.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos	also no Wigner rotation (not using "sectorStart").
-
-			//---------------------------------------------------------------------------------------------------------------------------------
-			//Intersect:
-			// Cone:
-			vec4 coneLocation = observersLocation;
-			
-			float tConeGalilean = GeodeticIntersectLightCone(offsetedStartPosGalilean, tangentVelocityGalilean, coneLocation);
-			
-			// Hyperplane:
-			vec4 planeLocation = observersLocation;
-			vec4 planeNormalGalilean = vec4(0, 0, 0, 1);
-
-			float tPlaneGalilean = GeodeticIntersectHyperplane(offsetedStartPosGalilean, tangentVelocityGalilean, planeLocation, planeNormalGalilean);
-			
-			if (interpolateIntersectionMode) {
-				if (intersectionMode == 0) {					// Light cone
-					tGalilean = lerp(tPlaneGalilean, tConeGalilean, tIntersectionMode);
-				}
-				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
-					tGalilean = lerp(tConeGalilean, tPlaneGalilean, tIntersectionMode);
-				}
-			}
-			else {
-				if (intersectionMode == 0) {					// Light cone
-					tGalilean = tConeGalilean;
-				}
-				else if (intersectionMode == 1) {				// Simultaneous hyperplane of the observer
-					tGalilean = tPlaneGalilean;
-				}
-			}
-
-			if (
-            (i == 0 && tGalilean < worldLineNodes[1].w)															// First section
-            || (i < noOfWorldLineNodes - 2 && tGalilean < worldLineNodes[i + 1].w && tGalilean >= worldLineNodes[i].w)		// Middle section
-            || (i == noOfWorldLineNodes - 2 && tGalilean >= worldLineNodes[i].w)											// Last section
-            ) {
-	            break;
-		    }
-		}
 		
 		vec3 vertexLocationProperFrameLorentz;
 		vec3 vertexVelocityProperFrameLorentz;

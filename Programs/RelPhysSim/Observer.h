@@ -92,17 +92,17 @@ public:
 	*/
 	vec3 transformConeAxisToDiagramSpace(const RelTypes::Settings& settings);
 
-	void Draw(GPUProgram& gpuProgram, Camera& camera);
-	void DrawDiagram(GPUProgram& gpuProgram, Camera& camera);
-	void DrawHyperplane(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings);
-	void DrawLightCone(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings);
-	void DrawNode(GPUProgram& gpuProgram, Camera& camera, const RelTypes::Settings& settings);
+	void draw(GPUProgram& gpuProgram, const Camera& camera);
+	void drawDiagram(GPUProgram& gpuProgram, const Camera& camera);
+	void drawHyperplane(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings);
+	void drawLightCone(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings);
+	void drawNode(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings);
 	
 	/*
 	* Draw intersectable and captions.
 	*/
-	void DrawExtras(GPUProgram& gpuProgram,
-		Camera& camera,
+	void drawExtras(GPUProgram& gpuProgram,
+		const Camera& camera,
 		const RelTypes::ObserverProperties& observerProperties,
 		const RelTypes::Settings& settings);
 

@@ -114,12 +114,12 @@ public:
 
 	void Control(float dt);
 
-	void Animate(float dt);
+	void animate(float dt);
 
 	/*
 	* Renders everything on screen.
 	*/
-	void Draw(GPUProgram& gpuProgram);
+	void draw(GPUProgram& gpuProgram);
 
 	void toggleActiveObserver();
 
@@ -146,6 +146,8 @@ public:
 	* Switches between simultaneous hyperplane intersection and light cone intersection.
 	*/
 	void toggleIntersectionMode();
+
+	void setIntersectionMode(RelTypes::IntersectionMode mode);
 
 	void toggleViewMode();
 
@@ -188,6 +190,9 @@ public:
 	* Receives the current mouse position on camera plane.
 	*/
 	void mouseMoved(float cX, float cY);
+
+
+	void mouseScrolled(float delta);
 
 	/*
 	* When the mouse is moved with pressed buttons.
@@ -295,9 +300,9 @@ public:
 		finishedLoading = b;
 	}
 
-	/*
-	*/
 	vec4 getEditedLocation(const float cX, const float cY);
+
+	void setCameraDirectionMode(RelTypes::DirectionMode mode);
 
 };
 

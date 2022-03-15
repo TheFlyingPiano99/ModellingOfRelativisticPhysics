@@ -81,7 +81,7 @@ Object* Object::createSpike(WorldLine* wrdln)
 		vec3(0, 0, 1),
 		wrdln,
 		Assets::getSpikeGeometry(),
-		new Material(vec3(3, 1.5, 1), vec3(10, 10, 10), vec3(5, 6, 20), 50),		// RealTime3D material
+		new Material(vec3(1, 1, 1), vec3(10, 10, 10), vec3(5, 5, 5), 50),		// RealTime3D material
 		diagramM,		// Diagram material
 		new AdvancedTexture(Assets::getTexturePath().append("spike.bmp").c_str(), "", ""),
 		"Spike",
@@ -90,13 +90,13 @@ Object* Object::createSpike(WorldLine* wrdln)
 	return obj;
 }
 
-mat4 Object::M() {
+mat4 Object::getModellMatrix() {
 	return ScaleMatrix(scale)
 		* RotationMatrix(rotationAngle, rotationAxis)
 		* TranslateMatrix(translation);
 }
 
-mat4 Object::invM() {
+mat4 Object::getInverseModellMatrix() {
 	return TranslateMatrix(-translation)
 		* RotationMatrix(-rotationAngle, rotationAxis)
 		* ScaleMatrix(vec3(1 / scale.x, 1 / scale.y, 1 / scale.z));
@@ -105,27 +105,32 @@ mat4 Object::invM() {
 vec3 Object::getDiagramPos(const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::Settings& settings, const RelTypes::ObserverProperties& observerProperties) {
 	// Transformation mode interpolation:
 	vec4 absoluteFramePos4 = intersect(lightCone, hyperplane, settings,
-		vec4(0, 0, 0, 0),
-		vec4(0, 0, 0, 0),
-		vec4(0, 0, 0, RelPhysics::speedOfLight));
+		observerProperties);
 
 	vec3 absoluteFramePos = vec3(absoluteFramePos4[settings.diagramX], absoluteFramePos4[settings.diagramY], absoluteFramePos4[settings.diagramZ]);
-	vec4 properFramePos4 = intersect(lightCone, hyperplane, settings,
-		observerProperties.location,
-		observerProperties.locationAtZero,
-		observerProperties.velocity);
-	vec3 properFramePos = vec3(properFramePos4[settings.diagramX], properFramePos4[settings.diagramY], properFramePos4[settings.diagramZ]);
+	vec4 properFramePos4 = intersect(lightCone,
+		hyperplane, 
+		settings,
+		observerProperties);
+	vec3 properFramePos = 
+		vec3(properFramePos4[settings.diagramX],
+		properFramePos4[settings.diagramY],
+		properFramePos4[settings.diagramZ]);
 
 	// "Transformation to proper frame" interpolation:
 	vec3 pos = interpolate<bool, vec3>(settings.transformToProperFrame, true, false, properFramePos, absoluteFramePos);
 	return pos;
 }
 
-void Object::Animate(float dt) {
+void Object::animate(float dt) {
 	//Todo
 }
 
-void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings) {
+void Object::draw(GPUProgram& gpuProgram,
+	const Camera& camera, 
+	const LightCone& lightCone,
+	const Hyperplane& hyperplane, const RelTypes::ObserverProperties& observerProperties,
+	const RelTypes::Settings& settings) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedObjectMaterial()->loadOnGPU(gpuProgram);
@@ -139,18 +144,21 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	if (texture != nullptr) {
 		texture->loadOnGPU(gpuProgram);
 	}
-	gpuProgram.setUniform(camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	//gpuProgram.setUniform(M(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");
 
-	geometry->Draw();
+	geometry->draw();
 
 	// Caption:
 	if (selected || hovered) {		
-		vec4 pos4 = intersect(lightCone, hyperplane, settings, camera.getLocationFV(), camera.getStartPosVF(), camera.getVelocityFV());
+		vec4 pos4 = intersect(lightCone,
+			hyperplane,
+			settings, 
+			observerProperties);
 		vec3 pos = vec3(pos4.x, pos4.y, pos4.z);
 		(*diagramCaption)->setPos(pos + normalize(camera.getRight() + camera.getUp()) * (geometry->getOverallRadius() + 0.3f));
 		(*diagramCaption)->setVisible(true);
@@ -181,7 +189,7 @@ void Object::Draw(GPUProgram& gpuProgram, Camera& camera, const LightCone& light
 	}
 }
 
-void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings) {
+void Object::drawDiagram(GPUProgram& gpuProgram, const Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings) {
 	worldLine->loadOnGPU(gpuProgram);
 	if (selected) {
 		Assets::getSelectedWorldLineMaterial()->loadOnGPU(gpuProgram);
@@ -193,7 +201,7 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 		diagramMaterial->loadOnGPU(gpuProgram);
 	}
 
-	gpuProgram.setUniform(camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(UnitMatrix(), "invM");
 	gpuProgram.setUniform(true, "noTexture");
@@ -202,18 +210,19 @@ void Object::DrawDiagram(GPUProgram& gpuProgram, Camera& camera, const LightCone
 	gpuProgram.setUniform(true, "glow");
 
 	if (worldLineView != nullptr) {
-		worldLineView->DrawDiagram();
+		worldLineView->drawDiagram();
 	}
 	
 	
 	vec3 pos = getDiagramPos(lightCone, hyperplane, settings, observerProperties);
-	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.Translate() * camera.V() * camera.P(), "MVP");
+	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() 
+		* camera.getActiveProjectionMatrix(), "MVP");
 	gpuProgram.setUniform(ScaleMatrix(vec3(0.5f, 0.5f, 0.5f)) * TranslateMatrix(pos), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "directRenderMode");
 	gpuProgram.setUniform(false, "glow");
 
-	Assets::getObserverNodeGeometry()->Draw();
+	Assets::getObserverNodeGeometry()->draw();
 	if (selected || hovered) {
 		(*diagramCaption)->setPos(pos);
 		(*diagramCaption)->setVisible(true);
@@ -298,9 +307,6 @@ Object* Object::loadFromFile(std::ifstream& file)
 			default:
 				break;
 			}
-			if (retVal == nullptr) {
-				return nullptr;
-			}
 			retVal->setID(_ID);
 			retVal->setName(_name);
 			retVal->setDescription(_description);
@@ -341,18 +347,21 @@ float Object::rayDistanceToDiagram(const Ray& ray, RelTypes::ObserverProperties 
 	return worldLine->distanceBetweenRayAndDiagram(ray, observerProperties, settings);
 }
 
-float Object::rayDistanceToObject(const Ray& ray, const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+float Object::rayDistanceToObject(const Ray& ray, 
+	const LightCone& lightCone, 
+	const Hyperplane& hyperplane,
+	const RelTypes::Settings& settings,
+	const RelTypes::ObserverProperties& observerProperties)
 {
-	vec4 location4 = intersect(lightCone, hyperplane, settings, observerCurrentLocation, observerLocationAtZero, observersCurrentVelocity);
+	vec4 location4 = intersect(lightCone, hyperplane, settings, observerProperties);
 	vec3 wPos = vec3(location4.x, location4.y, location4.z);	// only space coordinates!
-	vec3 rayPos = vec3(0, 0, 0);		// We use origo instead of the position given in absolute frame, because it would be transformed to origo anyway.
+	vec3 rayPos = ray.pos - vec3(observerProperties.location.x, observerProperties.location.y, observerProperties.location.z);
 	float d = length(wPos - rayPos - dot(ray.dir, wPos - rayPos) * ray.dir);
 	return (dot(wPos - rayPos, ray.dir) > 0) ? d : -1;		// If it's behod the camera, than return -1.
 }
 
-vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::Settings& settings, vec4 observerCurrentLocation, vec4 observerLocationAtZero, vec4 observersCurrentVelocity)
+vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::Settings& settings, const RelTypes::ObserverProperties& observerProperties)
 {
-	//Intersect:
 	float t = 0;		// absolute time parametre
 	
 	float tLightCone = worldLine->intersect(lightCone);
@@ -369,8 +378,8 @@ vec4 Object::intersect(const LightCone& lightCone, const Hyperplane& hyperplane,
 		settings.doLorentz,
 		true,
 		false,
-		RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity)),
-		RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerLocationAtZero, RelPhysics::To3DVelocity(observersCurrentVelocity))
+		RelPhysics::lorentzTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero, RelPhysics::To3DVelocity(observerProperties.velocity)),
+		RelPhysics::galileanTransformation(worldLine->getLocationAtAbsoluteTime(t) - observerProperties.locationAtZero, RelPhysics::To3DVelocity(observerProperties.velocity))
 		);
 }
 

@@ -13,7 +13,7 @@
 class Entity
 {
 	int ID;
-	static int nextID;
+	static int maxID;
 
 protected:
 
@@ -23,7 +23,7 @@ protected:
 	std::string description;
 
 	Entity(std::string _name = "", std::string _desc = "") : name(_name), description(_desc) {
-		ID = nextID++;
+		ID = ++maxID;
 	}
 
 	/*
@@ -31,8 +31,8 @@ protected:
 	*/
 	void setID(int id) {
 		ID = id;
-		if (ID >= nextID) {
-			nextID = ID + 1;
+		if (ID >= maxID) {
+			maxID = ID;
 		}
 	}
 
