@@ -175,8 +175,10 @@ void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel co
 			}
 			break;
 		case 3:			// Mouse wheel scroll
+			scene ->mouseScrolled(1.01);
+			break;
 		case 4:			// Mouse wheel scroll
-
+			scene->mouseScrolled(0.99);
 			break;
 		default: break;
 	}

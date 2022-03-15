@@ -589,6 +589,13 @@ void Scene::mouseMoved(float cX, float cY)
 	}
 }
 
+void Scene::mouseScrolled(float delta)
+{
+	if (activeCamera != nullptr) {
+		activeCamera->zoom(delta);
+	}
+}
+
 void Scene::mouseDragged(const float cX, const float cY, const float deltaCX, const float deltaCY, const RelTypes::MouseState& mouseState)
 {
 	if (mouseState.mouseRightDown) {

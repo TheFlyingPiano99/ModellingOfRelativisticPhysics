@@ -182,31 +182,29 @@ void ImGUIAdapter::configToScene(Scene& scene)
 	if (!visible) {
 		return;
 	}
-	if (ImGui::Begin("Settings")) {
-		ImGui::SetWindowSize(ImVec2(GlobalVariables::windowWidth / 4.0f, GlobalVariables::windowHeight / 2.0f));
-		buildCameraButtons(scene);
-		ImGui::Button("Toggle view mode", ImVec2(150, 50));
-		if (ImGui::IsItemClicked()) {
-			scene.toggleViewMode();
-		}
-		buildIntersectionModeSelector(scene);
-		buildTransformationModeSelector(scene);
-		if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode) {
-			buildDopplerModeSelector(scene);
-		}
-
-		ImGui::Checkbox("Run", &scene.getSettings().running);
-		ImGui::Checkbox("Shading", &scene.getSettings().doShading);
-		if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode && scene.getSettings().doLorentz.get()) {
-			ImGui::Checkbox("Simultane boost", &scene.getSettings().simultaneBoost);
-		}
-		else if (RelTypes::ViewMode::diagram == scene.getSettings().viewMode) {
-			ImGui::Checkbox("Display intersectable", &scene.getSettings().displayIntersectable);
-			ImGui::Checkbox("Transform to proper frame", &scene.getSettings().transformToProperFrame.get());
-			ImGui::Checkbox("Editor mode", &scene.getSettings().editorMode);
-		}
-		ImGui::End();
+	ImGui::Begin("Settings");
+	buildCameraButtons(scene);
+	ImGui::Button("Toggle view mode", ImVec2(150, 50));
+	if (ImGui::IsItemClicked()) {
+		scene.toggleViewMode();
 	}
+	buildIntersectionModeSelector(scene);
+	buildTransformationModeSelector(scene);
+	if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode) {
+		buildDopplerModeSelector(scene);
+	}
+
+	ImGui::Checkbox("Run", &scene.getSettings().running);
+	ImGui::Checkbox("Shading", &scene.getSettings().doShading);
+	if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode && scene.getSettings().doLorentz.get()) {
+		ImGui::Checkbox("Simultane boost", &scene.getSettings().simultaneBoost);
+	}
+	else if (RelTypes::ViewMode::diagram == scene.getSettings().viewMode) {
+		ImGui::Checkbox("Display intersectable", &scene.getSettings().displayIntersectable);
+		ImGui::Checkbox("Transform to proper frame", &scene.getSettings().transformToProperFrame.get());
+		ImGui::Checkbox("Editor mode", &scene.getSettings().editorMode);
+	}
+	ImGui::End();
 }
 
 

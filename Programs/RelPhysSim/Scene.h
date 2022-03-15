@@ -191,6 +191,9 @@ public:
 	*/
 	void mouseMoved(float cX, float cY);
 
+
+	void mouseScrolled(float delta);
+
 	/*
 	* When the mouse is moved with pressed buttons.
 	*/

@@ -154,6 +154,7 @@ void SpiralLineView::drawDiagram() const
 
 void SpiralLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
 {
+
 }
 
 void SpiralLineView::update()
