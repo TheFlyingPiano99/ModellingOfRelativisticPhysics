@@ -3,6 +3,16 @@
 #include "Assets.h"
 #include "StringOperations.h"
 
+
+const char* Object::typeNames[5] = {
+	"earth",
+	"dice",
+	"spaceship",
+	"spike",
+	"none"
+};
+
+
 /*
 * Factory for Earth-like object.
 */
@@ -300,7 +310,7 @@ Object* Object::loadFromFile(std::ifstream& file)
 				retVal = createSpaceship(NULL);
 				break;
 			case RelTypes::ObjectType::spike:
-				retVal = createSpaceship(NULL);
+				retVal = createSpike(NULL);
 				break;
 			case RelTypes::ObjectType::none:
 				break;

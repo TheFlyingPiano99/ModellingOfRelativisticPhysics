@@ -32,6 +32,7 @@ class Object : public Entity
 	std::shared_ptr<Caption*> diagramCaption;
 
 public:
+	static const char* typeNames[5];
 
 	Object(
 		vec3 _scale,

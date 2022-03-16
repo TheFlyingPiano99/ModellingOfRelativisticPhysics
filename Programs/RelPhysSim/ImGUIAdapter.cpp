@@ -157,6 +157,44 @@ void ImGUIAdapter::buildTransformationModeSelector(Scene& scene)
 	}
 }
 
+void ImGUIAdapter::buildObjectTypeSelector(Scene& scene)
+{
+	unsigned int currentType = scene.getInitialiser()->getObjectType();
+	if (ImGui::BeginCombo("Object type", Object::typeNames[currentType])) {
+		for (int i = 0; i < 5; i++) {
+			bool is_selected =
+				(currentType == i);
+			if (ImGui::Selectable(Object::typeNames[i], is_selected)) {
+				currentType = i;
+				scene.getInitialiser()->setObjectType((RelTypes::ObjectType)currentType);
+			}
+			if (is_selected) {
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
+}
+
+void ImGUIAdapter::buildWorldLineTypeSelector(Scene& scene)
+{
+	unsigned int currentType = scene.getInitialiser()->getWorldLineType();
+	if (ImGui::BeginCombo("World line type", WorldLine::typeNames[currentType])) {
+		for (int i = 0; i < NUMBER_OF_WORLD_LINE_TYPES; i++) {
+			bool is_selected =
+				(currentType == i);
+			if (ImGui::Selectable(WorldLine::typeNames[i], is_selected)) {
+				currentType = i;
+				scene.getInitialiser()->setWorldLineType((WorldLine::Type)currentType);
+			}
+			if (is_selected) {
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
+}
+
 void ImGUIAdapter::preDrawInit()
 {
 	if (!visible) {
@@ -204,7 +242,35 @@ void ImGUIAdapter::configToScene(Scene& scene)
 		ImGui::Checkbox("Transform to proper frame", &scene.getSettings().transformToProperFrame.get());
 		ImGui::Checkbox("Editor mode", &scene.getSettings().editorMode);
 	}
+
+	if (ImGui::Button("New object", ImVec2(120, 50))) {
+		scene.beginCreationSequence();
+	}
 	ImGui::End();
+
+	//Initialisation window:
+	if (scene.getCreationSequence() == CreationSequence::costumize) {
+		ImGui::Begin("Initialise object");
+		ImGui::InputText("Name", scene.getInitialiser()->name, NAME_BUFFER_SIZE);
+		buildObjectTypeSelector(scene);
+		buildWorldLineTypeSelector(scene);
+		ImGui::InputFloat3("Position at start [m]", &scene.getInitialiser()->positionAtZeroT[0]);
+		ImGui::InputFloat3("Velocity at start [c]", &scene.getInitialiser()->velocityAtZeroT[0]);
+		if (scene.getInitialiser()->getWorldLineType() == WorldLine::Type::SpiralLine) {
+			ImGui::InputFloat3("Center of rotation [m]", &scene.getInitialiser()->centerOfRotation[0]);
+		}
+
+		if (ImGui::Button("Finish", ImVec2(120, 50))) {
+			scene.finishCreationSequence();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 50))) {
+			scene.cancelCreationSequence();
+		}
+
+
+		ImGui::End();
+	}
 }
 
 

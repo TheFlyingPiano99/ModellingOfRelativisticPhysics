@@ -29,6 +29,8 @@ class ImGUIAdapter
 	void buildIntersectionModeSelector(Scene& scene);
 	void buildDopplerModeSelector(Scene& scene);
 	void buildTransformationModeSelector(Scene& scene);
+	void buildObjectTypeSelector(Scene& scene);
+	void buildWorldLineTypeSelector(Scene& scene);
 
 public:
 	ImGUIAdapter() {}

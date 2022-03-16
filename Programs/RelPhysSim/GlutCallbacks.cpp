@@ -78,19 +78,22 @@ bool escDown = false;
 
 // Key of ASCII code pressed
 void onKeyboard(unsigned char key, int pX, int pY) {
-
-	scene->type(key);
-
 	//Modifiers:
 	int modifiers = glutGetModifiers();
 	int ctrl = modifiers & GLUT_ACTIVE_CTRL;
 	int alt = modifiers & GLUT_ACTIVE_ALT;
 	int shift = modifiers & GLUT_ACTIVE_SHIFT;
 	
-	ControlEventManager::getInstance().handlePressedEvents(*scene, key);
 
 	bool windowDestroyed = false;
-	if (key == 27) {
+	if (scene->isEntryMode()) {
+		scene->type(key);
+	}
+	else if (scene->getCreationSequence() != CreationSequence::costumize) {
+		ControlEventManager::getInstance().handlePressedEvents(*scene, key);
+	}
+	/*
+	else if (key == 27) {
 		if (!escDown) {
 			escDown = true;
 			if (scene->askToQuit())
@@ -99,6 +102,7 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 				windowDestroyed = true;
 		}
 	}
+	*/
 	if (!windowDestroyed) {
 		ImGui_ImplGLUT_KeyboardFunc(key, pX, pY);
 	}

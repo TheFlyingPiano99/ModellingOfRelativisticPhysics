@@ -62,10 +62,8 @@ bool HUD::type(char c)
 	if (entry != nullptr) {
 		bool isFinished = entry->type(c);
 		if (isFinished) {
-			if (entry != nullptr) {
-				delete entry;
-				entry = nullptr;
-			}
+			delete entry;
+			entry = nullptr;
 			return true;
 		}
 	}
@@ -77,6 +75,14 @@ void HUD::clearCaptions()
 	messageQueue->clearQueue();
 
 	captions.clear();
+}
+
+void HUD::cancelEntry()
+{
+	if (entry != nullptr) {
+		delete entry;
+		entry = nullptr;
+	}
 }
 
 void pushCaptionHandler(std::shared_ptr<Caption*> captionToPush)

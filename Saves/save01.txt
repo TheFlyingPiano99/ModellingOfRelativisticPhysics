@@ -1,0 +1,84 @@
+GeodeticLine
+ID 1
+name Obs1's world line
+description 
+locationAtZeroT 0.000000 0.000000 20.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Observer
+ID 2
+name Obs1
+description An observer
+worldLine 1
+!Observer
+
+SpiralLine
+ID 3
+name Obs2's world line
+description 
+locationAtZeroT 10.000000 0.000000 0.000000 0.000000
+fourVelocityAtZeroT 0.000000 0.624695 0.000000 0.780869
+centerOfRotation 0.000000 0.000000 0.000000 0.000000
+!SpiralLine
+
+Observer
+ID 4
+name Obs2
+description An observer
+worldLine 3
+!Observer
+
+CompositeLine
+ID 5
+name Staying ship
+description 
+noOfControlPoints 3
+controlPoints
+0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 50.000000
+0.000000 0.000000 0.000000 100.000000
+!controlPoints
+!CompositeLine
+
+Object
+type 3
+ID 6
+name Spike
+description Used to visualise Wigner rotation.
+worldLine 5
+!Object
+
+SpiralLine
+ID 7
+name Spiral worldline
+description 
+locationAtZeroT 20.000000 0.000000 0.000000 0.000000
+fourVelocityAtZeroT 0.000000 0.624695 0.000000 0.780869
+centerOfRotation 0.000000 0.000000 0.000000 0.000000
+!SpiralLine
+
+Object
+type 3
+ID 8
+name Spike
+description Used to visualise Wigner rotation.
+worldLine 7
+!Object
+
+GeodeticLine
+ID 4964
+name Geodetic line
+description World line
+locationAtZeroT 0.000000 0.000000 0.000000 0.000000
+fourVelocity 0.000000 0.000000 0.000000 1.000000
+!GeodeticLine
+
+Object
+type 0
+ID 4965
+name dsaasasasasasasas
+description Inhabited planet
+worldLine 4964
+!Object
+

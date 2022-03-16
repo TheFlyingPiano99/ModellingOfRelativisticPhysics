@@ -8,6 +8,13 @@
 
 using namespace RelPhysics;
 
+const char* WorldLine::typeNames[NUMBER_OF_WORLD_LINE_TYPES] = {
+    "GeodeticLine",
+    "CompositeLine",
+    "SpiralLine"
+};
+
+
 void GeodeticLine::genGeometry() {
     vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
@@ -685,7 +692,8 @@ void SpiralLine::genGeometry()
     }
 }
 
-SpiralLine::SpiralLine(vec3 _posAtZeroT, vec3 _centerOfRotation, vec3 _velocity, std::string _name, std::string _desc) : WorldLine(_name, _desc)
+SpiralLine::SpiralLine(vec3 _posAtZeroT, vec3 _centerOfRotation, vec3 _velocity, std::string _name, std::string _desc) 
+    : WorldLine(_name, _desc)
 {
     locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0);
     centerOfRotation = vec4(_centerOfRotation.x, _centerOfRotation.y, _centerOfRotation.z, 0.0f);
@@ -694,15 +702,73 @@ SpiralLine::SpiralLine(vec3 _posAtZeroT, vec3 _centerOfRotation, vec3 _velocity,
     genGeometry();
 }
 
-std::string SpiralLine::genSaveString()
+SpiralLine::SpiralLine(vec4 _locationAtZeroT, vec4 _fourVelocityAtZeroT, vec4 _centerOfRotation, std::string _name, std::string _desc)
+    : WorldLine(_name, _desc)
 {
-    //TODO
-    return std::string();
+    locationAtZeroT = _locationAtZeroT;
+    centerOfRotation = _centerOfRotation;
+    fourVelocityAtZeroT = _fourVelocityAtZeroT;
+    noOfVds4D = 500;
+    genGeometry();
 }
 
-GeodeticLine* SpiralLine::loadFromFile(std::ifstream& file)
+std::string SpiralLine::genSaveString()
 {
-    //TODO
+    std::string str(
+        "SpiralLine\n"
+        "ID " + std::to_string(getID()) + "\n"
+        "name " + name + "\n"
+        "description " + description + "\n"
+        "locationAtZeroT " + std::to_string(locationAtZeroT.x) + " " + std::to_string(locationAtZeroT.y) + " " + std::to_string(locationAtZeroT.z) + " " + std::to_string(locationAtZeroT.w) + "\n"
+        "fourVelocityAtZeroT " + std::to_string(fourVelocityAtZeroT.x) + " " + std::to_string(fourVelocityAtZeroT.y) + " " + std::to_string(fourVelocityAtZeroT.z) + " " + std::to_string(fourVelocityAtZeroT.w) + "\n"
+        "centerOfRotation " + std::to_string(centerOfRotation.x) + " " + std::to_string(centerOfRotation.y) + " " + std::to_string(centerOfRotation.z) + " " + std::to_string(centerOfRotation.w) + "\n"
+    );
+    str.append("!SpiralLine\n");
+    return str;
+}
+
+SpiralLine* SpiralLine::loadFromFile(std::ifstream& file)
+{
+    int _ID;
+    std::string _name;
+    std::string _description;
+    vec4 _locationAtZeroT;
+    vec4 _fourVelocityAtZeroT;
+    vec4 _centerOfRotation;
+
+    std::string line;
+    while (getline(file, line)) {
+        std::vector<std::string> words = split(line, ' ');
+        if (words.empty()) {									// Empty line
+            continue;
+        }
+        else if (words.at(0).at(0) == '#') {					// Comment
+            continue;
+        }
+        else if (words.at(0).compare("!SpiralLine") == 0) {	// End of declaration
+            SpiralLine* retVal = new SpiralLine(_locationAtZeroT, _fourVelocityAtZeroT, _centerOfRotation, _name, _description);
+            retVal->setID(_ID);
+            return retVal;
+        }
+        else if (words.at(0).compare("ID") == 0) {              // ID
+            _ID = std::stoi(words.at(1));
+        }
+        else if (words.at(0).compare("name") == 0) {              // name
+            _name = join(words, 1);
+        }
+        else if (words.at(0).compare("description") == 0) {         // description
+            _description = join(words, 1);
+        }
+        else if (words.at(0).compare("locationAtZeroT") == 0) {         // locationAtZeroT
+            _locationAtZeroT = vec4(stof(words[1]), stof(words[2]), stof(words[3]), stof(words[4]));
+        }
+        else if (words.at(0).compare("fourVelocityAtZeroT") == 0) {         // fourVelocity
+            _fourVelocityAtZeroT = vec4(stof(words[1]), stof(words[2]), stof(words[3]), stof(words[4]));
+        }
+        else if (words.at(0).compare("centerOfRotation") == 0) {         // position
+            _centerOfRotation = vec4(stof(words[1]), stof(words[2]), stof(words[3]), stof(words[4]));
+        }
+    }
     return nullptr;
 }
 

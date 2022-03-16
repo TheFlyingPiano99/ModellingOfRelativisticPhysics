@@ -18,8 +18,12 @@
 #include "HUD.h"
 #include "IControlEvent.h"
 #include "Editor.h"
+#include "Initialiser.h"
 
-
+enum CreationSequence {
+	null,
+	costumize
+};
 
 class Scene {
 	static Scene* instance;
@@ -52,6 +56,8 @@ class Scene {
 	bool allowQuit = false;
 	bool loadingScene = false;
 	bool finishedLoading = false;
+	CreationSequence creationSequence = CreationSequence::null;
+	Initialiser* initialiser = nullptr;
 
 	RelTypes::Settings settings;		// All important settings mainly related to rendering.
 
@@ -90,6 +96,9 @@ public:
 		for each (WorldLine* line in linesToDisplay)
 		{
 			delete line;
+		}
+		if (initialiser != nullptr) {
+			delete initialiser;
 		}
 
 		delete background;
@@ -303,6 +312,20 @@ public:
 	vec4 getEditedLocation(const float cX, const float cY);
 
 	void setCameraDirectionMode(RelTypes::DirectionMode mode);
+
+	bool isEntryMode();
+
+	void beginCreationSequence();
+	void finishCreationSequence();
+	void cancelCreationSequence();
+
+	CreationSequence getCreationSequence() {
+		return creationSequence;
+	}
+
+	Initialiser* getInitialiser() {
+		return initialiser;
+	}
 
 };
 

@@ -100,5 +100,7 @@ public:
 	* Remove all captions.
 	*/
 	void clearCaptions();
+
+	void cancelEntry();
 };
 

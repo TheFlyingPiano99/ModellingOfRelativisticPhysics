@@ -772,6 +772,12 @@ void Scene::load(const char* sourceFileName)
 					worldLines.insert({ wrdLn->getID(), wrdLn });
 				}
 			}
+			else if (words.at(0).compare("SpiralLine") == 0) {	// CompositeLine
+				WorldLine* wrdLn = SpiralLine::loadFromFile(*file);
+				if (wrdLn != nullptr) {
+					worldLines.insert({ wrdLn->getID(), wrdLn });
+				}
+			}
 			else if (words.at(0).compare("Observer") == 0) {		// Observer
 				Observer* obs = Observer::loadFromFile(*file);
 				if (obs != nullptr) {
@@ -927,6 +933,44 @@ void Scene::setCameraDirectionMode(RelTypes::DirectionMode mode)
 			break;
 		}
 		Scene::getInstance()->getActiveCamera()->setLookat(vec3(0, 0, 0));
+	}
+}
+
+bool Scene::isEntryMode() {
+	return entryMode;
+}
+
+void Scene::beginCreationSequence()
+{
+	if (creationSequence == CreationSequence::null && !entryMode) {
+		if (initialiser != nullptr) {
+			delete initialiser;
+		}
+		initialiser = new Initialiser();
+		creationSequence = CreationSequence::costumize;
+	}
+}
+
+void Scene::finishCreationSequence()
+{
+	WorldLine* wl;
+	Object* o;
+	if (initialiser->finish(o, wl)) {
+		objects.push_back(o);
+		creationSequence = CreationSequence::null;
+		hud->pushMessage(std::string("Object created with ID: ").append(std::to_string(o->getID())).c_str());
+	}
+	else {
+		hud->pushMessage("Invalid parameter!");
+	}
+}
+
+void Scene::cancelCreationSequence()
+{
+	creationSequence = CreationSequence::null;
+	if (initialiser != nullptr) {
+		delete initialiser;
+		initialiser = nullptr;
 	}
 }
 

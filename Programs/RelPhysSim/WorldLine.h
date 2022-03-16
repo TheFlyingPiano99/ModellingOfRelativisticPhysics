@@ -9,6 +9,8 @@
 #include "RelPhysics.h"
 #include "Exceptions.h"
 
+#define NUMBER_OF_WORLD_LINE_TYPES 3
+
 /*
 * World-line of an object / observer in space-time continuum.
 * Abstract base class!
@@ -32,6 +34,13 @@ protected:
 	virtual void genGeometry() = 0;
 	
 public:
+	enum Type {
+		GeodeticLine,
+		CompositeLine,
+		SpiralLine
+	};
+
+	static const char* typeNames[NUMBER_OF_WORLD_LINE_TYPES];
 
 	~WorldLine();
 
@@ -223,13 +232,15 @@ public:
 	*/
 	SpiralLine(vec3 _posAtZeroT, vec3 _centerOfRotation, vec3 _velocity, std::string _name = "", std::string _desc = "");
 
+	SpiralLine(vec4 _locationAtZeroT, vec4 _fourVelocityAtZeroT, vec4 _centerOfRotation, std::string _name = "", std::string _desc = "");
+
 	//WorldLine* getWorldLineWithOffset(vec3 offset);
 	std::string genSaveString();
 
 	/*
 	* Returns the loaded object.
 	*/
-	static GeodeticLine* loadFromFile(std::ifstream& file);
+	static SpiralLine* loadFromFile(std::ifstream& file);
 
 	void draggedTo(vec4 location) override;
 	vec4 getClosestLocation(

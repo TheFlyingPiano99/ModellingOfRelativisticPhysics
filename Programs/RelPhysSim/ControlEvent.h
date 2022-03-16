@@ -67,7 +67,7 @@ class ToggleSelectionEvent : public ControlEvent {
 public:
 	ToggleSelectionEvent()
 	{
-		keyShortcut = 'o';
+		keyShortcut = '\t';
 	}
 
 	// Inherited via ControlEvent

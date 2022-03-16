@@ -177,6 +177,9 @@
     <ClCompile Include="Background.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Initialiser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IControlEvent.h">
@@ -358,6 +361,9 @@
     </ClInclude>
     <ClInclude Include="CoordinateSystem.h">
       <Filter>Header Files\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Initialiser.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
