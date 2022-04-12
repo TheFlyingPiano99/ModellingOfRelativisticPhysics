@@ -1,15 +1,29 @@
 \documentclass{egpubl}
-\usepackage{gg2022}
+\usepackage{wait2021}
 
-\ConferencePaper      % uncomment for (final) Conference Paper
+%\ConferencePaper      % uncomment for (final) Conference Paper
 
-\title[Visualization of relativity]{Visualization of relativistic phenomena}
+\title{Visualization of relativistic phenomena}
+\author{Zoltán Simon
+%\thanks{Dr. Nándor Bokor, Dr. László Szirmay-Kalos}
+}
 
-\author{Zoltán Simon}
+%for including postscript figures
+\usepackage{graphics}
 
-\usepackage[pdftex]{graphicx} \pdfcompresslevel=9
-\usepackage{t1enc,dfadobe}
+% \usepackage[dvips,draft]{graphicx}% replace PS figure by framed file name
+
 \usepackage{amsmath}
+
+\PrintedOrElectronic
+
+% prepare for electronic version of your document
+\usepackage{t1enc,dfadobe}
+
+%Graphics include path
+\graphicspath{ {./images} }
+\DeclareGraphicsExtensions{.png}
+
 
 % For backwards compatibility to old LaTeX type font selection.
 % Uncomment if your document adheres to LaTeX2e recommendations.
@@ -24,21 +38,26 @@
 % \issue{3}     % the issue number of the publication
 % \pStartPage{???}      % set starting page
 
-
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
 Special relativity describes many phenomena, not observable in everyday life. This article presents an educational application, which helps to understand these effects. It models vision of objects travelling close to the speed of light. e. g. it visualizes length contraction, time dilatation, relativistic Doppler effect. It considers the path of light between the object and our eye, but it also presents an opportunity to visualize events happening simultaneously as well. It allows to switch between Lorentz and Galilean transformation, so we can compare Einstein's and Newton's model. It serves with a three-dimensional space-time diagram, on which we have a chance to further analyse the movement of objects.
+\begin{classification} % according to http://www.acm.org/class/1998/
+\CCScat{I.3.3}{Computer Graphics}{Visualization of relativistic phenomena}
+\end{classification}
+
 \end{abstract}
 
 \section{Introduction}
 Theory of relativity is a key part of modern physics. There are many use cases of this theory. Despite of it's importance there is very little chance for people to experience relativistic phenomena in their everyday life, thus differences between Isaac Newton's classical and Albert Einstein's modern model remain unexplored. The application described in this article offers a way to visualise the most well-known phenomena associated with special relativity. The goal of this article is to showcase the algorithmic challenges surrounding this program and introduce solutions for these problems. 
 
+
 \section{Previous Work}
 
 This article is a direct follow up of the work \cite{TDKreport}. It explains previously neglected details, e.g. implementation of Wigner-rotation. 
+
 
 \section{Implementation of physical models}
 The rules of simulation are based on Einstein's postulates~\cite{EinsteinElectrodynamics}. These suggest that
@@ -86,14 +105,16 @@ The previously described equation can handle geodetic world lines. To use this w
 \subsection{Visualisation of events considering the propagation of light}
 \label{visConsLight}
 A more realistic approach for finding events to render uses the event horizon as the intersecting hypersurface. From greater distances older events are seen. This characteristic makes the event horizon analogous with a three dimensional cone. The  event describing the position and age of the viewer is enough to describe this hypercone. The quadratic equation~\ref{coneIntersection} provides the tool for calculating the intersection.
-\begin{align}
+\begin{equation}
 \label{coneIntersection}
+\begin{aligned}
 a &= v_x^2 + v_y^2 + v_z^2 - v_t^2\\
 \vec{m} &= (s_x, s_y, s_z)\cdot{}(v_x, v_y, v_z) - (v_x, v_y, v_z)\cdot{}(c_x, c_y, c_z)\\
 b &= 2((m_x + m_y + m_z) - (s_t\cdot{}v_t - v_t\cdot{}c_t))\\
 c &= ((c_x, c_y, c_z) - (s_x, s_y, s_z))\cdot{}((c_x, c_y, c_z) - (s_x, s_y, s_z))\\
 0 &=ax^2 + bx + c
-\end{align}
+\end{aligned}
+\end{equation}
 
 Because no world line can exceed the speed of light, the roots of the equation are always going to be real values. We select the root associated with the past event. 
 
@@ -174,16 +195,13 @@ In Figure~\ref{fig:circularWL}, the lines appear, to be wound up around the time
 
 When we switch to \emph{real time} mode, than we can observe the Thomas precession of the circulating object. This can be seen in Figure~\ref{fig:thomasPrec}. The object on the left is standing in the observer's frame. The right object is moving along a circular path. The path has radius of $r=20m$, and the tangential velocity of the object is $v=0,8$
 The time of the full rotation according the observer was $T=167m$.
-\begin{figure}[htb]
-  	\centering
-	\includegraphics[width=.95\linewidth]{figures/ThomasPrecession.eps}
-	% replacing the above command with the one below will explicitly set
-	% the bounding box of the PS figure to the rectangle (xl,yl),(xh,yh).
-  	% It will also prevent LaTeX from reading the PS file to determine
-  	% the bounding box (i.e., it will speed up the compilation process)
-  	% \includegraphics[width=.95\linewidth, bb=xl yl xh yh]{sampleFig.eps}
-	\caption{Thomas Precession after one full rotation}
-	\label{fig:thomasPrec}
+\begin{figure}[h]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/ThomasPrecession.eps}
+}
+\caption{Thomas Precession after one full rotation}
+\label{fig:thomasPrec}
 \end{figure}
 
 
@@ -198,6 +216,12 @@ I would like to thank Dr. Nándor Bokor and Dr. László Szirmay Kalos for their
 \newpage
 
 \begin{thebibliography}{1}
+
+
+\bibitem{TDKreport} Zoltán Simon.
+\newblock Visualization of relativistic phenomena.
+In \emph{Villamosmérnöki és Informatikai Kar 2021. évi TDK}, Szoftver, November 2021.
+
 \bibitem{EinsteinElectrodynamics} Albert Einstein.
 \newblock On the Electrodynamics of Moving Bodies.
 In \emph{Annalen der Physik}, \textbf{17}:891, June 1905.
@@ -214,46 +238,7 @@ In \emph{Elements of Newtonian Mechanics}. Advanced Texts in Physics. Springer, 
 In \emph{Apeiron: Studies in Infinite Nature}, 15.3, 2008.
 
 
-%---------------TEMPLATES---------------------------------------
-\bibitem{yll} Y. Le Lous,
-``Report on the First Eurographics Workshop on Visualization in
-Scientific Computing'', \emph{Computer Graphics Forum\/}
-\textbf{9}(4), pp. 371--372 (December 1990).
-
-\bibitem{FolDamFeiHug.etal93}
-J. Foley, A. van Dam, S. Feiner, J. Hugues, and R. Phillips.
-\newblock \emph{Introduction to Computer Graphics}.
-\newblock Addison Wesley, 1993.
-
-\bibitem{PosFel89}
-K.Ch. Posch and D.W. Fellner.
-\newblock The Circle-Brush Algorithm.
-\newblock \emph{Transactions on Graphics}, \textbf{18}(1):1--24, 1989.
-
-\bibitem{FolHagNie93}
-T.A. Foley, H.~Hagen, and G.M. Nielson.
-\newblock Visualizing and modeling unstructured data.
-\newblock \emph{The Visual Computer}, (9):439--449, 1993.
-
-\bibitem{Lev90}
-M.~Levoy.
-\newblock Efficient ray tracing of volume data.
-\newblock \emph{ACM Transactions on Graphics},
-          \textbf{9}(3):245--261, July 1990.
-
-\bibitem{PorDuf84}
-T.~Porter and T.~Duff.
-\newblock Compositing digital images.
-\newblock \emph{ACM Computer Graphics (Proc. of SIGGRAPH '84)},
-          \textbf{18}:253--259, 1984.
-
-\bibitem{RonRos96}
-R.~Ronfard and J.~Rossignac.
-\newblock Full-range approximation of triangulated polyhedra.
-\newblock \emph{Computer Graphics Forum (Eurographics'96 Proc.)},
-          \textbf{15}(3):67--76, 1996.
-
 \end{thebibliography}
 
 \end{document}
-%%%%%%%%%%%%%%%%%%%%%% end of EgPublSamp.tex %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% end of VisualizationOfRelativisticPhenomena.tex %%%%%%%%%%%%%%%%%%%%%%

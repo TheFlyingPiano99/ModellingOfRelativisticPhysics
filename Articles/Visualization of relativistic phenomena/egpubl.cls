@@ -67,7 +67,7 @@
   }%
   {\global\nfsstwotrue\def\f@s@s{with NFSS release 2,\space}}%
 %
-% \typeout{Document Style `GRAFGEO'}
+% \typeout{Document Style `CGF' \f@s@s v1.10 released 6th January 1994}
 %
 %  Journals use two-sided printing.
 %
@@ -831,7 +831,7 @@ Categories and Subject Descriptors {\small (according to ACM CCS)}: }
 \def\ps@titlepage{\let\@mkboth\@gobbletwo
  \def\@oddhead{\raisebox{\z@}[8pt][1pt]{\parbox{\textwidth}{\small
    \parbox[t]{.7\textwidth}{\sloppy\raggedright
-     WAIT: Workshop on the Advances in Information Technology, Budapest, 2021}
+     Third Hungarian Conference on Computer Graphics and Geometry}
    \hfill
    \textit{\ }}%
  }%
@@ -851,7 +851,7 @@ Categories and Subject Descriptors {\small (according to ACM CCS)}: }
 \def\ps@titlepage{\let\@mkboth\@gobbletwo
  \def\@oddhead{\raisebox{\z@}[8pt][1pt]{\parbox{\textwidth}{\small
    \parbox[t]{.7\textwidth}{\sloppy\raggedright
-     WAIT: Workshop on the Advances in Information Technology, Budapest, 2021}
+     Tenth Hungarian Conference on Computer Graphics and Geometry, Budapest, 2022}
    \hfill
    \textit{\ }
    \textit{\ }}%
