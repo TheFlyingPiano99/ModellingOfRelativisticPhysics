@@ -99,7 +99,7 @@ void Observer::drawDiagram(GPUProgram& gpuProgram, const Camera& camera) {
 	(*diagramCaption)->setVisible(false);
 	(*timerCaption)->setVisible(false);
 
-	worldLineView->drawDiagram();
+	worldLineView->drawDiagram(gpuProgram);
 }
 
 void Observer::drawHyperplane(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings)

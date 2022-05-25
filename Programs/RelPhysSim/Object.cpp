@@ -2,6 +2,7 @@
 
 #include "Assets.h"
 #include "StringOperations.h"
+#include "Scene.h"
 
 
 const char* Object::typeNames[5] = {
@@ -95,8 +96,13 @@ Object* Object::createSpike(WorldLine* wrdln)
 		diagramM,		// Diagram material
 		new AdvancedTexture(Assets::getTexturePath().append("spike.bmp").c_str(), "", ""),
 		"Spike",
-		"Used to visualise Wigner rotation.");
+		"Used to visualise Wigner rotation."
+	);
 	obj->setType(RelTypes::ObjectType::spike);
+	obj->addPointWordlLine(vec3(10.0f, 0.0f, 0.0f), Scene::getInstance()->getSettings(), vec3(0.5f, 0.0f, 0.0f));
+	obj->addPointWordlLine(vec3(-10.0f, 0.0f, 0.0f), Scene::getInstance()->getSettings(), vec3(0.0f, 0.0f, 0.5f));
+	//obj->addPointWordlLine(vec3(0.0f, 10.0f, 0.0f), Scene::getInstance()->getSettings());
+	//obj->addPointWordlLine(vec3(0.0f, -10.0f, 0.0f), Scene::getInstance()->getSettings());
 	return obj;
 }
 
@@ -197,6 +203,27 @@ void Object::draw(GPUProgram& gpuProgram,
 	if (worldLineView != nullptr) {
 		worldLineView->disableEditorInfo(gpuProgram, camera, settings);
 	}
+
+	if (settings.drawPath) {
+		gpuProgram.setUniform(camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
+		gpuProgram.setUniform(UnitMatrix(), "M");
+		gpuProgram.setUniform(UnitMatrix(), "invM");
+		gpuProgram.setUniform(true, "noTexture");
+		gpuProgram.setUniform(false, "outline");
+		gpuProgram.setUniform(false, "directRenderMode");
+		gpuProgram.setUniform(true, "glow");
+		gpuProgram.setUniform(true, "drawPath");
+
+		if (worldLineView != nullptr) {
+			worldLineView->drawDiagram(gpuProgram);
+		}
+		for (auto data : additionalWorldLines) {
+			if (data->view != nullptr) {
+				data->view->drawDiagram(gpuProgram);
+			}
+		}
+		gpuProgram.setUniform(false, "drawPath");
+	}
 }
 
 void Object::drawDiagram(GPUProgram& gpuProgram, const Camera& camera, const LightCone& lightCone, const Hyperplane& hyperplane, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings) {
@@ -220,7 +247,12 @@ void Object::drawDiagram(GPUProgram& gpuProgram, const Camera& camera, const Lig
 	gpuProgram.setUniform(true, "glow");
 
 	if (worldLineView != nullptr) {
-		worldLineView->drawDiagram();
+		worldLineView->drawDiagram(gpuProgram);
+	}
+	for (auto data : additionalWorldLines) {
+		if (data->view != nullptr) {
+			data->view->drawDiagram(gpuProgram);
+		}
 	}
 	
 	

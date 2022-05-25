@@ -65,6 +65,7 @@ void ControlEventManager::buildDefaultControlScheme()
 	controlEvents.push_back(new ToggleSimultaneBoostEvent());
 	controlEvents.push_back(new ToggleHUDEvent());
 	controlEvents.push_back(new ToggleDisplayIntersectableEvent());
+	controlEvents.push_back(new ToggleDrawPathEvent());
 	/*
 	controlEvents.push_back(new SelectFreeCameraDirectionEvent());
 	controlEvents.push_back(new SelectXCameraDirectionEvent());

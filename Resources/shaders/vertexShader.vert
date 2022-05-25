@@ -5,6 +5,7 @@
 	layout(location = 1) in vec3 vn;
 	layout(location = 2) in vec2 uv;
 
+
 	uniform	vec4 worldLineNodes[1000];
 	uniform int noOfWorldLineNodes;
 	
@@ -25,6 +26,7 @@
 	uniform mat4 invM;
 
 	uniform bool directRenderMode;
+	uniform bool drawPath;
 	uniform vec3 wEye;
 	uniform vec4 observersVelocity;
 	uniform vec4 observersLocation;
@@ -48,6 +50,7 @@
 	out vec3 norm;
 	out vec2 texCoord;
 	out float dopplerShift;
+	out vec4 originalVp;
 
 	mat4 TranslateMatrix(vec3 t) {
 		return mat4(vec4(1,   0,   0,   0),
@@ -333,12 +336,7 @@
 		for (int i = 0; i < noOfWorldLineNodes - 1; i++) {									// Iterate over world line segments
 			tangentVelocity = normalize(worldLineNodes[i + 1] - worldLineNodes[i]) * speedOfLight;
 			// Start position of tangential geodetic world line of world line of this vertex in absolute frame:
-			vec3 v = To3DVelocity(tangentVelocity);
-			float gamma = lorentzFactor(length(v));
-			vec3 n = normalize(v);
-			vec3 pParalel = dot(vp.xyz, n) * n;
-			vec3 pPerpend = vp.xyz - pParalel;
-			offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos	also no Wigner rotation (not using "sectorStart").
+			offsetedStartPos = vp + worldLineNodes[i] - tangentVelocity / tangentVelocity.w * worldLineNodes[i].w;	// vp + tangent worldLine start pos	also no Wigner rotation (not using "sectionStart").
 
 			//---------------------------------------------------------------------------------------------------------------------------------
 			//Intersect:
@@ -493,7 +491,12 @@
 			}
 		}
 
-		wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;
+		if (!drawPath) {
+			wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;
+		}
+		else {
+			wPos = (vec4(transformed.xyz, 1) * M).xyz;	// Use the
+		}
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = (invM * vec4(vn, 0)).xyz;
 		dopplerShift = 1.0f;			
@@ -509,15 +512,16 @@
 	}
 
 	void main() {
-		if (viewMode == 0 && !directRenderMode) {	// RealTime3D
+		if (viewMode == 0 && !directRenderMode && !drawPath) {	// RealTime3D
 			if (worldLineType == 0) {
 				realTime();
 			}
 		}
-		else if (viewMode == 1 && !directRenderMode) {	// Diagram
+		else if (viewMode == 1 && !directRenderMode || drawPath) {	// Diagram
 			diagram();
 		}
 		else if (directRenderMode) {
 			directRender();
 		}
+		originalVp = vp;
 	}

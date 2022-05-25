@@ -93,7 +93,7 @@ void Scene::Initialise()
 
 	// Background:-----------------------------------------------------
 	background = new Background();
-
+	backgroundColor = vec3(0.5f, 0.6f, 0.75f);
 	// Other:----------------------------------------------------------
 	hud->updateSettings(settings);
 	if (activeObserver != nullptr) {
@@ -113,7 +113,7 @@ void Scene::loadDefault()
 	observers.push_back(observer);
 
 	//2.:
-	wrdln = new SpiralLine(vec3(10, 0, 0), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.8f, 0.0f), "Obs2's world line");
+	wrdln = new SpiralLine(vec3(10.0f, 0.0f, 20.0f), vec3(0.0f, 0.0f, 20.0f), vec3(0.0f, 0.8f, 0.0f), "Obs2's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
@@ -170,7 +170,7 @@ void Scene::loadDefault()
 	objects.push_back(Object::createSpike(
 		new SpiralLine(vec3(20.0f, 0.0f, 0.0f), 
 			vec3(0.0f, 0.0f, 0.0f), 
-			vec3(0.0f, 0.8f, 0.0f), 
+			vec3(0.0f, 0.6f, 0.0f), 
 			"Spiral worldline")));
 	/*
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(0, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
@@ -236,6 +236,13 @@ void Scene::animate(float dt) {
 	settings.doLorentz.animate(dt);
 	settings.transformToProperFrame.animate(dt);
 
+	static bool prevLorentz, prevBoost = false;
+	if (settings.doLorentz.getPrev() != prevLorentz || settings.simultaneBoost != prevBoost) {	// Update additional world lines.
+		recreateObjectPointWorldLines();
+		prevLorentz = settings.doLorentz.getPrev();
+		prevBoost = settings.simultaneBoost;
+	}
+
 	// "In app world time" animate
 	if (settings.running) {
 
@@ -253,6 +260,9 @@ void Scene::animate(float dt) {
 }
 
 void Scene::draw(GPUProgram& gpuProgram) {
+	glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	if (loadingScene) {
 		return;
 	}
@@ -472,6 +482,11 @@ void Scene::toggleHUD()
 	static bool visible = true;
 	visible = !visible;
 	hud->setVisible(visible);
+}
+
+void Scene::toggleDrawPath()
+{
+	settings.drawPath = !settings.drawPath;
 }
 
 void Scene::toggleDisplayIntersectable()

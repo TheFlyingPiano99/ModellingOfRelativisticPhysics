@@ -234,6 +234,7 @@ void ImGUIAdapter::configToScene(Scene& scene)
 
 	ImGui::Checkbox("Run", &scene.getSettings().running);
 	ImGui::Checkbox("Shading", &scene.getSettings().doShading);
+	ImGui::Checkbox("Path", &scene.getSettings().drawPath);
 	if (RelTypes::ViewMode::realTime3D == scene.getSettings().viewMode && scene.getSettings().doLorentz.get()) {
 		ImGui::Checkbox("Simultane boost", &scene.getSettings().simultaneBoost);
 	}

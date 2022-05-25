@@ -178,3 +178,8 @@ void SelectMinusZCameraDirectionEvent::performAction(const float dt)
 {
 	Scene::getInstance()->setCameraDirectionMode(RelTypes::DirectionMode::minusZlocked);
 }
+
+void ToggleDrawPathEvent::performAction(const float dt)
+{
+	Scene::getInstance()->toggleDrawPath();
+}

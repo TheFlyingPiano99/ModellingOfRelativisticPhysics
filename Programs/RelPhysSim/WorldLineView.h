@@ -5,31 +5,29 @@
 
 class WorldLineView
 {
+public:
+	WorldLineView(const WorldLine* _model);
+	virtual ~WorldLineView();
+
+	virtual void draw(GPUProgram& gpuProgram) const = 0;
+	virtual void drawDiagram(GPUProgram& gpuProgram) const = 0;
+	virtual void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
+	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
+	virtual void update() = 0;
+	void updateGeometry();
+	vec3 getColor();
+	void setColor(const vec3 color);
+
 protected:
 	unsigned int vao, vbo;
 	const WorldLine* model;
 	std::vector<vec4> vds4D;
 	unsigned int noOfVds4D;
-
-public:
-	WorldLineView(const WorldLine* _model);
-	virtual ~WorldLineView();
-
-	virtual void draw() const = 0;
-	virtual void drawDiagram() const = 0;
-	virtual void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
-	virtual void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const = 0;
-	virtual void update() = 0;
-	void updateGeometry();
-
+	vec3 color;
 };
 
 
 class GeodeticLineView : public WorldLineView {
-	std::shared_ptr<Caption*> locationAtZeroTCaption;
-	std::shared_ptr<Caption*> velocityCaption;
-	vec4 locationAtZeroT, fourVelocity;
-
 public:
 	GeodeticLineView(const GeodeticLine* line): WorldLineView(line) {
 		update();
@@ -44,22 +42,22 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	void draw() const override;
+	void draw(GPUProgram& gpuProgram) const override;
 
-	void drawDiagram() const override;
+	void drawDiagram(GPUProgram& gpuProgram) const override;
 
 	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
 	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
 	void update() override;
-
+private:
+	std::shared_ptr<Caption*> locationAtZeroTCaption;
+	std::shared_ptr<Caption*> velocityCaption;
+	vec4 locationAtZeroT, fourVelocity;
 };
 
 class CompositeLineView : public WorldLineView {
-	std::vector<vec4> controlPoints;
-	std::vector<std::shared_ptr<Caption*>> pointCaptions;
-	std::vector<std::shared_ptr<Caption*>> velocityCaptions;
 
 public:
 	CompositeLineView(const CompositeLine* line) : WorldLineView(line) {
@@ -77,21 +75,22 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	void draw() const override;
+	void draw(GPUProgram& gpuProgram) const override;
 
-	void drawDiagram() const override;
+	void drawDiagram(GPUProgram& gpuProgram) const override;
 
 	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
 	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
 	void update() override;
+private:
+	std::vector<vec4> controlPoints;
+	std::vector<std::shared_ptr<Caption*>> pointCaptions;
+	std::vector<std::shared_ptr<Caption*>> velocityCaptions;
 };
 
 class SpiralLineView : public WorldLineView {
-	std::shared_ptr<Caption*> locationAtZeroTCaption;
-	std::shared_ptr<Caption*> velocityCaption;
-	vec4 locationAtZeroT, fourVelocity;
 
 public:
 	SpiralLineView(const SpiralLine* line) : WorldLineView(line) {
@@ -107,15 +106,44 @@ public:
 	}
 
 	// Inherited via WorldLineView
-	void draw() const override;
+	void draw(GPUProgram& gpuProgram) const override;
 
-	void drawDiagram() const override;
+	void drawDiagram(GPUProgram& gpuProgram) const override;
 
 	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override
 	{
 		(**locationAtZeroTCaption).setVisible(false);
 		(**velocityCaption).setVisible(false);
 	}
+
+	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
+
+	void update() override;
+
+private:
+	std::shared_ptr<Caption*> locationAtZeroTCaption;
+	std::shared_ptr<Caption*> velocityCaption;
+	vec4 locationAtZeroT, fourVelocity;
+
+};
+
+class FreeLineView : public WorldLineView {
+
+public:
+	FreeLineView(const FreeWordLine* line) : WorldLineView(line) {
+		update();
+		updateGeometry();
+	}
+
+	~FreeLineView() {
+	}
+
+	// Inherited via WorldLineView
+	void draw(GPUProgram& gpuProgram) const override;
+
+	void drawDiagram(GPUProgram & gpuProgram) const override;
+
+	void disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 
 	void drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const override;
 

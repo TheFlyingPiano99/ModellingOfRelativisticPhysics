@@ -49,6 +49,7 @@ class Scene {
 	std::vector<IControlEvent*> controlEvents;
 
 	Background* background;
+	vec3 backgroundColor;
 
 	MenuSystem menu;
 
@@ -61,7 +62,6 @@ class Scene {
 
 	RelTypes::Settings settings;		// All important settings mainly related to rendering.
 
-	//std::thread* loadThread;
 
 	Scene() {}
 
@@ -163,6 +163,8 @@ public:
 	void toggleShading();
 	
 	void toggleHUD();
+
+	void toggleDrawPath();
 
 	void toggleDisplayIntersectable();
 
@@ -325,6 +327,12 @@ public:
 
 	Initialiser* getInitialiser() {
 		return initialiser;
+	}
+
+	void recreateObjectPointWorldLines() {
+		for (auto obj : objects) {
+			obj->recreatePointWorldLines(settings);
+		}
 	}
 
 };

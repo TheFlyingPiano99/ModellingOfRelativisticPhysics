@@ -7,11 +7,16 @@
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
 	uniform bool doShading;
+
+	uniform vec4 observersLocation;
+	uniform bool drawPath;
+
 //Object:
 	in vec3 wPos;
 	in vec3 norm;
 	in vec2 texCoord;
 	in float dopplerShift;
+	in vec4 originalVp;
 
 	uniform mat4 M;
 	uniform mat4 invM;
@@ -249,5 +254,8 @@
 			else if (viewMode == 1) {	// Diagram
 				diagram();
 			}
+		}
+		if (drawPath && observersLocation.w < originalVp.w) {
+			outColor.a = 0.0f;
 		}
 	}

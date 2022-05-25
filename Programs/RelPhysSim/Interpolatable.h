@@ -6,10 +6,6 @@
 template<typename T>
 class InterpolationControl
 {	
-	T val;
-	T prevVal;
-	float tMax, t;
-
 public:
 
 	InterpolationControl(float _tMax = 400): t(0.0f), tMax(_tMax) {
@@ -67,6 +63,11 @@ public:
 	const T& getPrev() const {
 		return prevVal;
 	}
+
+private:
+	T val;
+	T prevVal;
+	float tMax, t;
 
 };
 

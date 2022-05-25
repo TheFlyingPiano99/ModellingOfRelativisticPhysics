@@ -390,3 +390,14 @@ public:
 	// Inherited via ControlEvent
 	virtual void performAction(const float dt) override;
 };
+
+class ToggleDrawPathEvent : public ControlEvent {
+public:
+	ToggleDrawPathEvent()
+	{
+		keyShortcut = ',';
+	}
+
+	// Inherited via ControlEvent
+	virtual void performAction(const float dt) override;
+};

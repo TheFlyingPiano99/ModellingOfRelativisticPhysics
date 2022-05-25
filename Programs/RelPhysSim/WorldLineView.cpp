@@ -2,11 +2,11 @@
 
 #include "RelPhysics.h"
 
-void GeodeticLineView::draw() const
+void GeodeticLineView::draw(GPUProgram& gpuProgram) const
 {
 }
 
-void GeodeticLineView::drawDiagram() const
+void GeodeticLineView::drawDiagram(GPUProgram& gpuProgram) const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -42,11 +42,11 @@ void GeodeticLineView::update()
     fourVelocity = ((GeodeticLine*)model)->getVelocity();
 }
 
-void CompositeLineView::draw() const
+void CompositeLineView::draw(GPUProgram& gpuProgram) const
 {
 }
 
-void CompositeLineView::drawDiagram() const
+void CompositeLineView::drawDiagram(GPUProgram& gpuProgram) const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -128,6 +128,15 @@ void WorldLineView::updateGeometry()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
+vec3 WorldLineView::getColor()
+{
+    return color;
+}
+
+void WorldLineView::setColor(const vec3 color) {
+    this->color = color;
+}
+
 WorldLineView::WorldLineView(const WorldLine* _model) : model(_model) {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -140,11 +149,11 @@ WorldLineView::~WorldLineView() {
     glDeleteVertexArrays(1, &vao);
 }
 
-void SpiralLineView::draw() const
+void SpiralLineView::draw(GPUProgram& gpuProgram) const
 {
 }
 
-void SpiralLineView::drawDiagram() const
+void SpiralLineView::drawDiagram(GPUProgram& gpuProgram) const
 {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -158,5 +167,30 @@ void SpiralLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera&
 }
 
 void SpiralLineView::update()
+{
+}
+
+void FreeLineView::draw(GPUProgram& gpuProgram) const
+{
+}
+
+void FreeLineView::drawDiagram(GPUProgram & gpuProgram) const
+{
+    gpuProgram.setUniform(color, "kd");
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glLineWidth(3);
+    glDrawArrays(GL_LINE_STRIP, 0, noOfVds4D);
+}
+
+void FreeLineView::disableEditorInfo(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
+{
+}
+
+void FreeLineView::drawEditorInfoDiagram(GPUProgram& gpuProgram, const Camera& camera, const RelTypes::Settings& settings) const
+{
+}
+
+void FreeLineView::update()
 {
 }

@@ -72,6 +72,7 @@ namespace RelTypes {
 		int diagramX;
 		int diagramY;
 		int diagramZ;
+		bool drawPath = false;
 		int diagramNotVisualised;
 		bool editorMode = false;
 		bool simultaneBoost = true;

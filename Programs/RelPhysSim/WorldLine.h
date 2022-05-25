@@ -17,22 +17,6 @@
 */
 class WorldLine : public Entity
 {
-protected:
-
-	enum WorldLineType {
-		geodetic,
-		other
-	} type;
-
-	std::vector<vec4> vds4D;
-	unsigned int noOfVds4D;
-
-	//Functions:--------------------------------------------------------
-
-	WorldLine(std::string _name = "", std::string _desc = "");
-
-	virtual void genGeometry() = 0;
-	
 public:
 	enum Type {
 		GeodeticLine,
@@ -142,14 +126,38 @@ public:
 	const std::vector<vec4>& getVds() const;
 	
 	virtual void* createView() = 0;
+
+	/*
+	* Create a world line of a single point of an object.
+	* Takes the point in 
+	*/
+	static WorldLine* createWorldLineOfObjectPoint(const vec3& point, const WorldLine& objectWorldLine, const RelTypes::Settings& settings);
+
+	protected:
+
+		enum WorldLineType {
+			geodetic,
+			other
+		} type;
+
+		std::vector<vec4> vds4D;
+		unsigned int noOfVds4D;
+
+		//Functions:--------------------------------------------------------
+
+		WorldLine(std::string _name = "", std::string _desc = "");
+
+		virtual void genGeometry() = 0;
+
+		static vec4 createStartingEventOfObjectPointWorldLine(const vec3& point, const WorldLine& objectWorldLine, const RelTypes::Settings& settings, vec4& prevEventLorentz);
+		static vec4 createNextEventOfObjectPointWorldLine(unsigned int section, const vec3& point,
+			const WorldLine& objectWorldLine, const RelTypes::Settings& settings,
+			vec4& endOfPrevSectionLorentz);
+
 };
 
 class GeodeticLine : public WorldLine
 {
-	vec4 locationAtZeroT;	//When tau = 0
-	vec4 fourVelocity;
-
-	void genGeometry();
 
 public:
 
@@ -172,18 +180,20 @@ public:
 	vec4 getClosestLocation (
 		const Ray& ray, 
 		const RelTypes::ObserverProperties& observerProperties,
-		const RelTypes::Settings& settings) override;
+		const RelTypes::Settings& settings);
 	void* createView() override;
 
 	vec4 getLocationAtZeroT();
 
 	vec4 getVelocity();
+private:
+	vec4 locationAtZeroT;	//When tau = 0
+	vec4 fourVelocity;
+
+	void genGeometry();
 };
 
 class CompositeLine : public WorldLine {
-	std::vector<vec4> controlPoints;
-
-	void genGeometry();
 public:
 
 	CompositeLine(std::vector<vec4>& points, std::string _name = "", std::string _desc = "");
@@ -216,15 +226,14 @@ public:
 	int getClosestControlPointIndex(vec4 location);
 	void* createView() override;
 
+private:
+	std::vector<vec4> controlPoints;
+
+	void genGeometry();
 };
 
 class SpiralLine : public WorldLine
 {
-	vec4 locationAtZeroT;	//When tau = 0
-	vec4 fourVelocityAtZeroT;
-	vec4 centerOfRotation;
-	void genGeometry();
-
 public:
 
 	/*
@@ -252,4 +261,29 @@ public:
 	vec4 getLocationAtZeroT();
 
 	vec4 getVelocity();
+private:
+	vec4 locationAtZeroT;	//When tau = 0
+	vec4 fourVelocityAtZeroT;
+	vec4 centerOfRotation;
+	void genGeometry();
+};
+
+class FreeWordLine : public WorldLine
+{
+public:
+
+	FreeWordLine(std::vector<vec4> events, std::string _name = "", std::string _desc = "");
+
+	std::string genSaveString();
+
+	static FreeWordLine* loadFromFile(std::ifstream& file);
+
+	void draggedTo(vec4 location) override;
+	vec4 getClosestLocation(
+		const Ray& ray,
+		const RelTypes::ObserverProperties& observerProperties,
+		const RelTypes::Settings& settings) override;
+
+	void* createView() override;
+	void genGeometry() override;
 };

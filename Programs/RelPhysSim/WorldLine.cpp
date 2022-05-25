@@ -14,6 +14,30 @@ const char* WorldLine::typeNames[NUMBER_OF_WORLD_LINE_TYPES] = {
     "SpiralLine"
 };
 
+float GeodeticIntersectLightCone(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 coneLocation)
+{
+    float a, b, c, t;
+    a = LorentzianProduct(tangentVelocity, tangentVelocity);
+    vec3 temp = (offsetedStartPos.xyz() * tangentVelocity.xyz() - tangentVelocity.xyz() * coneLocation.xyz());
+    b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * tangentVelocity.w - tangentVelocity.w * coneLocation.w));
+    c = dot(coneLocation.xyz() - offsetedStartPos.xyz(), coneLocation.xyz() - offsetedStartPos.xyz())
+        - pow(coneLocation.w - offsetedStartPos.w, 2);
+
+    int noOfSolutions;
+    vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
+
+    t = solutions.x;	// Should be tested, whether its from the past!
+    return t * tangentVelocity.w;
+}
+
+float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 planeLocation, vec4 planeNormal) {
+    return dot(planeLocation - offsetedStartPos, planeNormal)
+        / dot(tangentVelocity, planeNormal) * tangentVelocity.w;
+}
+
+vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, vec4 tangentVelocity, float t) {
+    return offsetedStartPos + tangentVelocity / tangentVelocity.w * t;
+}
 
 void GeodeticLine::genGeometry() {
     vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
@@ -116,6 +140,52 @@ std::string GeodeticLine::genSaveString()
 
 WorldLine::WorldLine(std::string _name, std::string _desc) : Entity(_name, _desc) {
 
+}
+
+vec4 WorldLine::createStartingEventOfObjectPointWorldLine(const vec3& point, const WorldLine& objectWorldLine, const RelTypes::Settings& settings, vec4& prevEventLorentz)
+{
+    //Lorentz:
+    vec4 tangentVelocity = normalize(objectWorldLine.getVds()[1] - objectWorldLine.getVds()[0]) * speedOfLight;
+    vec3 v = To3DVelocity(tangentVelocity);
+    float gamma = lorentzFactor(length(v));
+    vec3 pParalel;
+    if (gamma > 1.0f) {
+        vec3 n = normalize(v);
+        pParalel = dot(point, n) * n;
+    }
+    vec3 pPerpend = point - pParalel;
+    vec3 temp = pPerpend + pParalel / gamma;
+    vec4 startLorentz = vec4(temp.x, temp.y, temp.z, 0.0f)
+        + objectWorldLine.getVds()[0];	// Length Contraction(vp) + object worldLine start pos;
+    prevEventLorentz = startLorentz;
+    //Galilean:
+    vec4 startGalilean = vec4(point.x, point.y, point.z, 0.0f) + objectWorldLine.getVds()[0];
+
+    return interpolate(settings.doLorentz, true, false, startLorentz, startGalilean);
+}
+
+vec4 WorldLine::createNextEventOfObjectPointWorldLine(unsigned int section, const vec3& point,
+    const WorldLine& objectWorldLine, const RelTypes::Settings& settings,
+    vec4& endOfPrevSectionLorentz)
+{
+    vec4 tangentVelocity = normalize(objectWorldLine.getVds()[section + 1] - objectWorldLine.getVds()[section]);
+    vec4 boostPlaneLocation = objectWorldLine.getVds()[section + 1];
+    vec4 boostPlaneNormal;
+    if (settings.simultaneBoost) {
+        boostPlaneNormal = normalize(vec4(-tangentVelocity.x, -tangentVelocity.y, -tangentVelocity.z, tangentVelocity.w));
+    }
+    else {
+        boostPlaneNormal = vec4(0, 0, 0, 1);
+    }
+    vec4 offsetedStartPos = endOfPrevSectionLorentz - tangentVelocity
+        / tangentVelocity.w * endOfPrevSectionLorentz.w;
+    float tSectionEnd = GeodeticIntersectHyperplane(offsetedStartPos, tangentVelocity, boostPlaneLocation, boostPlaneNormal);	// <- To make Wigner rotation happen.
+    vec4 nextLorentz = GeodeticLocationAtAbsoluteTime(offsetedStartPos, tangentVelocity, tSectionEnd);
+    endOfPrevSectionLorentz = nextLorentz;
+
+    // Galilean:
+    vec4 nextGalilean = vec4(point.x, point.y, point.z, 0.0f) + objectWorldLine.getVds()[section + 1];
+    return interpolate(settings.doLorentz, true ,false, nextLorentz, nextGalilean);
 }
 
 WorldLine::~WorldLine() {
@@ -475,6 +545,18 @@ const std::vector<vec4>& WorldLine::getVds() const {
     return vds4D;
 }
 
+WorldLine* WorldLine::createWorldLineOfObjectPoint(const vec3& point, const WorldLine& objectWorldLine, const RelTypes::Settings& settings)
+{
+    std::vector<vec4> events;
+    vec4 prevEventLorentz;
+    events.push_back(createStartingEventOfObjectPointWorldLine(point, objectWorldLine, settings, prevEventLorentz));
+    for (int i = 0; i < objectWorldLine.getNoOfVds() - 1; i++) {
+        events.push_back(createNextEventOfObjectPointWorldLine(i, point, objectWorldLine, settings, prevEventLorentz));
+    }
+    WorldLine* line = new FreeWordLine(events);
+    return line;
+}
+
 
 void GeodeticLine::draggedTo(vec4 location)
 {
@@ -528,6 +610,7 @@ void CompositeLine::genGeometry()
     }
     velocity = RelPhysics::tangentFourVelocity(controlPoints[controlPoints.size() - 2], controlPoints[controlPoints.size() - 1]);
     vds4D[countVDS++] = controlPoints[controlPoints.size() - 1] + velocity * 50.0f;
+    vds4D[countVDS++] = controlPoints[controlPoints.size() - 1] + velocity * 1000.0f;
     noOfVds4D = countVDS;
 }
 
@@ -680,15 +763,19 @@ void SpiralLine::genGeometry()
     vec3 velocity = RelPhysics::To3DVelocity(fourVelocityAtZeroT);
     float speed = length(velocity);
     vec3 up = normalize(cross(startPos - center, velocity));
-    float radius = length(startPos - center);
+    vec3 toStart = startPos - center;
+    float radius = length(toStart);
     vec3 currentPos = startPos;
-        //float angularVelocity = atanf(length(RelPhysics::To3DVelocity(fourVelocityAtZeroT)) / radius);
+    float angularVelocity = atanf(length(velocity) / radius);
     vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
         vds4D[i] = vec4(currentPos.x, currentPos.y, currentPos.z, i);
-        vec3 centrifugalDir = currentPos - center;
+        vec3 centrifugalDir = normalize(currentPos - center);
         vec3 tangentDir = normalize(cross(up, centrifugalDir));
+        vec3 prevPos = currentPos;
+        vec3 delta = currentPos - prevPos;
         currentPos = currentPos + tangentDir * speed;
+        currentPos = currentPos + normalize(center - currentPos) * (length(center - currentPos) - radius);
     }
 }
 
@@ -795,4 +882,42 @@ vec4 SpiralLine::getLocationAtZeroT()
 vec4 SpiralLine::getVelocity()
 {
     return vec4();
+}
+
+FreeWordLine::FreeWordLine(std::vector<vec4> events, std::string _name, std::string _desc) : WorldLine(_name, _desc)
+{
+    vds4D = events;
+    noOfVds4D = events.size();
+    genGeometry();
+}
+
+std::string FreeWordLine::genSaveString()
+{
+    return std::string();
+}
+
+FreeWordLine* FreeWordLine::loadFromFile(std::ifstream& file)
+{
+    return nullptr;
+}
+
+void FreeWordLine::draggedTo(vec4 location)
+{
+}
+
+vec4 FreeWordLine::getClosestLocation(const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings)
+{
+    return vec4();
+}
+
+void FreeWordLine::genGeometry()
+{
+    vds4D.resize(GlobalVariables::shaderWorldLineResolution);
+    // place holder :(  --> needs refactoring!!!
+}
+
+
+void* FreeWordLine::createView()
+{
+    return new FreeLineView(this);
 }

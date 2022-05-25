@@ -18,18 +18,6 @@
 
 class Object : public Entity
 {
-	float rotationAngle, rotationSpeed;
-	vec3 scale, rotationAxis, translation;
-	WorldLine* worldLine = NULL;
-	WorldLineView* worldLineView = NULL;
-	Mesh* geometry;
-	Material* material = NULL;
-	Material* diagramMaterial = NULL;
-	AdvancedTexture* texture = NULL;
-	vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
-	RelTypes::ObjectType type = RelTypes::ObjectType::none;
-	int worldLineID = 0;
-	std::shared_ptr<Caption*> diagramCaption;
 
 public:
 	static const char* typeNames[5];
@@ -188,5 +176,52 @@ public:
 	vec4 getClosestLocation(const Ray& ray,
 		const RelTypes::ObserverProperties& observerProperties,
 		const RelTypes::Settings& settings) override;
+
+	void addPointWordlLine(const vec3 point, const RelTypes::Settings& settings, const vec3 color = vec3(0.5f, 0.5f, 0.5f)) {
+		AdditionalWorldLineData* data = new AdditionalWorldLineData();
+		data->point = point;
+		data->line = WorldLine::createWorldLineOfObjectPoint(point, *worldLine, settings);
+		data->view = (WorldLineView*)data->line->createView();
+		data->view->setColor(color);
+		additionalWorldLines.push_back(data);
+	}
+
+	void recreatePointWorldLines(const RelTypes::Settings& settings) {
+		std::vector<AdditionalWorldLineData*> oldData = additionalWorldLines;
+		additionalWorldLines.clear();
+		for (auto data : oldData) {
+			addPointWordlLine(data->point, settings, data->view->getColor());
+			delete data;
+		}
+	}
+
+	private:
+		float rotationAngle, rotationSpeed;
+		vec3 scale, rotationAxis, translation;
+		WorldLine* worldLine = NULL;
+		WorldLineView* worldLineView = NULL;
+		Mesh* geometry;
+		Material* material = NULL;
+		Material* diagramMaterial = NULL;
+		AdvancedTexture* texture = NULL;
+		vec4 locationFV, velocityFV = vec4(0, 0, 0, 1);
+		RelTypes::ObjectType type = RelTypes::ObjectType::none;
+		int worldLineID = 0;
+		std::shared_ptr<Caption*> diagramCaption;
+		struct AdditionalWorldLineData {
+			vec3 point;
+			WorldLine* line;
+			WorldLineView* view;
+			~AdditionalWorldLineData() {
+				if (nullptr != line) {
+					delete line;
+				}
+				if (nullptr != view) {
+					delete view;
+				}
+			}
+		};
+		std::vector<AdditionalWorldLineData*> additionalWorldLines;
+
 };
 
