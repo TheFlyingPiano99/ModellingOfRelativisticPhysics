@@ -12,7 +12,6 @@ std::string* Assets::geometryPath = NULL;
 std::string* Assets::texturePath = NULL;
 std::string* Assets::savesPath = NULL;
 Texture* Assets::fontTexture = NULL;
-TextureCube* Assets::seaBackgroundTexture = NULL;
 Font* Assets::defaultFont = NULL;
 Material* Assets::hoveredObjectMaterial = NULL;
 Material* Assets::hoveredWorldLineMaterial = NULL;
@@ -180,21 +179,6 @@ Texture* Assets::getFontTexture() {
 	return fontTexture;
 }
 
-TextureCube* Assets::getSeaBackgroundTexture()
-{
-	if (seaBackgroundTexture == nullptr) {
-		std::vector<std::string> names;
-		names.push_back(getTexturePath().append("seaBackground/right.bmp"));
-		names.push_back(getTexturePath().append("seaBackground/left.bmp"));
-		names.push_back(getTexturePath().append("seaBackground/top.bmp"));
-		names.push_back(getTexturePath().append("seaBackground/bottom.bmp"));
-		names.push_back(getTexturePath().append("seaBackground/front.bmp"));
-		names.push_back(getTexturePath().append("seaBackground/left.bmp"));
-		seaBackgroundTexture = new TextureCube(names, 0);
-	}
-	return seaBackgroundTexture;
-}
-
 Font* Assets::getDefaultFont() {
 	if (defaultFont == nullptr) {
 		defaultFont = new Font(getFontTexture());
@@ -236,6 +220,4 @@ void Assets::cleanUp() {
 		delete hoveredObjectMaterial;
 	if (nullptr != hoveredWorldLineMaterial)
 		delete hoveredWorldLineMaterial;
-	if (nullptr != seaBackgroundTexture)
-		delete seaBackgroundTexture;
 }

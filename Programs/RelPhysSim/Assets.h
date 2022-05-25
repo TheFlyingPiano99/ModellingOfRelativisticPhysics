@@ -7,7 +7,6 @@
 #include "Material.h"
 #include "Font.h"
 #include "Mesh.h"
-#include "TextureCube.h"
 
 
 /*
@@ -29,7 +28,6 @@ class Assets {
 	static std::string* savesPath;
 	
 	static Texture* fontTexture;
-	static TextureCube* seaBackgroundTexture;
 	static Font* defaultFont;
 
 public:
@@ -61,8 +59,6 @@ public:
 	static std::string getSavesPath();
 
 	static Texture* getFontTexture();
-
-	static TextureCube* getSeaBackgroundTexture();
 
 	static Font* getDefaultFont();
 

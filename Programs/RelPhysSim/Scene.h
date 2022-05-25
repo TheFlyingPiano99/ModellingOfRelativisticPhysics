@@ -36,7 +36,7 @@ class Scene {
 	CoordinateSystem* system = NULL;
 	HUD* hud = NULL;
 	Editor* editor = NULL;
-	std::vector<GPUProgram*> gpuPrograms;
+
 	Observer* activeObserver = NULL;
 	Entity* selected = NULL;
 	Entity* grabbed = NULL;
@@ -112,9 +112,6 @@ public:
 		delete loadThread;
 		*/
 
-		for (GPUProgram* program : gpuPrograms) {
-			delete program;
-		}
 	}
 
 	/*
@@ -131,7 +128,7 @@ public:
 	/*
 	* Renders everything on screen.
 	*/
-	void draw();
+	void draw(GPUProgram& gpuProgram);
 
 	void toggleActiveObserver();
 
