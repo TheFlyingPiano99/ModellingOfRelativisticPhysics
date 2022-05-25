@@ -17,7 +17,7 @@ void RealTime3DView::draw(GPUProgram& gpuProgram) {
 
 	gpuProgram.setUniform(false, "doLorentz");
 	gpuProgram.setUniform(1, "intersectionMode");
-	scene->getBackground()->draw(gpuProgram, *(activeCamera));		// Background
+	scene->getBackground()->draw(*(activeCamera));		// Background
 	gpuProgram.setUniform(scene->getSettings().doLorentz.get(), "doLorentz");
 	gpuProgram.setUniform(scene->getSettings().intersectionMode.get(), "intersectionMode");
 
@@ -57,7 +57,7 @@ void DiagramView::draw(GPUProgram& gpuProgram) {
 	Camera* activeCamera = scene->getActiveCamera();
 	LightCone* lightCone = scene->getActiveObserver()->getLightCone(scene->getSettings());
 	Hyperplane* hyperplane = scene->getActiveObserver()->getHyperplane(scene->getSettings());
-	scene->getBackground()->drawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
+	scene->getBackground()->draw(*(scene->getActiveCamera()));		// Background
 	for each (Object * obj in *(scene->getObjects()))
 	{
 		obj->drawDiagram(gpuProgram, *activeCamera, *lightCone, *hyperplane,

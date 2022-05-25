@@ -10,6 +10,7 @@
 #include "Assets.h"
 #include "Plane.h"
 #include "GlobalVariables.h"
+#include "Shaders.h"
 
 
 const bool initFromFile = false;
@@ -18,6 +19,28 @@ const bool initFromFile = false;
 Scene* Scene::instance = NULL;
 
 
+void loadShaderSources(const char* vShaderFileName, const char* fShaderFileName, std::string& vSourceString, std::string& fSourceString) {
+	// Vertex shader:
+	std::ifstream vertexSource;
+	vertexSource.open(Shaders::getShaderPath().append(vShaderFileName));
+	if (vertexSource.is_open()) {
+		vSourceString = std::string(std::istreambuf_iterator<char>(vertexSource), std::istreambuf_iterator<char>());
+		vertexSource.close();
+	}
+	else {
+		throw RelTypes::CannotLoadShader("vertex shader");
+	}
+	// Fragment shader:
+	std::ifstream fragmentSource;
+	fragmentSource.open(Shaders::getShaderPath().append(fShaderFileName));
+	if (fragmentSource.is_open()) {
+		fSourceString = std::string(std::istreambuf_iterator<char>(fragmentSource), std::istreambuf_iterator<char>());
+		fragmentSource.close();
+	}
+	else {
+		throw RelTypes::CannotLoadShader("fragment shader");
+	}
+}
 
 void Scene::Initialise()
 {
@@ -32,6 +55,12 @@ void Scene::Initialise()
 	settings.diagramY = 1;
 	settings.diagramZ = 3;
 	settings.diagramNotVisualised = 2;
+
+	std::string vSource, fSource;
+	loadShaderSources("relativistic.vert", "relativistic.frag", vSource, fSource);
+	GPUProgram* program = new GPUProgram();
+	program->create(vSource.c_str(), fSource.c_str(), "outColor");
+	gpuPrograms.push_back(program);
 
 	hud = new HUD(this);
 	editor = new Editor(this);
@@ -92,7 +121,11 @@ void Scene::Initialise()
 	*/
 
 	// Background:-----------------------------------------------------
-	background = new Background();
+	GPUProgram* backgroundProgram = new GPUProgram();
+	loadShaderSources("skybox.vert", "skybox.frag", vSource, fSource);
+	backgroundProgram->create(vSource.c_str(), fSource.c_str(), "FragColor");
+	gpuPrograms.push_back(backgroundProgram);
+	background = new Background(backgroundProgram);
 
 	// Other:----------------------------------------------------------
 	hud->updateSettings(settings);
@@ -252,17 +285,17 @@ void Scene::animate(float dt) {
 	}
 }
 
-void Scene::draw(GPUProgram& gpuProgram) {
+void Scene::draw() {
 	if (loadingScene) {
 		return;
 	}
 	if (activeObserver != nullptr) {
 		//Prefase:
-		RelPhysics::loadOnGPU(gpuProgram);
-		gpuProgram.loadOnGPU(settings);
-		activeCamera->loadOnGPU(gpuProgram);
-		activeObserver->loadOnGPU(gpuProgram, settings);
-		view->draw(gpuProgram);
+		RelPhysics::loadOnGPU(*gpuPrograms[0]);
+		gpuPrograms[0]->loadOnGPU(settings);
+		activeCamera->loadOnGPU(*gpuPrograms[0]);
+		activeObserver->loadOnGPU(*gpuPrograms[0], settings);
+		view->draw(*gpuPrograms[0]);
 	}
 }
 

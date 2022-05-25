@@ -14,6 +14,21 @@ struct vec2 {
 	vec2 operator-() const { return vec2(-x, -y); }
 };
 
+struct ivec2 {
+	int x, y;
+
+	ivec2(int x0 = 0, int y0 = 0) { x = x0; y = y0; }
+	ivec2 operator*(int a) const { return ivec2(x * a, y * a); }
+	ivec2 operator*(float a) const { return ivec2(x * a, y * a); }
+	ivec2 operator/(int a) const { return ivec2(x / a, y / a); }
+	ivec2 operator/(float a) const { return ivec2(x / a, y / a); }
+	ivec2 operator+(const ivec2& v) const { return ivec2(x + v.x, y + v.y); }
+	ivec2 operator-(const ivec2& v) const { return ivec2(x - v.x, y - v.y); }
+	ivec2 operator*(const ivec2& v) const { return ivec2(x * v.x, y * v.y); }
+	ivec2 operator-() const { return ivec2(-x, -y); }
+};
+
+
 inline float dot(const vec2& v1, const vec2& v2) {
 	return (v1.x * v2.x + v1.y * v2.y);
 }
