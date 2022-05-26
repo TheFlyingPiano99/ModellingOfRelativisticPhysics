@@ -162,7 +162,7 @@ void Object::draw(GPUProgram& gpuProgram,
 	}
 	gpuProgram.setUniform(camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
 	//gpuProgram.setUniform(M(), "M");
-	gpuProgram.setUniform(UnitMatrix(), "invM");
+	gpuProgram.setUniform(camera.getActiveInverseProjectionMatrix() * camera.getInverseViewMatrix(), "invM");
 	gpuProgram.setUniform(texture == nullptr, "noTexture");
 	gpuProgram.setUniform(false, "outline");
 	gpuProgram.setUniform(false, "directRenderMode");

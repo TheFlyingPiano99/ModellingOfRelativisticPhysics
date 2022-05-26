@@ -113,9 +113,11 @@ void Scene::loadDefault()
 	observers.push_back(observer);
 
 	//2.:
+	/*
 	wrdln = new SpiralLine(vec3(10.0f, 0.0f, 20.0f), vec3(0.0f, 0.0f, 20.0f), vec3(0.0f, 0.8f, 0.0f), "Obs2's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
+	*/
 
 	//3.:
 	//...
@@ -151,27 +153,32 @@ void Scene::loadDefault()
 	objects.push_back(dice);
 	*/
 
-	/*
-	for (int j = 0; j < 2; j++) {
-		for (int i = 0; i < 10; i++) {
-			wrdln = new GeodeticLine(vec3(10.0f + j * 3, -15.0f + (i) * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+	
+	for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 1; i++) {
+			//wrdln = new GeodeticLine(vec3(10.0f + j * 3, -15.0f + (i) * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			wrdln = new SpiralLine(vec3(20.0f + 10.0f + j * 3, -15.0f + (i) * 3, 0.0f), 
+				vec3(10.0f + j * 3, -15.0f + (i) * 3, 0.0f), 
+				vec3(0.0f, 0.5f, 0.0f), "");
 			objects.push_back(Object::createDice(wrdln));
-			wrdln = new GeodeticLine(vec3(10.f + j * 3, -15.0f + (i) * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
-			objects.push_back(Object::createDice(wrdln));
+			//wrdln = new GeodeticLine(vec3(10.f + j * 3, -15.0f + (i) * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			//objects.push_back(Object::createDice(wrdln));
 		}
 	}
-	*/
-	
+
+	/*
 	objects.push_back(Object::createSpike(
-		new CompositeLine(vec3(0.0f, 0.0f, 0.0f), 
-		vec3(0.0f, 0.0f, 0.0f), 
+		new CompositeLine(vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 0.0f, 0.0f),
 			"Staying ship")));
 
 	objects.push_back(Object::createSpike(
-		new SpiralLine(vec3(20.0f, 0.0f, 0.0f), 
-			vec3(0.0f, 0.0f, 0.0f), 
-			vec3(0.0f, 0.6f, 0.0f), 
+		new SpiralLine(vec3(20.0f, 0.0f, 0.0f),
+			vec3(0.0f, 0.0f, 0.0f),
+			vec3(0.0f, 0.6f, 0.0f),
 			"Spiral worldline")));
+	*/
+
 	/*
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(0, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(2, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
@@ -186,7 +193,6 @@ void Scene::loadDefault()
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-8, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	objects.push_back(Object::createEarth(new GeodeticLine(vec3(-10, -5.0f, 0), vec3(0.0f, 0.0f, 0.0f), "Staying")));
 	*/
-
 	system = new CoordinateSystem();
 	toggleActiveObserver();
 }

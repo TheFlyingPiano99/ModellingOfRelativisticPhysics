@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include <corecrt_math_defines.h>
+#include <glm.hpp>
 
 void Camera::updateDirections(vec3 updatedEye)
 {
@@ -74,12 +75,31 @@ const mat4 Camera::getTranslationMatrix() const {
 const mat4 Camera::getViewMatrix() const {
 	vec3 w = normalize(eye - lookat);
 
-	return mat4(right.x, up.x, w.x, 0,
+	return mat4(
+		right.x, up.x, w.x, 0,
 		right.y, up.y, w.y, 0,
 		right.z, up.z, w.z, 0,
 		0, 0, 0, 1);
 }
 
+const mat4 Camera::getInverseViewMatrix() const
+{
+	vec3 w = normalize(eye - lookat);
+	glm::mat4 m = glm::mat4(
+		right.x, up.x, w.x, 0,
+		right.y, up.y, w.y, 0,
+		right.z, up.z, w.z, 0,
+		0, 0, 0, 1);
+
+	m = glm::inverse(m);
+
+	return mat4(
+		m[0][0], m[0][1], m[0][2], m[0][3],
+		m[1][0], m[1][1], m[1][2], m[1][3],
+		m[2][0], m[2][1], m[2][2], m[2][3],
+		m[3][0], m[3][1], m[3][2], m[3][3]
+		);
+}
 
 
 const mat4 Camera::getPerspectiveProjectionMatrix() const {
@@ -90,6 +110,25 @@ const mat4 Camera::getPerspectiveProjectionMatrix() const {
 		0, sy, 0, 0,
 		0, 0, a, -1,
 		0, 0, b, 0);
+}
+
+const mat4 Camera::getInversePerspectiveProjectionMatrix() const {
+	float sy = 1.0f / tanf(fov / zoomFactor / 2.0f);
+	float a = -(nearPlane + farPlane) / (farPlane - nearPlane);
+	float b = -2.0f * nearPlane * farPlane / (farPlane - nearPlane);
+	glm::mat4 m = glm::mat4(sy / asp, 0, 0, 0,
+		0, sy, 0, 0,
+		0, 0, a, -1,
+		0, 0, b, 0);
+
+	m = glm::inverse(m);
+
+	return mat4(
+		m[0][0], m[0][1], m[0][2], m[0][3],
+		m[1][0], m[1][1], m[1][2], m[1][3],
+		m[2][0], m[2][1], m[2][2], m[2][3],
+		m[3][0], m[3][1], m[3][2], m[3][3]
+	);
 }
 
 const mat4 Camera::getOrthographicProjectionMatrix() const {
@@ -108,11 +147,41 @@ const mat4 Camera::getOrthographicProjectionMatrix() const {
 	return transpose(m);
 }
 
+const mat4 Camera::getInverseOrthographicProjectionMatrix() const {
+	float sy = 1.0f / tanf(fov / 2.0f) * orthographicScale / zoomFactor;
+	float r, l, t, b;
+	t = sy;
+	b = -sy;
+	r = sy * asp;
+	l = -sy * asp;
+	glm::mat4 m = glm::mat4(
+		2.0f / (r - l), 0, 0, -(r + l) / (r - l),
+		0, 2.0f / (t - b), 0, -(t + b) / (t - b),
+		0, 0, -2.0f / (farPlane - nearPlane), -(farPlane + nearPlane) / (farPlane - nearPlane),
+		0, 0, 0, 1
+	);
+
+	m = glm::inverse(glm::transpose(m));
+	return mat4(
+		m[0][0], m[0][1], m[0][2], m[0][3],
+		m[1][0], m[1][1], m[1][2], m[1][3],
+		m[2][0], m[2][1], m[2][2], m[2][3],
+		m[3][0], m[3][1], m[3][2], m[3][3]
+	);
+}
+
 const mat4 Camera::getActiveProjectionMatrix() const {
 	if (usePerspective) {
 		return getPerspectiveProjectionMatrix();
 	}
 	return getOrthographicProjectionMatrix();
+}
+
+const mat4 Camera::getActiveInverseProjectionMatrix() const {
+	if (usePerspective) {
+		return getInversePerspectiveProjectionMatrix();
+	}
+	return getInverseOrthographicProjectionMatrix();
 }
 
 const vec3 Camera::calculateRayStart(vec2 cPos) const {

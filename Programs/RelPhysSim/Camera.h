@@ -61,15 +61,26 @@ public:
 	*/
 	const mat4 getViewMatrix() const;
 	
+	const mat4 getInverseViewMatrix() const;
+
 	const mat4 getPerspectiveProjectionMatrix() const;
 
+	const mat4 getInversePerspectiveProjectionMatrix() const;
+
 	const mat4 getOrthographicProjectionMatrix() const;
+
+	const mat4 getInverseOrthographicProjectionMatrix() const;
+
+
 	
 	/*
 	* Returns the currently selected projection matrix.
 	* This can be perspective or orthographic.
 	*/
 	const mat4 getActiveProjectionMatrix() const;
+
+	const mat4 getActiveInverseProjectionMatrix() const;
+
 	/*
 	* Transforms a camera space vector to world space so, that the world space position represented by the vector is in the "lookat plane".
 	*/

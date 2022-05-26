@@ -12,8 +12,8 @@
 	uniform bool drawPath;
 
 //Object:
-	in vec3 wPos;
-	in vec3 norm;
+	in vec4 wPos;
+	in vec4 norm;
 	in vec2 texCoord;
 	in float dopplerShift;
 	in vec4 originalVp;
@@ -126,41 +126,40 @@
 	vec3 DirectLight(vec3 rawColor) {
 		vec3 eyeDir;
 		if (viewMode == 0) {		// Real3D
-			eyeDir = normalize(-wPos);			// eye is in (0,0,0)
+			eyeDir = normalize(-wPos.xyz);			// eye is in (0,0,0)
 		}
 		else {
-			eyeDir = normalize(wEye - wPos);
+			eyeDir = normalize(wEye - wPos.xyz);
 		}
-		 
 
 		vec3 outRadiance = ka * La;
 
 		//Light0:	(Point light)
-
-		vec3 lightDir = normalize(lightPos0 - wPos);
-		float dist = length(lightPos0 - wPos);
+		vec3 lightDir = normalize(lightPos0 - wPos.xyz);
+		float dist = length(lightPos0 - wPos.xyz);
 		vec3 radiance = lightL0 / dist / dist;
-		float cosTheta = dot(norm, lightDir);
+		vec3 n = abs(normalize(norm).xyz);
+		float cosTheta = dot(n, lightDir);
 		vec3 halfway;
 		float cosDelta;
 		if (cosTheta > 0) {
 			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
 			halfway = normalize(eyeDir + lightDir);
-			cosDelta = dot(norm, halfway);
+			cosDelta = dot(n, halfway);
 			if (cosDelta > 0) {
 				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
 			}
 		}
 
 		//Light1:	(Point light)
-		lightDir = normalize(lightPos1 - wPos);
-		dist = length(lightPos1 - wPos);
+		lightDir = normalize(lightPos1 - wPos.xyz);
+		dist = length(lightPos1 - wPos.xyz);
 		radiance = lightL1 / dist / dist;
-		cosTheta = dot(norm, lightDir);
+		cosTheta = max(dot(n, lightDir), 0.0);
 		if (cosTheta > 0) {
 			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
 			halfway = normalize(eyeDir + lightDir);
-			cosDelta = dot(norm, halfway);
+			cosDelta = max(dot(n, halfway), 0.0);
 			if (cosDelta > 0) {
 				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
 			}
@@ -169,11 +168,11 @@
 		//Light2:	(Direction light)
 		lightDir = normalize(lightPos2);
 		radiance = lightL2;
-		cosTheta = dot(norm, lightDir);
+		cosTheta = dot(n, lightDir);
 		if (cosTheta > 0) {
 			outRadiance = outRadiance + radiance * kd * cosTheta * rawColor;
 			halfway = normalize(eyeDir + lightDir);
-			cosDelta = dot(norm, halfway);
+			cosDelta = dot(n, halfway);
 			if (cosDelta > 0) {
 				outRadiance = outRadiance + radiance * ks * pow(cosDelta, shininess);
 			}
@@ -212,14 +211,13 @@
 
 	void realTime3D() {
 		if (outline) {
-			if (dot(normalize(-wPos), norm) < 0.3) {		// Eye position is in (0,0,0), when using intersections
+			if (dot(normalize(-wPos).xyz, normalize(norm).xyz) < 0.3) {		// Eye position is in (0,0,0), when using intersections
 				outColor = vec4(0,1,0,1);							// green outline
 				return;
 			}
 		}
-		vec4 rawColor = texture(textureUnit, texCoord);		
+		vec4 rawColor = texture(textureUnit, texCoord);	
 		vec3 shaded = shading(rawColor);
-
 		vec3 redShifted = waveLengthToRGB(625.0 * dopplerShift);	// Red
 		vec3 greenShifted = waveLengthToRGB(526.0 * dopplerShift);	// Green
 		vec3 blueShifted = waveLengthToRGB(444.0 * dopplerShift);	// Blue
@@ -231,7 +229,8 @@
 		vec4 rawColor = texture(textureUnit, texCoord);		
 		vec3 shaded = shading(rawColor);
 		if (transparency < 1.0) {
-			outColor = vec4(shaded, transparency * (1 - dot(norm, normalize(wEye - wPos)) * dot(norm, normalize(wEye - wPos))));
+			vec3 n = normalize(norm.xyz);
+			outColor = vec4(shaded, transparency * (1 - dot(n, normalize(wEye - wPos.xyz)) * dot(n, normalize(wEye - wPos.xyz))));
 		}
 		else {
 			outColor = vec4(shaded, 1);

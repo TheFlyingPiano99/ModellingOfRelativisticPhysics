@@ -15,7 +15,7 @@ class Observer : public Entity
 {
 	WorldLine* worldLine = NULL;
 	WorldLineView* worldLineView = NULL;
-	float currentProperTime = 0.0f;
+	float currentProperTime = 251.33f;		// For performance test
 	int worldLineID = 0;
 	std::shared_ptr<Caption*> diagramCaption;
 	std::shared_ptr<Caption*> timerCaption;		// Displays the current proper time in diagram view.

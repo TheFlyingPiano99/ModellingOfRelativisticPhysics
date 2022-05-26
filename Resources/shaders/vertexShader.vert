@@ -46,8 +46,8 @@
 	//WorldLine:
 	uniform int worldLineType;	// 0 = geodetic
 
-	out vec3 wPos;
-	out vec3 norm;
+	out vec4 wPos;
+	out vec4 norm;
 	out vec2 texCoord;
 	out float dopplerShift;
 	out vec4 originalVp;
@@ -444,9 +444,9 @@
 			dopplerShift = 1.0f;			
 		}
 
-		wPos = vertexLocationProperFrame;
+		wPos = vec4(vertexLocationProperFrame, 1);
 		texCoord = vec2(uv.x, 1 - uv.y);
-		norm = (invM * vec4(vn, 0)).xyz;
+		norm = invM * vec4(vn, 0);
 		gl_Position = vec4(vertexLocationProperFrame, 1) * MVP;			// Now the MVP doesn't contain translation by -eye! Because eye is in (0,0,0)
 	}
 
@@ -492,21 +492,21 @@
 		}
 
 		if (!drawPath) {
-			wPos = (vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M).xyz;
+			wPos = vec4(transformed[diagramX], transformed[diagramY], transformed[diagramZ], 1) * M;
 		}
 		else {
-			wPos = (vec4(transformed.xyz, 1) * M).xyz;	// Use the
+			wPos = vec4(transformed.xyz, 1) * M;	// Use the
 		}
 		texCoord = vec2(uv.x, 1 - uv.y);
-		norm = (invM * vec4(vn, 0)).xyz;
+		norm = invM * vec4(vn, 0);
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(wPos, 1) * MVP;		// Now the MVP should contain the translation to -eye!
+		gl_Position = wPos * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void directRender() {					// Classic render mode, without any relativistic transformation. Only MVP is applied.
-		wPos = (vec4(vp.xyz, 1) * M).xyz;
+		wPos = vec4(vp.xyz, 1) * M;
 		texCoord = vec2(uv.x, 1 - uv.y);
-		norm = (invM * vec4(vn, 0)).xyz;
+		norm = invM * vec4(vn, 0);
 		dopplerShift = 1.0f;			
 		gl_Position = vec4(vp.xyz, 1) * MVP;		// Now the MVP should contain the translation to -eye!
 	}
