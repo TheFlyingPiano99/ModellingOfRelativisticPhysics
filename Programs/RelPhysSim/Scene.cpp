@@ -65,7 +65,7 @@ void Scene::Initialise()
 
 	lights.push_back(new LightSource(vec3(70, -50, 50), vec3(1000, 1000, 1000), 1));
 
-	lights.push_back(new LightSource(vec3(-1, 1, -1), vec3(0.1, 0.1, 0.1), 2));
+	lights.push_back(new LightSource(vec3(-1, 1, -1), vec3(0.01, 0.01, 0.01), 2));
 
 	//-----------------------------------------------------------------
 
@@ -111,6 +111,10 @@ void Scene::loadDefault()
 	observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
+	wrdln = new GeodeticLine(vec3(-5.0f, 20.0f, 0.0f), vec3(0.0f, -0.8f, 0.0f), "Obs2's world line");
+	observer = new Observer(wrdln, "Obs2", "An observer");
+	observers.push_back(observer);
+
 	//2.:
 	
 	/*
@@ -123,24 +127,27 @@ void Scene::loadDefault()
 	//3.:
 	//...
 	//Objects:----------------------------------------------------
-	/*
-	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
-	objects.push_back(Object::createEarth(wrdln));
+	
+	// For Doppler demonstration:
+//	wrdln = new GeodeticLine(vec3(3.0f, -6.0f, 0.0f), vec3(0.0f, 0.99f, 0.0f), "Obj1's world line");
+//	objects.push_back(Object::createEarth(wrdln));
 
+	/*
 	for (int i = 0; i < 10; i++) {
-		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 3, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
+		wrdln = new GeodeticLine(vec3(3.0f, -6.0f + i * 2, -1.0f), vec3(0.0f, 0.0f, 0.0f), "Obj1's world line");
 		objects.push_back(Object::createEarth(wrdln));
 	}
 	*/
+	
 
 	
 	//Dice:
-	wrdln = new GeodeticLine(vec3(10.0f, -6.0f, 0.0f), vec3(0.0f, 0.75f, 0.0f), "Speeding dice world line v = 0.75c");
+	wrdln = new GeodeticLine(vec3(10.0f, -6.0f, 0.0f), vec3(0.0f, 0.9f, 0.0f), "Speeding dice world line v = 0.75c");
 	Object* dice = Object::createDice(wrdln);
 	dice->setName("Fast dice");
-	dice->setDescription("v = 0.75c");
+	dice->setDescription("v = 0.9c");
 	objects.push_back(dice);
-
+	
 	/*
 	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, 3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 1");
 	dice = Object::createDice(wrdln);
@@ -148,12 +155,13 @@ void Scene::loadDefault()
 	dice->setDescription("");
 	objects.push_back(dice);
 	*/
-
+	
 	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, -3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 2");
 	dice = Object::createDice(wrdln);
 	dice->setName("Standing dice");
 	dice->setDescription("");
 	objects.push_back(dice);
+	
 	
 
 	/*
@@ -170,6 +178,7 @@ void Scene::loadDefault()
 	}
 	*/
 
+	
 	/*
 	objects.push_back(Object::createSpike(
 		new CompositeLine(vec3(0.0f, 0.0f, 0.0f),
@@ -182,6 +191,7 @@ void Scene::loadDefault()
 			vec3(0.0f, 0.6f, 0.0f),
 			"Spiral worldline")));
 	*/
+	
 	
 
 	/*

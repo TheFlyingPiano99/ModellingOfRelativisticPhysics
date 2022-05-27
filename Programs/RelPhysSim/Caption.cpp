@@ -52,7 +52,7 @@ void Caption::draw(GPUProgram& gpuProgram, const Camera& camera) const
 	mat4 m = this->getModellMatrix(cPos, vec3(0, 1, 0), camera.getAspectRatio());
 	gpuProgram.setUniform(m, "MVP");	// In real time 3D space there is no camera traslation to origo in MVP matrix.
 
-	gpuProgram.setUniform(m, "m");
+	gpuProgram.setUniform(UnitMatrix(), "M");
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(vao);

@@ -8,6 +8,7 @@ void GeodeticLineView::draw(GPUProgram& gpuProgram) const
 
 void GeodeticLineView::drawDiagram(GPUProgram& gpuProgram) const
 {
+    gpuProgram.setUniform(UnitMatrix(), "M");
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glLineWidth(3);

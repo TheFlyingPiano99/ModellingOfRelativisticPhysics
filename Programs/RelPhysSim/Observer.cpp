@@ -111,7 +111,7 @@ void Observer::drawHyperplane(GPUProgram& gpuProgram, const Camera& camera, cons
 	
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
@@ -139,7 +139,7 @@ void Observer::drawLightCone(GPUProgram& gpuProgram, const Camera& camera, const
 	geometry->GenSurface(100, 100);
 
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(false, "glow");
 	gpuProgram.setUniform(true, "noTexture");
@@ -157,7 +157,7 @@ void Observer::drawNode(GPUProgram& gpuProgram, const Camera& camera, const RelT
 	vec3 pos = transformPosToDiagramSpace(getLocation(settings), settings);
 	Assets::getObserverMaterial()->loadOnGPU(gpuProgram);
 	gpuProgram.setUniform(TranslateMatrix(pos) * camera.getTranslationMatrix() * camera.getViewMatrix() * camera.getActiveProjectionMatrix(), "MVP");
-	gpuProgram.setUniform(TranslateMatrix(pos), "M");
+	gpuProgram.setUniform(UnitMatrix(), "M");
 	gpuProgram.setUniform(TranslateMatrix(-pos), "invM");
 	gpuProgram.setUniform(true, "glow");
 	gpuProgram.setUniform(true, "noTexture");

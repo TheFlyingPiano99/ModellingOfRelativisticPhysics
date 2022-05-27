@@ -10,7 +10,7 @@
 \usepackage[pdftex]{graphicx} \pdfcompresslevel=9
 \usepackage{t1enc,dfadobe}
 \usepackage{amsmath}
-\usepackage{placeins}
+\usepackage{placeIns}
 
 % For backwards compatibility to old LaTeX type font selection.
 % Uncomment if your document adheres to LaTeX2e recommendations.
@@ -36,7 +36,7 @@ Special relativity describes many phenomena, not observable in everyday life. Th
 
 \section{Introduction}
 \label{sec:introduction}
-Theory of relativity is a key part of modern physics. There are many use cases of this theory. Despite of it's importance there is very little chance for people to experience relativistic phenomena in their everyday life, thus differences between Isaac Newton's classical and Albert Einstein's modern model remain unexplored. The application described in this article offers a way to visualize the most well-known phenomena associated with special relativity. The goal of this article is to showcase the algorithmic challenges surrounding this program and introduce solutions for these problems.
+Theory of special relativity \cite{EinsteinElectrodynamics} is a key part of modern physics. There are many use cases of this theory. Despite of it's importance there is very little chance for people to experience relativistic phenomena in their everyday life, thus differences between Isaac Newton's classical and Albert Einstein's modern model remain unexplored. The application described in this article offers a way to visualize well-known phenomena associated with special relativity. I took inspiration from the work of Ute Kraus and Corvin Zahn \cite{krausZahn}. On their website \emph{Space Time Travel} they present many computer generated images and short animations about relativistic effects. The goal of my work was the implementation of a software that can render images similar to the ones on \emph{Space Time Travel}, enables inspection of world lines using space-time diagrams and allows the user to freely change the parameters of the simulation and see the changes take effect. In this article I showcase the algorithmic challenges surrounding this program and introduce solutions for these problems. To present it's capabilities, I included images rendered by this simulator.
 
 \section{Theoretical background}
 \label{sec:theoretical_background}
@@ -54,21 +54,24 @@ To simplify representation of world lines every event and velocity is described 
 \subsection{Representation of physical bodies}
 To model the journey of physical objects through space-time, it is convenient to assign a world line to each object. To be more precise, this is going to be the world line of the object's origin point. For practical purposes this point is selected to be the same as the origin point in model space. Such world line can be stored as a set of events. We assume geodetic world line between two neighbouring events. At this point it is necessary to note that we also assume flat space-time. This method allows us to represent world lines consisting of few geodetic sections easily. World lines of accelerating objects appear curved in space-time diagrams. We can approximate these lines by a set of short geodetic sections. This approximation is useful, because along the small sections we can use the simple formulas of Lorentz transformation. The downside of this method is that many calculations require iteration over the small sections. E. g. determining the age of an object without a priory information requires summing of ageing of the object along the geodetic sections. The other obvious downside of such approximation is that the resulting world line is going to have relatively low resolution. This is particularly noticeable, when we --as a viewer-- place ourselves in the proper frame of such accelerating object. In this case the violent jumping nature of the movement of surroundings is much more noticeable.
 
-\section{View modes}
-The application supports multiple view modes. The two main modes are the \emph{real time} three dimensional view and the \emph{diagram view}. In the \emph{real time} mode the scene is shown as regular three dimensional scene, changing over time. We can look around with the virtual camera to observe the moving objects. The shape and colour of objects gets distorted in accordance with the relativistic effects.
+Length values are stored in metres. To get space-time diagrams, where the angle between world line of light and coordinate axes is $45^{\circ}$, we also measure time in metres. This way the velocity is dimensionless quantity.
 
-In the \emph{diagram view} we can observe the world lines of objects present in the scene. This provides additional insight into the behaviour of objects. As a recent addition to the project now the user can switch to orthographic projection from the standard perspective projection. This improves the readability of the space-time diagram, and it's also useful in the \emph{real time} view.
+\section{View modes}
+The application supports multiple view modes. The two main modes are the \emph{real time} three dimensional view and the \emph{diagram view}. In the \emph{real time} mode the scene is shown as regular three dimensional scene, changing over time. We can look around with the virtual camera to observe the moving objects. The shape and colour of objects gets distorted in accordance with the relativistic effects. The simulation speed is slowed down greatly compared to the real physical world, to make comprehension of fast movements possible.
+
+
+In the \emph{diagram view} we can observe the world lines of objects present in the scene. This provides additional insight into the behaviour of objects. The user can switch to orthographic projection from the standard perspective projection. This improves the readability of the space-time diagram, and it's also useful in the \emph{real time} view.
 
 In order to help the user spot differences between classic and relativistic physics, there is a way to switch between Galilean \cite{KHGalilei} and Lorentz transformation. A viewer can see the incoming light from an object, thus we can only see images showing the past. This is due to the finiteness of the speed of light. The application allows to toggle between visualization of present event as described in the selected observer's frame, and past events in accordance with the incoming light beams.
 
 \subsection{Switching between observers}
 To compare the observations in different inertial frames of reference, we can toggle between multiple observers. In this implementation observers are independent from physical objects, however it's possible to make an observer follow an object. Every observer has it's own world line. These lines can also be visualized in \emph{diagram view}.
 
-When switching between frames of reference the origin of the frame also changes. The $\vec{O} =(0,0,0)$ in currently selected proper frame gets assigned to the space coordinate vector of an event along the world line of the observer. The question is, how do we select the time component. In other words which event will be selected along the new world line. This implementation chooses the event from the new observers world line, which happened simultaneously with the event of changing observers according to the previous observer. This method introduces a somewhat more realistic approach, however in real life still no object can travel from one event's location to an other's if these two events appear to be simultaneous. This would require velocity greater than the speed of light. In defence of this approach in this computer simulation neither the user's perspective nor an observer is necessary bound to a physical object. At least this way the false sense, that the `absolute frame' in the program would have special characteristics in real life, is weakened. This is because the change is simultaneous in different frames of reference depending on the initial frame. There is a downside of this approach. When we change the frame of reference once, and then change back to the initial frame of reference, we potentially arrive to a different event.
+When switching between frames of reference the origin of the frame also changes. The $\vec{O} =(0,0,0)$ in currently selected proper frame gets assigned to the space coordinate vector of an event along the world line of the observer. The question is, how do we select the time component. In other words, which event will be selected along the new world line. This implementation chooses the event from the new observers world line, which happened simultaneously with the event of changing observers according to the previous observer. This method introduces a somewhat more realistic approach, however in real life still no object can travel from one event's location to an other's if these two events appear to be simultaneous. This would require velocity greater than the speed of light. In defence of this approach in this computer simulation neither the user's perspective nor an observer is necessary bound to a physical object. At least this way the false sense, that the `absolute frame' in the program would have special characteristics in real life, is weakened. There is a downside to this approach. When we change the frame of reference once, and then change back to the initial frame of reference, we potentially arrive to a different event.
 
 \subsection{Visualization of simultaneous events}
 \label{visOfSimEvents}
-The less realistic approach for selecting events to render finds the simultaneously happening events. Due to relativity of simultaneity it is necessary to determine simultaneity in the currently selected observers proper frame. Luckily present events form a hyperplane in the four dimensional space-time. Present events along object's world lines can be obtained by calculating intersections between the world lines and this simultaneous hyperplane. In this simulation the above-stated hyperplane is described by coordinates assigned in the `absolute frame'. A hyperplane can be defined by an event on the hyperplane and a normal four-vector. The event is going to be the one along the world line associated with the observer, of which time component is $t_{abs}$~time~variable of the simulation. The normal vector is obtained from the $\vec{v}=(v_x, v_y, v_z, v_t)$ velocity of the observer's frame relative to the `absolute frame'. This is described in form \ref{eq:normalOfSimult}.
+First let's take a look at the less realistic approach of visualization.  We render the simultaneously happening events. Due to relativity of simultaneity it is necessary to determine simultaneity in the currently selected observers proper frame. Luckily present events form a hyperplane in the four dimensional space-time. Present events along object's world lines can be obtained by calculating intersections between the world lines and this simultaneous hyperplane. In this simulation the above-stated hyperplane is described by coordinates assigned in the `absolute frame'. A hyperplane can be defined by an event on the hyperplane and a normal four-vector. The event is going to be the one along the world line associated with the observer, of which time component is $t_{abs}$~time~variable of the simulation. The normal vector is obtained from the $\vec{v}=(v_x, v_y, v_z, v_t)$ velocity of the observer's frame relative to the `absolute frame'. This is described in form \ref{eq:normalOfSimult}.
 \begin{equation}
 \vec{n}_{pl} = (-v_x, -v_y, -v_z, v_t)
 \label{eq:normalOfSimult}
@@ -84,7 +87,7 @@ The previously described equation can handle geodetic world lines. To use this w
 
 \subsection{Visualization of events considering the propagation of light}
 \label{visConsLight}
-A more realistic approach for finding events to render uses the event horizon as the intersecting hypersurface. From greater distances older events are seen. This characteristic makes the event horizon analogous with a cone in three dimensional space. The event at the viewers position and age at the time of measurement is enough to describe this hypercone. The  `slope' of this hypercone is always the same, because the speed of light is constant. The quadratic equation~\ref{eq:coneIntersection} provides the tool for calculating the intersection.
+A more realistic approach for finding events to render uses the event horizon as the intersecting hypersurface. From greater distances older events are seen. This characteristic makes the event horizon analogous with a cone in three dimensional space. The event at the viewers position is enough to describe this hypercone. The `slope' of this hypercone is always the same, because the speed of light is constant. The quadratic equation~\ref{eq:coneIntersection} provides the tool for calculating the intersection.
 \begin{align}
 a &= v_x^2 + v_y^2 + v_z^2 - v_t^2\\
 \vec{m} &= (s_x, s_y, s_z)\cdot{}(v_x, v_y, v_z) - (v_x, v_y, v_z)\cdot{}(c_x, c_y, c_z)\\
@@ -111,21 +114,20 @@ First step in generating the world line for a given vertex is determining the $s
 l' =l\sqrt{1 - \frac{v^2}{c^2}}
 \end{equation}
 
-By taking the initial $\vec{v}_0$ four-velocity of the object's origin's world line and our new $\vec{s}$ starting event, we get the first geodetic segment of the new world line. The next step is to calculate the ending event of this section. In this implementation we assume, that all vertices of the object get boosted simultaneously with the origin of the object. Simultaneity is determined in the proper frame of the object prior to the event of the boost. Thus, the ending event is the intersection between the mentioned simultaneous hyperplane and the geodetic world line segment. This method is able to recreate \emph{Wigner rotation} as described in section~\ref{sec:wigner_rotation}. The ending event of the current segment will be the starting event of the following event. Please note, that this method introduces an accumulated error to the iteration caused by the computer's finite precision of number representation. The velocity is always equal to the origin point's velocity in the corresponding segment. Before the first starting event and after the last ending event the algorithm assumes, that the first  and last segment is a continuation and is continued by the same geodetic world line respectively.
+By taking the initial $\vec{v}_0$ four-velocity of the object's origin's world line measured in the `absolute frame' and our new $\vec{s}$ starting event, we get the first geodetic segment of the new world line. The next step is to calculate the ending event of this section. In this implementation we assume, that all vertices of the object get boosted simultaneously with the origin of the object. Simultaneity is determined in the proper frame of the object prior to the event of the boost. Thus, the ending event is the intersection between the mentioned simultaneous hyperplane and the geodetic world line segment. This method is able to recreate \emph{Wigner rotation} as described in section~\ref{sec:wigner_rotation}. The ending event of the current segment will be the starting event of the following geodetic section. Please note, that this method introduces an accumulated error to the iteration caused by the computer's finite precision number representation. The velocity is always equal to the origin point's velocity in the corresponding segment. Before the first starting event and after the last ending event the algorithm assumes, that the first  and last segment is a continuation and is continued by the same geodetic world line respectively.
 
 During the previously described iteration intersection between the hyperplane or hypercone and the segments can be obtained as described in sections \ref{visOfSimEvents} and \ref{visConsLight}. As an optimization the iteration can be quit after this intersection is found.
 
 The finishing steps of the rendering pipeline include transforming the found intersection event from the `absolute frame' to the proper frame of the current observer using the \emph{Lorentz transformation} and calculating the \emph{Doppler shift} of colour. When calculating the \emph{Doppler shift} the relative velocity between the selected observer and the object's proper frame also must be transformed with the \emph{Lorentz transformation} for velocity.
 
 \subsection{Generating world lines for vertices with classic procedure}
-When using the \emph{Galilean transformation}, generating world lines for the vertices is similar to the one described in subsection~\ref{sec:genRelProc}. The key differences are described in this subsection. When creating the $\vec{s}$ starting event for the world line, no length contraction is applied. The ending event of segments can be obtained by translating the events of the object's origin's world line by the spacial coordinates of the vertex. This way we also eliminate the accumulated error introduced by the method in \ref{genRelProc}. This simplification is available, because in Newton's model simultaneity is absolute, thus events of boosting have equal time component.
+When using the \emph{Galilean transformation}, generating world lines for the vertices is similar to the one described in subsection~\ref{sec:genRelProc}. The key differences are described in this subsection. When creating the $s$ starting event for the world line, no length contraction is applied. The ending event of segments can be obtained by translating the events of the object's origin's world line by the spacial coordinates of the vertex. This way we also eliminate the accumulated error introduced by the method in subsection~\ref{sec:genRelProc}. This simplification is available, because in Newton's model simultaneity is absolute, thus events of boosting are simultaneous in every frame of reference.
 
 After obtaining the intersection event between the hyperplane or hypercone and the world line of a vertex, \emph{Galilean transformation} is applied, to obtain the coordinates of the event in the selected observers proper frame and the relative velocity between the object's and observer's proper frame.
 
 \section{Wigner rotation and Thomas precession}
 \label{sec:wigner_rotation}
-Let's consider an stationary object in frame $S$. Now let's boost the object to $\vec{v}_1$ velocity. We assume that, the effect of the boost is instantaneous, and all points of the object get boosted simultaneously in the proper frame of the object. Also no interaction takes place between the points of the object. With the change of velocity the proper frame of the object also changes. Let's name the new proper frame of the object $S'$. In the frame $S'$ we boost the object once again to $\vec{v}_2$ velocity. This boost is perpendicular to the first one. The 
-In frame $S$ after the two boosts the distortion of the object is measured as if it had been boosted diagonally by $(v_x, v_y)$ and rotated by angle $\alpha$. This rotation is called Wigner rotation. The values can be calculated in the form of the following equations.
+Let's consider a stationary object in frame $S$. Now let's boost the object to $\vec{v}_1$ velocity. We assume that, the effect of the boost is instantaneous, and all points of the object get boosted simultaneously in the proper frame of the object. Also no interaction takes place between points of the object. With the change of velocity the proper frame of the object also changes. Let's name the new proper frame of the object $S'$. In the frame $S'$ we boost the object once again to $\vec{v}_2$ velocity. This boost is perpendicular to the first one. After the two boosts in frame $S$ the distortion of the object is measured as if it had been boosted diagonally by $(v_x, v_y)$ and rotated by angle $\alpha$. This rotation is called \emph{Wigner rotation}. The values can be calculated in the form of the following equations.
 \begin{align}
 v_x &= v_1 \label{eq:wigner_rotation_1}\\
 v_y &= \frac{v_2}{\gamma{}_1} \label{eq:wigner_rotation_2}\\
@@ -133,8 +135,8 @@ v_y &= \frac{v_2}{\gamma{}_1} \label{eq:wigner_rotation_2}\\
 \cos{\alpha} &= \frac{\gamma{}_1}{\gamma{}_2}\cdot\frac{\gamma{}_2v_1^2+\gamma{}_2v_2^2}{\gamma{}_1^2v_1^2+v_2^2} \label{eq:wigner_rotation_4}
 \end{align}
 
-Now that we have introduced the concept of Wigner rotation, let's discuss Thomas precession. Let's say that we have a fast spinning particle. Let's move the particle along a circular path, so that only the center of mass of the particle is being accelerated. After the particle arrives back to it's starting position along the circular path, the axis will point in different direction than at the start.
-This phenomena is called Thomas precession. It can be explained by the Wigner rotation. The particles velocity is tangential to the circular path. The centripetal acceleration boosting the particle is perpendicular to the velocity. As a consequence a series of infinitesimal Wigner rotations are occurring.
+Now that we have introduced the concept of Wigner rotation, let's discuss Thomas precession. Let's say that we have a fast spinning particle. Let's move the particle along a circular path, so that only the center of mass of the particle is being accelerated. After the particle arrives back to it's starting position, the axis will point in different direction than at the start.
+This phenomena is called Thomas precession. It can be explained by the Wigner rotation. The particles velocity is tangential to the circular path. The centripetal acceleration boosting the particle is perpendicular to the velocity. Consequently a series of infinitesimal Wigner rotations are occurring.
 Equation~\ref{eq:thomas_precession} defines the angular velocity of the described precession, where $a$ is the centripetal acceleration, $v$ is the tangential velocity of the particle and $\gamma$ is the Lorentz factor calculated as $\gamma = \frac{1}{\sqrt{1-\frac{v^2}{c^2}}}$.
 \begin{equation}
 \omega{}_T=\frac{\gamma{}^2}{\gamma + 1}\frac{av}{c^2}
@@ -143,78 +145,69 @@ Equation~\ref{eq:thomas_precession} defines the angular velocity of the describe
 
 As stated earlier, the Thomas precession is a series of Wigner rotations. This is convenient, because we only need to make sure that the boost of each individual world line assigned to the vertices of an object happen simultaneously. This is the part of the relativistic render pipeline described is subsection~\ref{sec:genRelProc}.
 
-Although previously Thomas precession was described using the spin axis of a particle, extended and not spinning objects also suffer such precession, when travelling in circles. However it's harder to precisely describe to nature of the deformations suffered by such objects. Figure~\ref{fig:thomasPrec_01} shows the effect of Thomas precession on a circulating cross shaped object. The circular path has a radius of $r=20m$ and the tangential velocity is $v=0.6$. The The object travels counterclockwise. For comparison the object at the center of the image is stationary in the frame of reference. The changes in length and the rotations add up to a complex deformation. Although it is complex, the amount of general Thomas precession is in accordance with equation~\ref{eq:thomas_precession}. Given $r$ and $v$, the time it takes the object to travel one full circle is $t_{rot}=\frac{2\pi{}r}{v}$. After substitution to equation~\ref{eq:thomas_precession} we get $\omega_T=\frac{1.25^2}{1.25+1}\cdot{}0.018\cdot{}0.6=0.0075$ and we can calculate $t_{rot} \doteq 209.44\,{}m$. Consequently $\alpha{}_T \approx \frac{\pi}{2}$. This precession can be observed in figure~\ref{fig:thomasPrec_01}. Figure~\ref{fig:thomasPrec_02} shows the same scene after two full rotations. The lines on the two images plot the path of the center (white line) and the initially left and right (blue and red) endpoints of the red beam of the cross.
+Although previously Thomas precession was described using the spin axis of a particle, extended and not spinning objects also suffer such precession, when travelling in circles. However it's harder to precisely describe the nature of the deformations suffered by such objects. Figure~\ref{fig:thomasPrec_01} shows the effect of Thomas precession on a circulating cross shaped object. The circular path has a radius of $r=20m$ and the tangential velocity is $v=0.6$. The The object travels counterclockwise. For comparison the object at the center of the image is stationary in the observer frame. The changes in length and the rotations add up to a complex deformation. Although it is complex, the amount of general Thomas precession is in accordance with equation~\ref{eq:thomas_precession}. Given the radius $r$ and the tangential velocity $v$, the time it takes the object to travel one full circle is described in equation~\ref{}.
+\begin{equation}
+t_{rot}=\frac{2\pi{}r}{v}
+\label{eq:t_rot}
+\end{equation}
+After substitution to equation~\ref{eq:thomas_precession} and \ref{eq:t_rot} we get $\omega_T=\frac{1.25^2}{1.25+1}\cdot{}0.018\cdot{}0.6=0.0075\,\frac{1}{m}$ and $t_{rot} \doteq 209.44\,{}m$. Consequently $\alpha{}_T \approx \frac{\pi}{2}$. This precession can be observed in figure~\ref{fig:thomasPrec_01}. Figure~\ref{fig:thomasPrec_02} shows the same scene after two full rotations. The lines on the images plot the path of the center (white line) and the initially left and right (blue and red) endpoints of the red beam of the cross.
 \begin{figure}[htb]
-  	\centering
-	\includegraphics[width=.95\linewidth]{figures/v06_r20_1rot_path.jpg}
-	\caption{Thomas Precession after one full rotation}
+\centering
+\includegraphics[width=0.8\linewidth]{figures/v06_r20_1rot_path.jpg}
+\caption{Thomas Precession after one full rotation}
 	\label{fig:thomasPrec_01}
 \end{figure}
 \begin{figure}[htb]
   	\centering
-	\includegraphics[width=.95\linewidth]{figures/v06_r20_2rot_path.jpg}
+	\includegraphics[width=0.8\linewidth]{figures/v06_r20_2rot_path.jpg}
 	\caption{Thomas Precession after two full rotations}
 	\label{fig:thomasPrec_02}
 \end{figure}
 
-\section{Results}
-\label{sec:results}
-This section showcases the images rendered by this application. These images focus on a selection of popular relativistic phenomena.
-
-When an object passes by in front of the viewer, the object appears to be rotated. The rotation axis is perpendicular to the movement direction and the viewer's direction from the object. This is shown in Figure~\ref{fig:RotatingDice}. Top dice is moving to left in parallel with the viewing plane. The effect is the consequence of light beams travelling different distances from different points of the object.
+In Figure~\ref{fig:circularWL} we can take a look at the world line of the stationary and rotating object. The additional world lines of the end points of the object are also visible. The lines appear, to be wound up around the time axis.
 \begin{figure}[htb]
 \center
-\resizebox{70mm}{!}{
-\includegraphics{figures/rotatingDice.eps}
-}
-\caption{Rotated view of fast moving dice}
-\label{fig:RotatingDice}
-\end{figure}
-
-We can ignore the path travelled by photons towards the eye and render simultaneous events. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
-\begin{figure}[htb]
-\center
-\resizebox{70mm}{!}{
-\includegraphics{figures/lengthContraction.eps}
-}
-\caption{Length contraction}
-\label{fig:lengthContraction}
-\end{figure}
-
-The twin paradox as described by Albert Einstein can be demonstrated in \emph{diagram view}. This is seen in Figure~\ref{fig:twinParadox}.
-\begin{figure}[htb]
-\center
-\resizebox{70mm}{!}{
-\includegraphics{figures/twinParadox.eps}
-}
-\caption{Twin paradox}
-\label{fig:twinParadox}
-\end{figure}
-
-In Figure~\ref{fig:circularWL} we take a look at the world lines of objects following circular trajectory. The lines appear, to be wound up around the time axis.
-\begin{figure}[htb]
-\center
-\resizebox{70mm}{!}{
-\includegraphics{figures/circularWL.eps}
-}
+\includegraphics[width=0.8\linewidth]{figures/circularWL.jpg}
 \caption{Circular world line}
 \label{fig:circularWL}
 \end{figure}
 
-Relativistic Doppler effect shifts the spectrum of incoming light depending on the relative velocity of the light source compared to the viewer. Figure~\ref{fig:doppler_effect_1} and \ref{fig:doppler_effect_2} show a row of globes first without any Doppler shift and than with realistic amount of shift.
+\section{Results}
+\label{sec:results}
+This section showcases further images rendered by the application. These images focus on a selection of popular relativistic phenomena.
+
+When an object passes by in front of the viewer, the object appears to be rotated.  The rotation axis is perpendicular to the movement direction and the viewer's direction from the object. The effect is the consequence of light beams travelling different distances from different points of the object. This can also be described using the classical model. The difference is that when we use the relativistic model, the length contraction cancels out the visual lengthening of the object. This way it creates the perfect illusion of rotation. Results of Lorentz and Galilean transformation on a moving dice are shown in Figure~\ref{fig:RotatingDice} and \ref{fig:RotatingDice_Galilean} respectively. Top dice is moving to the left in parallel with the viewing plane with velocity $v=0.9$. 
 \begin{figure}[htb]
 \center
-\resizebox{70mm}{!}{
-\includegraphics{figures/DopplerOff.PNG}
-}
+\includegraphics[width=0.8\linewidth]{figures/rotatingDice.jpg}
+\caption{Rotated view of fast moving dice using Lorentz transformation}
+\label{fig:RotatingDice}
+\end{figure}
+\begin{figure}[htb]
+\center
+\includegraphics[width=0.8\linewidth]{figures/rotatingDiceGalilean.jpg}
+\caption{Rotated view of fast moving dice using Galilean transformation}
+\label{fig:RotatingDice_Galilean}
+\end{figure}
+
+We can ignore the path travelled by photons towards the eye and render simultaneous events. This way the length contraction is observable explicitly as shown in Figure~\ref{fig:lengthContraction}. The dice on the top of the image moves to the left with velocity $v=0.9$.
+\begin{figure}[htb]
+\center
+\includegraphics[width=0.8\linewidth]{figures/length_contraction.jpg}
+\caption{Length contraction}
+\label{fig:lengthContraction}
+\end{figure}
+
+Relativistic Doppler effect is the shift of the electromagnetic spectrum of incoming light depending on the relative velocity of the light source compared to the viewer. Figure~\ref{fig:doppler_effect_1} and \ref{fig:doppler_effect_2} show a row of globes first without any Doppler shift and then with realistic amount of shift.
+\begin{figure}[htb]
+\center
+\includegraphics[width=\linewidth]{figures/doppler_effect_off.jpg}
 \caption{Globes without Doppler effect}
 \label{fig:doppler_effect_1}
 \end{figure}
 \begin{figure}[htb]
 \center
-\resizebox{70mm}{!}{
-\includegraphics{figures/DopplerFull.PNG}
-}
+\includegraphics[width=\linewidth]{figures/doppler_effect.jpg}
 \caption{Globes with Doppler effect}
 \label{fig:doppler_effect_2}
 \end{figure}
@@ -222,14 +215,15 @@ Relativistic Doppler effect shifts the spectrum of incoming light depending on t
 \subsection{Performance}
 \label{sec:performance}
 The application implementing algorithms described in this article had been tested with different amount of detailed objects. The results of performance tests are listed in table~\ref{tab:performance}. The tests where performed on a computer running \emph{Windows 11} operating system, with \emph{AMD Radeon(TM) Vega 8 Graphics} and 8 \emph{AMD Ryzen 5 3500U} core processor.
-The geometry of the object used for the tests consists of $36900$ vertices. Without any objects to display the programs frame rate was around $400$ frames per second. Two different settings where used during testing. In both cases the time variable of the simulation was set to a fixed value. In each test both \emph{Lorentz} and \emph{Galilean} transformations where performed simultaneously to consider the case, where the simulator must interpolate between these two transformations. 
-The first series of tests used the fixed $t_{abs}=0 m$ absolute time setting. The world lines where geodetic. This way the least possible amount of world line sections must be checked to determine the intersection between the hypersurface and the world lines. In the second series of tests spiral world lines where used. This type of world line uses relatively large number of geodetic sections. Each spiral line described a circular path with $r=20 m$ radius and $v=0.5 c$ tangential velocity. The time variable was set to $t_{abs}=251 m$. This way the displayed objects have travelled approximately one full circle around their center of rotation.
+The geometry of the object used for the tests consists of $36900$ vertices. Without any objects to display the programs frame rate was around $400$ frames per second. Two different settings where used during testing. In both cases the time variable of the simulation was set to a fixed value. In each test both the relativistic and classical algorithms where performed simultaneously to consider the case, where the simulator must interpolate to provide visually pleasing transitions between the results of the two methods. 
+The first series of tests used the fixed $t_{abs}=0 m$ time setting as the proper time of the observer. The world lines where geodetic. This way the least possible amount of world line sections must be checked to determine the intersection between the hypersurface and the world lines. In the second series of tests spiral world lines where used. This type of world line uses relatively large number of geodetic sections. Each spiral line described a circular path with $r=20 m$ radius and $v=0.5$ tangential velocity. The time variable was set to $t_{abs}=251 m$. This way the displayed objects have travelled approximately one full circle around their center of rotation.
+
 \begin{table}
 \caption{Performance of the simulation}
 \label{tab:performance}
 \begin{tabular}{|r|r|r|}
 \hline
-Number of objects & FPS $t_{abs} = 0 m$ & FPS $t_{abs} = 251 m$\\
+Number of objects & FPS (short iter.) & FPS (long iter.)\\
 \hline
 \hline
 1&198&76\\
@@ -260,12 +254,6 @@ Number of objects & FPS $t_{abs} = 0 m$ & FPS $t_{abs} = 251 m$\\
 \end{tabular}
 \end{table}
 
-\subsection{Suggestions for performance improvement}
-\label{sec:performance_improvement}
-In section~\ref{sec:performance} performance details showed that the simulation speed can drop to small values due to the long iterations along the complex world lines. In this subsection a potential improvement strategy is described aiming to fix the low frame rates.
-
-The idea of the performance fix is that we do not iterate always over the full world line of an object.
-
 \section{Conclusions}
 \label{sec:concl}
 The methods described in this article are capable of visualizing the most common relativistic phenomena. The performance details show that the program is able to run with interactive frame rates while displaying detailed objects, although there is room for improvement when it comes to displaying objects with complex world lines. The ability to change the parameters of the simulation enables users to experiment freely with objects moving with velocities close to the speed of light. The combination of \emph{real time} and  \emph{diagram} view alongside the interactivity unlocks the ability to further deepen one's understanding of the theory of special relativity.
@@ -277,61 +265,34 @@ I would like to thank Dr. Nándor Bokor and Dr. László Szirmay Kalos for their
 \begin{thebibliography}{1}
 \bibitem{EinsteinElectrodynamics} Albert Einstein.
 \newblock On the Electrodynamics of Moving Bodies.
-In \emph{Annalen der Physik}, \textbf{17}:891, June 1905.
+In~\emph{Annalen der Physik}, \textbf{17}:891, June 1905.
+
+\bibitem{krausZahn} Kraus U., Zahn C.
+\newblock Relativity visualized \emph{Space Time Travel}.
+url:~\emph{https://www.spacetimetravel.org/}, Last~access~12:30~May~27.~2022.
 
 \bibitem{AERelativity} Albert Einstein.
 \newblock \emph{Relativity: The Special and General Theory}.
 Henry Holt and company, 1920.
 
 \bibitem{KHGalilei} Knudsen J.M., Hjorth P.G. The Galilei Transformation.
-In \emph{Elements of Newtonian Mechanics}. Advanced Texts in Physics. Springer, Berlin, Heidelberg, 2000.
+In~\emph{Elements of Newtonian Mechanics}. Advanced Texts in Physics. Springer, Berlin, Heidelberg, 2000.
 
 \bibitem{BRGPS} Buenker, Robert J.
 \newblock The Global Positioning System and the Lorentz Transformation.
-In \emph{Apeiron: Studies in Infinite Nature}, 15.3, 2008.
+In~\emph{Apeiron: Studies in Infinite Nature}, 15.3, 2008.
 
 \bibitem{utkarsh} Utkarsh Bajaj.
 \newblock Visual Appearance of Extended objects in Special Relativity.
-\emph{arXiv}, eprint 2104.03908, April 2021.
+\emph{arXiv}, eprint:~2104.03908, April~2021.
 
-%---------------TEMPLATES---------------------------------------
-%\bibitem{yll} Y. Le Lous,
-%``Report on the First Eurographics Workshop on Visualization in
-%Scientific Computing'', \emph{Computer Graphics Forum\/}
-%\textbf{9}(4), pp. 371--372 (December 1990).
-%
-%\bibitem{FolDamFeiHug.etal93}
-%J. Foley, A. van Dam, S. Feiner, J. Hugues, and R. Phillips.
-%\newblock \emph{Introduction to Computer Graphics}.
-%\newblock Addison Wesley, 1993.
-%
-%\bibitem{PosFel89}
-%K.Ch. Posch and D.W. Fellner.
-%\newblock The Circle-Brush Algorithm.
-%\newblock \emph{Transactions on Graphics}, \textbf{18}(1):1--24, 1989.
-%
-%\bibitem{FolHagNie93}
-%T.A. Foley, H.~Hagen, and G.M. Nielson.
-%\newblock Visualizing and modeling unstructured data.
-%\newblock \emph{The Visual Computer}, (9):439--449, 1993.
-%
-%\bibitem{Lev90}
-%M.~Levoy.
-%\newblock Efficient ray tracing of volume data.
-%\newblock \emph{ACM Transactions on Graphics},
-%          \textbf{9}(3):245--261, July 1990.
-%
-%\bibitem{PorDuf84}
-%T.~Porter and T.~Duff.
-%\newblock Compositing digital images.
-%\newblock \emph{ACM Computer Graphics (Proc. of SIGGRAPH '84)},
-%          \textbf{18}:253--259, 1984.
-%
-%\bibitem{RonRos96}
-%R.~Ronfard and J.~Rossignac.
-%\newblock Full-range approximation of triangulated polyhedra.
-%\newblock \emph{Computer Graphics Forum (Eurographics'96 Proc.)},
-%          \textbf{15}(3):67--76, 1996.
+\bibitem{OpenRelativity} Sherin Z. W., Cheu R., Tan P.
+\newblock Visualizing relativity: The OpenRelativity project. In~\emph{American Journal of Physics}, \textbf{84}:369, doi:~10.1119/1.4938057, 2016.
+
+\bibitem{TaylorWheeler} Taylor E. F., Wheeler J. A.
+\newblock \emph{Spacetime Physics}.
+New~York, W.~H.~Freeman~and~Co., 1992.
+isbn:~0-7167-2327-1.
 
 \end{thebibliography}
 
