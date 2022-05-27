@@ -84,7 +84,7 @@ The previously described equation can handle geodetic world lines. To use this w
 
 \subsection{Visualization of events considering the propagation of light}
 \label{visConsLight}
-A more realistic approach for finding events to render uses the event horizon as the intersecting hypersurface. From greater distances older events are seen. This characteristic makes the event horizon analogous with a cone in three dimensional space. The event at the viewers position and age at the time of measurement is enough to describe this hypercone. The  `slope' of this hypercone is always the same. The quadratic equation~\ref{eq:coneIntersection} provides the tool for calculating the intersection.
+A more realistic approach for finding events to render uses the event horizon as the intersecting hypersurface. From greater distances older events are seen. This characteristic makes the event horizon analogous with a cone in three dimensional space. The event at the viewers position and age at the time of measurement is enough to describe this hypercone. The  `slope' of this hypercone is always the same, because the speed of light is constant. The quadratic equation~\ref{eq:coneIntersection} provides the tool for calculating the intersection.
 \begin{align}
 a &= v_x^2 + v_y^2 + v_z^2 - v_t^2\\
 \vec{m} &= (s_x, s_y, s_z)\cdot{}(v_x, v_y, v_z) - (v_x, v_y, v_z)\cdot{}(c_x, c_y, c_z)\\
@@ -122,31 +122,57 @@ When using the \emph{Galilean transformation}, generating world lines for the ve
 
 After obtaining the intersection event between the hyperplane or hypercone and the world line of a vertex, \emph{Galilean transformation} is applied, to obtain the coordinates of the event in the selected observers proper frame and the relative velocity between the object's and observer's proper frame.
 
-\section{Wigner rotation}
+\section{Wigner rotation and Thomas precession}
 \label{sec:wigner_rotation}
-I this section we take a closer look at the details of Wigner rotation and it's implementation in the simulator.
+Let's consider an stationary object in frame $S$. Now let's boost the object to $\vec{v}_1$ velocity. We assume that, the effect of the boost is instantaneous, and all points of the object get boosted simultaneously in the proper frame of the object. Also no interaction takes place between the points of the object. With the change of velocity the proper frame of the object also changes. Let's name the new proper frame of the object $S'$. In the frame $S'$ we boost the object once again to $\vec{v}_2$ velocity. This boost is perpendicular to the first one. The 
+In frame $S$ after the two boosts the distortion of the object is measured as if it had been boosted diagonally by $(v_x, v_y)$ and rotated by angle $\alpha$. This rotation is called Wigner rotation. The values can be calculated in the form of the following equations.
+\begin{align}
+v_x &= v_1 \label{eq:wigner_rotation_1}\\
+v_y &= \frac{v_2}{\gamma{}_1} \label{eq:wigner_rotation_2}\\
+\sin{\alpha} &= \frac{\gamma{}_1}{\gamma{}_2}\cdot\frac{v_1v_2(1-\gamma{}_1\gamma{}_2)}{\gamma{}_1^2v_1^2+v_2^2} \label{eq:wigner_rotation_3}\\
+\cos{\alpha} &= \frac{\gamma{}_1}{\gamma{}_2}\cdot\frac{\gamma{}_2v_1^2+\gamma{}_2v_2^2}{\gamma{}_1^2v_1^2+v_2^2} \label{eq:wigner_rotation_4}
+\end{align}
 
-When an extended object's state of motion changes, then the object suffers deformation. This deformation is caused by the relativity of simultaneity. We assume that, the effect of the boost is instantaneous, and all points of the object get boosted simultaneously in the proper frame of the object. With the change of velocity the proper frame of the object also changes. In this new frame of reference the events of boosts have not been simultaneous. When the direction of the boost the initial velocity of the object has parallel component, then this causes changes in the length.
+Now that we have introduced the concept of Wigner rotation, let's discuss Thomas precession. Let's say that we have a fast spinning particle. Let's move the particle along a circular path, so that only the center of mass of the particle is being accelerated. After the particle arrives back to it's starting position along the circular path, the axis will point in different direction than at the start.
+This phenomena is called Thomas precession. It can be explained by the Wigner rotation. The particles velocity is tangential to the circular path. The centripetal acceleration boosting the particle is perpendicular to the velocity. As a consequence a series of infinitesimal Wigner rotations are occurring.
+Equation~\ref{eq:thomas_precession} defines the angular velocity of the described precession, where $a$ is the centripetal acceleration, $v$ is the tangential velocity of the particle and $\gamma$ is the Lorentz factor calculated as $\gamma = \frac{1}{\sqrt{1-\frac{v^2}{c^2}}}$.
+\begin{equation}
+\omega{}_T=\frac{\gamma{}^2}{\gamma + 1}\frac{av}{c^2}
+\label{eq:thomas_precession}
+\end{equation}
 
+As stated earlier, the Thomas precession is a series of Wigner rotations. This is convenient, because we only need to make sure that the boost of each individual world line assigned to the vertices of an object happen simultaneously. This is the part of the relativistic render pipeline described is subsection~\ref{sec:genRelProc}.
+
+Although previously Thomas precession was described using the spin axis of a particle, extended and not spinning objects also suffer such precession, when travelling in circles. However it's harder to precisely describe to nature of the deformations suffered by such objects. Figure~\ref{fig:thomasPrec_01} shows the effect of Thomas precession on a circulating cross shaped object. The circular path has a radius of $r=20m$ and the tangential velocity is $v=0.6$. The The object travels counterclockwise. For comparison the object at the center of the image is stationary in the frame of reference. The changes in length and the rotations add up to a complex deformation. Although it is complex, the amount of general Thomas precession is in accordance with equation~\ref{eq:thomas_precession}. Given $r$ and $v$, the time it takes the object to travel one full circle is $t_{rot}=\frac{2\pi{}r}{v}$. After substitution to equation~\ref{eq:thomas_precession} we get $\omega_T=\frac{1.25^2}{1.25+1}\cdot{}0.018\cdot{}0.6=0.0075$ and we can calculate $t_{rot} \doteq 209.44\,{}m$. Consequently $\alpha{}_T \approx \frac{\pi}{2}$. This precession can be observed in figure~\ref{fig:thomasPrec_01}. Figure~\ref{fig:thomasPrec_02} shows the same scene after two full rotations. The lines on the two images plot the path of the center (white line) and the initially left and right (blue and red) endpoints of the red beam of the cross.
+\begin{figure}[htb]
+  	\centering
+	\includegraphics[width=.95\linewidth]{figures/v06_r20_1rot_path.jpg}
+	\caption{Thomas Precession after one full rotation}
+	\label{fig:thomasPrec_01}
+\end{figure}
+\begin{figure}[htb]
+  	\centering
+	\includegraphics[width=.95\linewidth]{figures/v06_r20_2rot_path.jpg}
+	\caption{Thomas Precession after two full rotations}
+	\label{fig:thomasPrec_02}
+\end{figure}
 
 \section{Results}
 \label{sec:results}
 This section showcases the images rendered by this application. These images focus on a selection of popular relativistic phenomena.
 
 When an object passes by in front of the viewer, the object appears to be rotated. The rotation axis is perpendicular to the movement direction and the viewer's direction from the object. This is shown in Figure~\ref{fig:RotatingDice}. Top dice is moving to left in parallel with the viewing plane. The effect is the consequence of light beams travelling different distances from different points of the object.
-
-\begin{figure}[h]
+\begin{figure}[htb]
 \center
 \resizebox{70mm}{!}{
 \includegraphics{figures/rotatingDice.eps}
 }
-\caption{Rotating dice}
+\caption{Rotated view of fast moving dice}
 \label{fig:RotatingDice}
 \end{figure}
 
-If we ignore the path travelled by photons towards the eye, then simultaneous events can be seen. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
-
-\begin{figure}[h]
+We can ignore the path travelled by photons towards the eye and render simultaneous events. This way the length contraction is observable as shown in Figure~\ref{fig:lengthContraction}.
+\begin{figure}[htb]
 \center
 \resizebox{70mm}{!}{
 \includegraphics{figures/lengthContraction.eps}
@@ -156,8 +182,7 @@ If we ignore the path travelled by photons towards the eye, then simultaneous ev
 \end{figure}
 
 The twin paradox as described by Albert Einstein can be demonstrated in \emph{diagram view}. This is seen in Figure~\ref{fig:twinParadox}.
-
-\begin{figure}[h]
+\begin{figure}[htb]
 \center
 \resizebox{70mm}{!}{
 \includegraphics{figures/twinParadox.eps}
@@ -166,10 +191,8 @@ The twin paradox as described by Albert Einstein can be demonstrated in \emph{di
 \label{fig:twinParadox}
 \end{figure}
 
-Take a look at the world lines of objects following circular trajectory. 
-In Figure~\ref{fig:circularWL}, the lines appear, to be wound up around the time axis.
-
-\begin{figure}[h]
+In Figure~\ref{fig:circularWL} we take a look at the world lines of objects following circular trajectory. The lines appear, to be wound up around the time axis.
+\begin{figure}[htb]
 \center
 \resizebox{70mm}{!}{
 \includegraphics{figures/circularWL.eps}
@@ -178,21 +201,23 @@ In Figure~\ref{fig:circularWL}, the lines appear, to be wound up around the time
 \label{fig:circularWL}
 \end{figure}
 
-When we switch to \emph{real time} mode, then we can observe the Thomas precession of the circulating object. This can be seen in Figure~\ref{fig:thomasPrec}. The object on the left is standing in the observer's frame. The right object is moving along a circular path. The path has radius of $r=20m$, and the tangential velocity of the object is $v=0,8$
-The time of the full rotation according the observer was $T=167m$.
+Relativistic Doppler effect shifts the spectrum of incoming light depending on the relative velocity of the light source compared to the viewer. Figure~\ref{fig:doppler_effect_1} and \ref{fig:doppler_effect_2} show a row of globes first without any Doppler shift and than with realistic amount of shift.
 \begin{figure}[htb]
-  	\centering
-	\includegraphics[width=.95\linewidth]{figures/ThomasPrecession.eps}
-	% replacing the above command with the one below will explicitly set
-	% the bounding box of the PS figure to the rectangle (xl,yl),(xh,yh).
-  	% It will also prevent LaTeX from reading the PS file to determine
-  	% the bounding box (i.e., it will speed up the compilation process)
-  	% \includegraphics[width=.95\linewidth, bb=xl yl xh yh]{sampleFig.eps}
-	\caption{Thomas Precession after one full rotation}
-	\label{fig:thomasPrec}
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/DopplerOff.PNG}
+}
+\caption{Globes without Doppler effect}
+\label{fig:doppler_effect_1}
 \end{figure}
-
-\FloatBarrier
+\begin{figure}[htb]
+\center
+\resizebox{70mm}{!}{
+\includegraphics{figures/DopplerFull.PNG}
+}
+\caption{Globes with Doppler effect}
+\label{fig:doppler_effect_2}
+\end{figure}
 
 \subsection{Performance}
 \label{sec:performance}

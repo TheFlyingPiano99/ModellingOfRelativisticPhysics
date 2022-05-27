@@ -447,7 +447,6 @@
 		wPos = vec4(vertexLocationProperFrame, 1);
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = invM * vec4(vn, 0);
-		gl_Position = vec4(vertexLocationProperFrame, 1) * MVP;			// Now the MVP doesn't contain translation by -eye! Because eye is in (0,0,0)
 	}
 
 	void diagram() {
@@ -500,7 +499,6 @@
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = invM * vec4(vn, 0);
 		dopplerShift = 1.0f;			
-		gl_Position = wPos * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void directRender() {					// Classic render mode, without any relativistic transformation. Only MVP is applied.
@@ -508,10 +506,10 @@
 		texCoord = vec2(uv.x, 1 - uv.y);
 		norm = invM * vec4(vn, 0);
 		dopplerShift = 1.0f;			
-		gl_Position = vec4(vp.xyz, 1) * MVP;		// Now the MVP should contain the translation to -eye!
 	}
 
 	void main() {
+		originalVp = vp;
 		if (viewMode == 0 && !directRenderMode && !drawPath) {	// RealTime3D
 			if (worldLineType == 0) {
 				realTime();
@@ -523,5 +521,5 @@
 		else if (directRenderMode) {
 			directRender();
 		}
-		originalVp = vp;
+		gl_Position = wPos * MVP;
 	}

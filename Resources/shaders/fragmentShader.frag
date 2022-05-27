@@ -138,7 +138,7 @@
 		vec3 lightDir = normalize(lightPos0 - wPos.xyz);
 		float dist = length(lightPos0 - wPos.xyz);
 		vec3 radiance = lightL0 / dist / dist;
-		vec3 n = abs(normalize(norm).xyz);
+		vec3 n = normalize(norm.xyz);
 		float cosTheta = dot(n, lightDir);
 		vec3 halfway;
 		float cosDelta;
@@ -211,7 +211,7 @@
 
 	void realTime3D() {
 		if (outline) {
-			if (dot(normalize(-wPos).xyz, normalize(norm).xyz) < 0.3) {		// Eye position is in (0,0,0), when using intersections
+			if (dot(normalize(-wPos).xyz, normalize(norm.xyz)) < 0.3) {		// Eye position is in (0,0,0), when using intersections
 				outColor = vec4(0,1,0,1);							// green outline
 				return;
 			}
