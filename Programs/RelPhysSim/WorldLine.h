@@ -164,9 +164,9 @@ public:
 	/*
 	* _velocity ... velocity of object in [m/m] according to the absolute observer.
 	*/
-	GeodeticLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name = "", std::string _desc = "");
+	GeodeticLine(const vec3& _posAtZeroT, const vec3& _velocity, const std::string& _name = "", const std::string& _desc = "");
 
-	GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name = "", std::string _desc = "");
+	GeodeticLine(const vec4& _posAtZeroT, const vec4& _velocity, const std::string& _name = "", const std::string& _desc = "");
 
 	//WorldLine* getWorldLineWithOffset(vec3 offset);
 	std::string genSaveString();

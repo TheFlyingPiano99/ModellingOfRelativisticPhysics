@@ -30,17 +30,17 @@ class Scene {
 	float timeScale = 0.005f; // Time scale of the simulation. (1 reallife millisec = to "timeScale" * 1[m])
 	float cameraVelocity = 1;
 	View* view;
-	Camera* realTime3DCamera = NULL;
-	Camera* diagramCamera = NULL;
-	Camera* activeCamera = NULL;
-	CoordinateSystem* system = NULL;
-	HUD* hud = NULL;
-	Editor* editor = NULL;
+	Camera* realTime3DCamera = nullptr;
+	Camera* diagramCamera = nullptr;
+	Camera* activeCamera = nullptr;
+	CoordinateSystem* system = nullptr;
+	HUD* hud = nullptr;
+	Editor* editor = nullptr;
 
-	Observer* activeObserver = NULL;
-	Entity* selected = NULL;
-	Entity* grabbed = NULL;
-	Entity* hovered = NULL;
+	Observer* activeObserver = nullptr;
+	Entity* selected = nullptr;
+	Entity* grabbed = nullptr;
+	Entity* hovered = nullptr;
 	std::vector<Observer*> observers;
 	std::vector<Object*> objects;
 	std::vector<LightSource*> lights;
@@ -63,7 +63,7 @@ class Scene {
 	RelTypes::Settings settings;		// All important settings mainly related to rendering.
 
 
-	Scene() {}
+	Scene() = default;
 
 public:
 

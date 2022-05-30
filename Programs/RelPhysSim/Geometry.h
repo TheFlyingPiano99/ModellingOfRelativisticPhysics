@@ -5,7 +5,7 @@
 struct vec2 {
 	float x, y;
 
-	vec2(float x0 = 0, float y0 = 0) { x = x0; y = y0; }
+	vec2(float x0 = 0, float y0 = 0) : x(x0), y(y0) {}
 	vec2 operator*(float a) const { return vec2(x * a, y * a); }
 	vec2 operator/(float a) const { return vec2(x / a, y / a); }
 	vec2 operator+(const vec2& v) const { return vec2(x + v.x, y + v.y); }
@@ -25,10 +25,12 @@ inline vec2 normalize(const vec2& v) { return v * (1 / length(v)); }
 inline vec2 operator*(float a, const vec2& v) { return vec2(v.x * a, v.y * a); }
 
 struct vec3 {
-	float x, y, z;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
-	vec3(float x0 = 0, float y0 = 0, float z0 = 0) { x = x0; y = y0; z = z0; }
-	vec3(vec2 v) { x = v.x; y = v.y; z = 0; }
+	vec3(float x0 = 0.0f, float y0 = 0.0f, float z0 = 0.0f) : x(x0), y(y0), z(z0) {}
+	explicit vec3(vec2 v) : x(v.x), y(v.y) {}
 
 	float& operator[](int j) { return *(&x + j); }
 	float operator[](int j) const { return *(&x + j); }
@@ -59,9 +61,12 @@ inline vec3 operator*(float a, const vec3& v) { return vec3(v.x * a, v.y * a, v.
 */
 struct vec4 {
 	//--------------------------
-	float x, y, z, w;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float w = 0.0f;
 
-	vec4(float x0 = 0, float y0 = 0, float z0 = 0, float w0 = 0) { x = x0; y = y0; z = z0; w = w0; }
+	vec4(float x0 = 0.0f, float y0 = 0.0f, float z0 = 0.0f, float w0 = 0.0f) : x(x0), y(y0), z(z0), w(w0) {}
 	float& operator[](int j) { return *(&x + j); }
 	float operator[](int j) const { return *(&x + j); }
 
@@ -70,8 +75,8 @@ struct vec4 {
 	vec4 operator+(const vec4& v) const { return vec4(x + v.x, y + v.y, z + v.z, w + v.w); }
 	vec4 operator-(const vec4& v)  const { return vec4(x - v.x, y - v.y, z - v.z, w - v.w); }
 	vec4 operator*(const vec4& v) const { return vec4(x * v.x, y * v.y, z * v.z, w * v.w); }
-	void operator+=(const vec4 right) { x += right.x; y += right.y; z += right.z, w += right.z; }
-	vec3 xyz() { return vec3(x, y, z); }
+	void operator+=(const vec4& right) { x += right.x; y += right.y; z += right.z, w += right.z; }
+	vec3 xyz() const { return vec3(x, y, z); }
 };
 
 inline float dot(const vec4& v1, const vec4& v2) {
@@ -199,7 +204,7 @@ inline vec2 solveQuadraticFunction(float a, float b, float c, int& noOfRealSolut
 	return results;
 }
 
-inline float LorentzianProduct(vec4 v1, vec4 v2) {
+inline float LorentzianProduct(const vec4& v1, const vec4& v2) {
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z - v1.w * v2.w;
 }
 

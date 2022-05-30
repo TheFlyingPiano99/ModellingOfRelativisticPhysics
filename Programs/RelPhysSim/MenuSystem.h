@@ -3,11 +3,7 @@
 #include "GL\glut.h"
 
 static void processMenuEvents(int options) {
-	switch (options)
-	{
-	default:
-		break;
-	}
+	//TODO
 }
 
 class MenuSystem {

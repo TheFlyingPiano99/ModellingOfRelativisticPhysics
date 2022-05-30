@@ -14,35 +14,32 @@ const char* WorldLine::typeNames[NUMBER_OF_WORLD_LINE_TYPES] = {
     "SpiralLine"
 };
 
-float GeodeticIntersectLightCone(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 coneLocation)
+float GeodeticIntersectLightCone(const vec4& offsetedStartPos, const vec4& tangentVelocity, const vec4& coneLocation)
 {
-    float a, b, c, t;
-    a = LorentzianProduct(tangentVelocity, tangentVelocity);
+    float a = LorentzianProduct(tangentVelocity, tangentVelocity);
     vec3 temp = (offsetedStartPos.xyz() * tangentVelocity.xyz() - tangentVelocity.xyz() * coneLocation.xyz());
-    b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * tangentVelocity.w - tangentVelocity.w * coneLocation.w));
-    c = dot(coneLocation.xyz() - offsetedStartPos.xyz(), coneLocation.xyz() - offsetedStartPos.xyz())
-        - pow(coneLocation.w - offsetedStartPos.w, 2);
-
+    float b = 2 * ((temp.x + temp.y + temp.z) - (offsetedStartPos.w * tangentVelocity.w - tangentVelocity.w * coneLocation.w));
+    float c = dot(coneLocation.xyz() - offsetedStartPos.xyz(), coneLocation.xyz() - offsetedStartPos.xyz())
+        - powf(coneLocation.w - offsetedStartPos.w, 2);
     int noOfSolutions;
     vec2 solutions = solveQuadraticFunction(a, b, c, noOfSolutions);
-
-    t = solutions.x;	// Should be tested, whether its from the past!
+    float t = solutions.x;	// Should be tested, whether its from the past!
     return t * tangentVelocity.w;
 }
 
-float GeodeticIntersectHyperplane(vec4 offsetedStartPos, vec4 tangentVelocity, vec4 planeLocation, vec4 planeNormal) {
+float GeodeticIntersectHyperplane(const vec4& offsetedStartPos, const vec4& tangentVelocity, const vec4& planeLocation, const vec4& planeNormal) {
     return dot(planeLocation - offsetedStartPos, planeNormal)
         / dot(tangentVelocity, planeNormal) * tangentVelocity.w;
 }
 
-vec4 GeodeticLocationAtAbsoluteTime(vec4 offsetedStartPos, vec4 tangentVelocity, float t) {
+vec4 GeodeticLocationAtAbsoluteTime(const vec4& offsetedStartPos, const vec4& tangentVelocity, float t) {
     return offsetedStartPos + tangentVelocity / tangentVelocity.w * t;
 }
 
 void GeodeticLine::genGeometry() {
     vds4D.resize(GlobalVariables::shaderWorldLineResolution);     // Size given in shader.
     for (int i = 0; i < noOfVds4D; i++) {
-        vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * (i - noOfVds4D / 2.0f) * 50;
+        vec4 pos = locationAtZeroT + fourVelocity / fourVelocity.w * ((float)i - (float)noOfVds4D / 2.0f) * 50;
         vds4D[i] = pos;
     }
 }
@@ -51,18 +48,16 @@ void GeodeticLine::genGeometry() {
 * _velocity ... velocity of object in [m/m] according to the absolute observer.
 */
 
-GeodeticLine::GeodeticLine(vec3 _posAtZeroT, vec3 _velocity, std::string _name, std::string _desc)
-    : WorldLine(_name, _desc) {
+GeodeticLine::GeodeticLine(const vec3& _posAtZeroT, const vec3& _velocity, const std::string& _name, const std::string& _desc)
+    : WorldLine(_name, _desc), locationAtZeroT(vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f)) {
     type = WorldLineType::geodetic;
-    locationAtZeroT = vec4(_posAtZeroT.x, _posAtZeroT.y, _posAtZeroT.z, 0.0f);
     fourVelocity = RelPhysics::ToFourVelocity(_velocity);
     noOfVds4D = 100;
-
     genGeometry();
 }
 
-GeodeticLine::GeodeticLine(vec4 _posAtZeroT, vec4 _velocity, std::string _name, std::string _desc)
-    : locationAtZeroT(_posAtZeroT), fourVelocity(_velocity), WorldLine(_name, _desc) {
+GeodeticLine::GeodeticLine(const vec4& _posAtZeroT, const vec4& _velocity, const std::string& _name, const std::string& _desc)
+    : WorldLine(_name, _desc), locationAtZeroT(_posAtZeroT), fourVelocity(_velocity) {
     type = WorldLineType::geodetic;
     noOfVds4D = 100;
     genGeometry();
@@ -156,7 +151,7 @@ vec4 WorldLine::createStartingEventOfObjectPointWorldLine(const vec3& point, con
     vec3 pPerpend = point - pParalel;
     vec3 temp = pPerpend + pParalel / gamma;
     vec4 startLorentz = vec4(temp.x, temp.y, temp.z, 0.0f)
-        + objectWorldLine.getVds()[0];	// Length Contraction(vp) + object worldLine start pos;
+        + objectWorldLine.getVds()[0];
     prevEventLorentz = startLorentz;
     //Galilean:
     vec4 startGalilean = vec4(point.x, point.y, point.z, 0.0f) + objectWorldLine.getVds()[0];
@@ -188,8 +183,7 @@ vec4 WorldLine::createNextEventOfObjectPointWorldLine(unsigned int section, cons
     return interpolate(settings.doLorentz, true ,false, nextLorentz, nextGalilean);
 }
 
-WorldLine::~WorldLine() {
-}
+WorldLine::~WorldLine() = default;
 
 /*
 * The time measured by the absolute observer at the hyperplane,
@@ -499,7 +493,7 @@ float WorldLine::distanceBetweenRayAndDiagram(
         }
         vec4 tangentVelocity = tangentFourVelocity(pos1, pos2);
         vec4 offsettedStartPos = pos1 - tangentVelocity / tangentVelocity.w * pos1.w;
-        vec3 diagramStartPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
+        auto diagramStartPos = vec3(offsettedStartPos[settings.diagramX], offsettedStartPos[settings.diagramY], offsettedStartPos[settings.diagramZ]);
         vec3 diagramDir = normalize(vec3(tangentVelocity[settings.diagramX], tangentVelocity[settings.diagramY], tangentVelocity[settings.diagramZ]));
         float temp = abs(dot(ray.pos - diagramStartPos, cross(diagramDir, ray.dir)));
         vec3 cn = normalize(cross(diagramDir, ray.dir));

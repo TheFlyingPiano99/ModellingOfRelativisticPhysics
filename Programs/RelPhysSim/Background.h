@@ -14,7 +14,7 @@ public:
 	Background() {
 		geometry = new SphereSurface(120);
 		geometry->GenSurface(100, 100);
-		vec3 color = vec3(0.1,0.1, 0.1);
+		auto color = vec3(0.1f,0.1f, 0.1f);
 		material = new Material(color, color, color, 50);
 		material->setGlow(true);
 		texture = new Texture(Assets::getTexturePath().append("stars_milky_way.bmp"));

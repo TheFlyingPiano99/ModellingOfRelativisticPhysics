@@ -40,8 +40,8 @@ Hyperplane* Observer::getHyperplane(const RelTypes::Settings& settings)
 	vec4 location = getLocation(settings);
 
 	vec4 tangent = normalize(worldLine->getVelocityAtProperTime(currentProperTime));
-	vec4 lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);	// Simultaneity is relative.
-	vec4 galileanNormal = vec4(0, 0, 0, 1);										// Simultaneity is absolute.
+	auto lorentzNormal = vec4(-tangent.x, -tangent.y, -tangent.z, tangent.w);	// Simultaneity is relative.
+	auto galileanNormal = vec4(0, 0, 0, 1);										// Simultaneity is absolute.
 	vec4 normal = interpolate<bool, vec4>(settings.doLorentz, true, false, lorentzNormal, galileanNormal);
 	return new Hyperplane(location, normal);
 }
@@ -296,7 +296,7 @@ Observer* Observer::loadFromFile(std::ifstream& file)
 			continue;
 		}
 		else if (words.at(0).compare("!Observer") == 0) {	// End of declaration
-			Observer* retVal = new Observer(NULL, _name, _description);
+			auto* retVal = new Observer(NULL, _name, _description);
 			retVal->setID(_ID);
 			retVal->worldLineID = _worldLine;
 			return retVal;

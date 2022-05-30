@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Geometry.h"
 #include "Assets.h"
+#include <functional>
 
 class CaptionAnimation {
 
@@ -14,19 +15,21 @@ class CaptionAnimation {
 
 class Caption {
 	std::shared_ptr<Caption*> sharedThis;
-	unsigned int vao, vbo, noOfVds;
+	unsigned int vao;
+	unsigned int vbo;
+	unsigned int noOfVds;
 	vec3 pos;
 	Font* fontTexture;
 	float fontSize;
 	vec3 color;
 	std::string text;
-	CaptionAnimation* animation = NULL;
+	CaptionAnimation* animation = nullptr;
 	bool faceCamera = true;
 	bool visible = true;
 	bool cameraSpace = false;		// Whether the position should be interpereted in camera space.
 	
-	static void (*pushCaption)(std::shared_ptr<Caption*>);
-	static void (*ereaseCaption)(std::shared_ptr<Caption*>);
+	static std::function<void (std::shared_ptr<Caption*>)> pushCaption;
+	static std::function<void (std::shared_ptr<Caption*>)> ereaseCaption;
 
 	Caption(vec3 _pos, Font* _font, float _fontSize, vec3 _color, const char* _text)
 		: pos(_pos), fontTexture(_font), fontSize(_fontSize), color(_color), text(_text)
@@ -45,7 +48,7 @@ class Caption {
 		sharedThis = std::make_shared<Caption*>(this);
 		pushCaption(sharedThis);
 	}
-	Caption() {};
+	Caption() = default;
 
 	mat4 getModellMatrix(vec2 cPos, vec3 preferedUp, float asp) const;
 
@@ -53,11 +56,11 @@ class Caption {
 
 public:
 
-	static void setPushCaptionFunction(void (*func)(std::shared_ptr<Caption*>)) {
+	static void setPushCaptionFunction(std::function<void (std::shared_ptr<Caption*>)> const& func) {
 		pushCaption = func;
 	}
 
-	static void setEreaseCaptionFunction(void (*func)(std::shared_ptr<Caption*>)) {
+	static void setEreaseCaptionFunction(std::function<void (std::shared_ptr<Caption*>)> const& func) {
 		ereaseCaption = func;
 	}
 
@@ -66,7 +69,7 @@ public:
 		ereaseCaption(sharedThis);
 	}
 
-	std::shared_ptr<Caption*> getSharedPtr() {
+	std::shared_ptr<Caption*> getSharedPtr() const {
 		return sharedThis;
 	}
 
@@ -79,18 +82,17 @@ public:
 	* Creates a new Caption object. Registers the objects to the scene and returns a pointer to the object.
 	*/
 	static std::shared_ptr<Caption*> createNormalCaption(vec3 pos, const char* text, vec3 _color = vec3(1, 1, 1)) {
-		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.03f, _color, text);
+		auto const* caption = new Caption(pos, Assets::getDefaultFont(), 0.03f, _color, text);
 		return caption->getSharedPtr();
 	}
 
 	static std::shared_ptr<Caption*> createSmallCaption(vec3 pos, const char* text, vec3 _color = vec3(1, 1, 1)) {
-		Caption* caption = new Caption(pos, Assets::getDefaultFont(), 0.015f, _color, text);
+		Caption const* caption = new Caption(pos, Assets::getDefaultFont(), 0.015f, _color, text);
 		return caption->getSharedPtr();
 	}
 
 	static std::shared_ptr<Caption*> createNormalCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
-
-		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, _color, text);
+		auto* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.03f, _color, text);
 		caption->setCameraSpace(true);
 
 		return caption->getSharedPtr();
@@ -98,7 +100,7 @@ public:
 
 	static std::shared_ptr<Caption*> createSmallCameraSpaceCaption(vec2 sPos, const char* text, vec3 _color = vec3(1, 1, 1)) {
 
-		Caption* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.023f, _color, text);
+		auto* caption = new Caption(vec3(sPos.x, sPos.y, 0), Assets::getDefaultFont(), 0.023f, _color, text);
 		caption->setCameraSpace(true);
 		return caption->getSharedPtr();
 	}
@@ -109,7 +111,7 @@ public:
 
 	void changeText(const char* str);
 
-	const vec3 getPos() const {
+	vec3 getPos() const {
 		return pos;
 	}
 
@@ -121,7 +123,7 @@ public:
 		fontSize = size;
 	}
 
-	const float getFontSize() const {
+	float getFontSize() const {
 		return fontSize;
 	}
 
@@ -133,7 +135,7 @@ public:
 		color = _color;
 	}
 
-	const vec3 getColor() const {
+	vec3 getColor() const {
 		return color;
 	}
 

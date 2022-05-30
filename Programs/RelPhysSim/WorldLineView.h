@@ -60,16 +60,16 @@ private:
 class CompositeLineView : public WorldLineView {
 
 public:
-	CompositeLineView(const CompositeLine* line) : WorldLineView(line) {
+	explicit CompositeLineView(const CompositeLine* line) : WorldLineView(line) {
 		update();
 		updateGeometry();
 	}
 
-	~CompositeLineView() {
-		for (int i = 0; i < controlPoints.size(); i++) {
+	~CompositeLineView() final {
+		for (unsigned int i = 0; i < controlPoints.size(); i++) {
 			(**pointCaptions[i]).erease();
 		}
-		for (int i = 0; i < controlPoints.size() - 1; i++) {
+		for (unsigned int i = 0; i < controlPoints.size() - 1; i++) {
 			(**velocityCaptions[i]).erease();
 		}
 	}

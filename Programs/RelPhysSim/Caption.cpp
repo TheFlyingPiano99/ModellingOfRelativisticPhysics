@@ -1,11 +1,11 @@
 #include "Caption.h"
 
 
-void (*Caption::pushCaption)(std::shared_ptr<Caption*>) = NULL;
-void (*Caption::ereaseCaption)(std::shared_ptr<Caption*>) = NULL;
+std::function<void (std::shared_ptr<Caption*>)> Caption::pushCaption;
+std::function<void (std::shared_ptr<Caption*>)> Caption::ereaseCaption;
 
 mat4 Caption::getModellMatrix(vec2 cPos, vec3 preferedUp, float asp) const {
-	vec3 norm = vec3(0, 0, 1);
+	auto norm = vec3(0, 0, 1);
 	vec3 right = normalize(cross(preferedUp, norm));
 	vec3 up = normalize(cross(norm, right));
 
