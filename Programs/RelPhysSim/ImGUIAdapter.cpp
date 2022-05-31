@@ -1,22 +1,21 @@
 #include "ImGUIAdapter.h"
 
-#include "GlobalVariables.h"
 #include "imgui/imgui.h"
-#include "imgui/imgui_impl_glut.h"
+#include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "GlobalInclude.h"
 
 const char* ImGUIAdapter::Variables::intersectionModeNames[2] = { "Hypercone", "Hyperplane" };
 const char* ImGUIAdapter::Variables::dopplerModeNames[3] = { "Full", "Mild", "Off"};
 const char* ImGUIAdapter::Variables::transformationModeNames[2] = { "Galilean", "Lorentz" };
 
-void ImGUIAdapter::initGUI() {
+void ImGUIAdapter::initGUI(GLFWwindow* window) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	io = ImGui::GetIO();
 	ImGui::StyleColorsDark();
-	ImGui_ImplGLUT_Init();
-
-	ImGui_ImplOpenGL3_Init("#version 330");
-
+	ImGui_ImplGlfw_InitForOpenGL(window, false);
+	ImGui_ImplOpenGL3_Init("#version 420");
 }
 
 void ImGUIAdapter::initBindings(Scene* scene)
@@ -42,7 +41,7 @@ void ImGUIAdapter::checkChanges()
 
 void ImGUIAdapter::destroyGUI() {
 	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGLUT_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
 
@@ -200,17 +199,9 @@ void ImGUIAdapter::preDrawInit()
 	if (!visible) {
 		return;
 	}
-	int w, h;
-	w = glutGet(GLUT_WINDOW_WIDTH);
-	h = glutGet(GLUT_WINDOW_HEIGHT);
-	ImGuiIO* io = &ImGui::GetIO();
-	if (io == nullptr) {
-		return;
-	}
-	io->DisplaySize = ImVec2((float)w, (float)h);
-	//io.DisplayFramebufferScale = ImVec2();
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGLUT_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 }
 
 float tempX = 0.0f;

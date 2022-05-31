@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "imgui/imgui_impl_glut.h"
 #include "Scene.h"
 #include "ImGUIObserver.h"
+#include "imgui/imgui_impl_glfw.h"
 
 /*
 * Singleton object
@@ -12,6 +12,7 @@
 class ImGUIAdapter
 {
 	bool visible = false;
+	ImGuiIO io;
 
 	struct Variables {
 		bool paused;
@@ -42,7 +43,7 @@ public:
 	/*
 	* Should be called after application start.
 	*/
-	void initGUI();
+	void initGUI(GLFWwindow* window);
 
 	/*
 	* Buid bindings between guid variables and the Scene.

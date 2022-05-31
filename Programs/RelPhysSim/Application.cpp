@@ -1,203 +1,125 @@
 
-//=============================================================================================
-// Collection of classes from lecture slides.
-// Framework for assignments. Valid from 2019.
-// Do not change it if you want to submit a homework.
-//=============================================================================================
 
-#include "Application.h"
-#include "Assets.h"
-#include "GlutCallbacks.h"
-#include "GlobalVariables.h"
-#include "ControlEventManager.h"
+#include "Callbacks.h"
+#include "Scene.h"
+#include "GlobalInclude.h"
 
-// Initialization
-void onInitialization();
+#define PROJECT_NAME "Voxel renderer"
 
-// Window has become invalid: Redraw
-void onDisplay();
-
-// Key of ASCII code pressed
-void onKeyboard(unsigned char key, int pX, int pY);
-
-// Key of ASCII code released
-void onKeyboardUp(unsigned char key, int pX, int pY);
-
-// Move mouse with key pressed
-void onMouseMotion(int pX, int pY);
-
-// Mouse click event
-void onMouse(int button, int state, int pX, int pY);
-
-// Idle event indicating that some time elapsed: do animation here
-void onIdle();
-
-void cleanUp() {
-	delete scene;
-	Assets::cleanUp();
-	ControlEventManager::destroyInstance();
+void setFullScreenMode(GLFWwindow*& window, bool isFullScreenMode) {
+	if (isFullScreenMode) {
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 60);
+	}
+	else {
+		glfwSetWindowMonitor(window, nullptr, 50, 50, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 60);
+	}
+	glfwGetWindowSize(window, &GlobalVariables::windowWidth, &GlobalVariables::windowHeight);
 }
 
-// Entry point of the application
-int main(int argc, char * argv[]) {
 
-	// Initialize GLUT, Glew and OpenGL 
-	glutInit(&argc, argv);
+int initWindow(GLFWwindow*& window) {
+	// Initialize GLFW
+	glfwInit();
 
-	// OpenGL major and minor versions
-	int majorVersion = 3, minorVersion = 3;
-#if !defined(__APPLE__)
-	glutInitContextVersion(majorVersion, minorVersion);
-#endif
-	glutInitWindowSize(
-		GlobalVariables::windowWidth, 
-		GlobalVariables::windowHeight);				// Application window is initially of resolution 600x600
-	glutInitWindowPosition(100, 100);							// Relative location of the application window
-#if defined(__APPLE__)
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);  // 8 bit R,G,B,A + double buffer + depth buffer
-#else
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-#endif
-	glutCreateWindow(argv[0]);
-	if (GlobalVariables::fullScreenMode) {	// Full screen
-		glutFullScreen();
-		HWND hDesktop = GetDesktopWindow();
-		RECT rect;
-		GetWindowRect(hDesktop, &rect);
-		GlobalVariables::windowWidth = rect.right;
-		GlobalVariables::windowHeight = rect.bottom;
+	// Tell GLFW what version of OpenGL we are using 
+	// In this case we are using OpenGL 4.2
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	// Tell GLFW we are using the CORE profile
+	// So that means we only have the modern functions
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, PROJECT_NAME, NULL, NULL);
+	// Error check if the window fails to create
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window!" << std::endl;
+		glfwTerminate();
+		return -1;
 	}
+	GlobalVariables::window = window;
+	// Introduce the window into the current context
+	glfwMakeContextCurrent(window);
 
-#if !defined(__APPLE__)
-	glewExperimental = true;	// magic
-	glewInit();
-#endif
-	printf("GL Vendor    : %s\n", glGetString(GL_VENDOR));
-	printf("GL Renderer  : %s\n", glGetString(GL_RENDERER));
-	printf("GL Version (string)  : %s\n", glGetString(GL_VERSION));
-	glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-	glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
-	printf("GL Version (integer) : %d.%d\n", majorVersion, minorVersion);
-	printf("GLSL Version : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	setFullScreenMode(window, GlobalVariables::fullScreenMode);
 
-	// Initialize this program and getInstance shaders
-	onInitialization();
-	glutDisplayFunc(onDisplay);                // Register event handlers
-	glutMouseFunc(onMouse);
-	glutIdleFunc(onIdle);
-	glutKeyboardFunc(onKeyboard);
-	glutKeyboardUpFunc(onKeyboardUp);
-	glutMotionFunc(onMouseMotion);
-	glutPassiveMotionFunc(onMouseMotion);
-	HWND hWnd = GetConsoleWindow();
-	ShowWindow(hWnd, SW_HIDE);
-
-	glutSetWindowTitle(WINDOW_TITLE);
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-
-	glutMainLoop();
-
-	cleanUp();
+	Callbacks::setCallbacks(window);
 	return 0;
 }
 
-void GPUProgram::getErrorInfo(unsigned int handle) { // shader error report
-	int logLen, written;
-	glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLen);
-	if (logLen > 0) {
-		std::string log(logLen, '\0');
-		glGetShaderInfoLog(handle, logLen, &written, &log[0]);
-		printf("Shader log:\n%s", log.c_str());
-		if (waitError) getchar();
-	}
-}
-
-bool GPUProgram::checkShader(unsigned int shader, std::string message) { // check if shader could be compiled
-	int OK;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &OK);
-	if (!OK) {
-		printf("%s!\n", message.c_str());
-		getErrorInfo(shader);
-		return false;
-	}
-	return true;
-}
-
-bool GPUProgram::checkLinking(unsigned int program) { 	// check if shader could be linked
-	int OK;
-	glGetProgramiv(program, GL_LINK_STATUS, &OK);
-	if (!OK) {
-		printf("Failed to link shader program!\n");
-		getErrorInfo(program);
-		return false;
-	}
-	return true;
-}
-
-// Get the address of a GPU uniform variable
-
-int GPUProgram::getLocation(const std::string& name) {
-	int location = glGetUniformLocation(shaderProgramId, name.c_str());
-	if (location < 0) printf("uniform %s cannot be set\n", name.c_str());
-	return location;
-}
-
-GPUProgram::GPUProgram(const GPUProgram& program) {
-	if (program.shaderProgramId > 0) printf("\nError: GPU program is not copied on GPU!!!\n");
-}
-
-bool GPUProgram::create(const char* const vertexShaderSource, const char* const fragmentShaderSource, const char* const fragmentShaderOutputName, const char* const geometryShaderSource)
+int main()
 {
-	// Create vertex shader from string
-	if (vertexShader == 0) vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	if (!vertexShader) {
-		printf("Error in vertex shader creation\n");
-		exit(1);
+	GLFWwindow* window;
+	if (-1 == initWindow(window)) {
+		return -1;
 	}
-	glShaderSource(vertexShader, 1, (const GLchar**)&vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	if (!checkShader(vertexShader, "Vertex shader error")) return false;
 
-	// Create geometry shader from string if given
-	if (geometryShaderSource != nullptr) {
-		if (geometryShader == 0) geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-		if (!geometryShader) {
-			printf("Error in geometry shader creation\n");
-			exit(1);
+	//Load GLAD so it configures OpenGL
+	gladLoadGL();
+
+	Callbacks::onWindowInit(window);
+
+	// Variables to create periodic event for FPS displaying
+	double prevTime = 0.0;
+	double crntTime = 0.0;
+	double timeDiff;
+	double prevIterTime = 0.0f;
+	// Keeps track of the amount of frames in timeDiff
+	unsigned int frameCounter = 0;
+
+	const double dtLimit = 10.0;
+
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+	// Main while loop
+	while (!glfwWindowShouldClose(window))
+	{
+		// Updates counter and times
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		frameCounter++;
+
+		if (frameCounter >= 50)
+		{
+			// Creates new title
+			std::string FPS = std::to_string((1.0 / timeDiff) * frameCounter);
+			std::string ms = std::to_string((timeDiff / frameCounter) * 1000.0);
+			std::string newTitle = std::string(PROJECT_NAME) + " (" + FPS + " FPS / " + ms + " ms)";
+			glfwSetWindowTitle(window, newTitle.c_str());
+
+			// Resets times and counter
+			prevTime = crntTime;
+			frameCounter = 0;
 		}
-		glShaderSource(geometryShader, 1, (const GLchar**)&geometryShaderSource, NULL);
-		glCompileShader(geometryShader);
-		if (!checkShader(geometryShader, "Mesh shader error")) return false;
+
+		double dt = 0.0;
+		double realDelta = (crntTime - prevIterTime) * 1000;
+		//Scene::getInstance()->getCamera()->Inputs(window);		<<-- temp solution only!!!
+		while (realDelta > 0.0) {
+			if (realDelta > dtLimit) {
+				dt = dtLimit;
+				realDelta -= dtLimit;
+			}
+			else {
+				dt = realDelta;
+				realDelta = 0.0;
+			}
+			Scene::getInstance()->control(dt);
+			Scene::getInstance()->animate(dt);
+		}
+		prevIterTime = crntTime;
+
+		Callbacks::onWindowRefresh(window);
+
+		// Take care of all GLFW events
+		glfwPollEvents();
 	}
 
-	// Create fragment shader from string
-	if (fragmentShader == 0) fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	if (!fragmentShader) {
-		printf("Error in fragment shader creation\n");
-		exit(1);
-	}
-
-	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	if (!checkShader(fragmentShader, "Fragment shader error")) return false;
-
-	shaderProgramId = glCreateProgram();
-	if (!shaderProgramId) {
-		printf("Error in shader program creation\n");
-		exit(1);
-	}
-	glAttachShader(shaderProgramId, vertexShader);
-	glAttachShader(shaderProgramId, fragmentShader);
-	if (geometryShader > 0) glAttachShader(shaderProgramId, geometryShader);
-
-	// Connect the fragmentColor to the frame buffer memory
-	glBindFragDataLocation(shaderProgramId, 0, fragmentShaderOutputName);	// this output goes to the frame buffer memory
-
-																			// program packaging
-	glLinkProgram(shaderProgramId);
-	if (!checkLinking(shaderProgramId)) return false;
-
-	// make this program run
-	glUseProgram(shaderProgramId);
-	return true;
+	// Delete window before ending the program
+	glfwDestroyWindow(window);
+	// Terminate GLFW before ending the program
+	glfwTerminate();
+	return 0;
 }

@@ -4,7 +4,6 @@
 
 #include "ImGUIAdapter.h"
 #include "GlobalVariables.h"
-#include "Application.h"
 #include "ControlEventManager.h"
 
 // Initialization, getInstance an OpenGL context
@@ -68,7 +67,6 @@ void onDisplay() {
 	guiAdapter->configToScene(*scene);
 	guiAdapter->draw();
 	glutSwapBuffers();
-
 }
 
 
@@ -225,7 +223,7 @@ void onIdle() {
 
 	for (float t = tStart; t < tEnd; t += dt) {
 		float DT = (dt < tEnd - t) ? dt : tEnd - t;
-		scene->Control(DT);
+		scene->control(DT);
 		scene->animate(DT);
 	}
 	glutPostRedisplay();

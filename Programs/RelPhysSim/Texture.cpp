@@ -1,5 +1,5 @@
 
-#include "GL\glew.h"
+#include "glad/glad.h"
 #include "Texture.h"
 
 std::vector<vec4> Texture::load(std::string pathname, bool transparent, int& width, int& height) {

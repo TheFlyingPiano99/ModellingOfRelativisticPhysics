@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 #include <corecrt_math_defines.h>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 void Camera::updateDirections(vec3 updatedEye)
 {

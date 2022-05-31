@@ -10,7 +10,6 @@
 #include "Object.h"
 #include "Background.h"
 #include "Caption.h"
-#include "MenuSystem.h"
 #include "LightSource.h"
 #include "View.h"
 #include "EnumTypes.h"
@@ -50,8 +49,6 @@ class Scene {
 
 	Background* background;
 	vec3 backgroundColor;
-
-	MenuSystem menu;
 
 	bool entryMode = false;
 	bool allowQuit = false;
@@ -114,6 +111,13 @@ public:
 
 	}
 
+	static void destroyInstance() {
+		if (instance != nullptr) {
+			delete instance;
+			instance = nullptr;
+		}
+	}
+
 	/*
 	* Called once, after the app is launched.
 	*/
@@ -121,9 +125,11 @@ public:
 
 	void loadDefault();
 
-	void Control(float dt);
+	void control(float dt);
 
 	void animate(float dt);
+
+	void onContextResize(unsigned int windowWidth, unsigned int windowHeight);
 
 	/*
 	* Renders everything on screen.

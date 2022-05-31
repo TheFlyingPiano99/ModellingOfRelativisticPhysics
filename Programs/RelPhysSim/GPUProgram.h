@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "GL\glew.h"
+#include "glad/glad.h"
 #include "Geometry.h"
 #include "Texture.h"
 #include "EnumTypes.h"

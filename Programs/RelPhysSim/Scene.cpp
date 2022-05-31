@@ -212,7 +212,7 @@ void Scene::loadDefault()
 	toggleActiveObserver();
 }
 
-void Scene::Control(float dt) {
+void Scene::control(float dt) {
 	if (loadingScene) {
 		controlEvents.clear();
 		if (finishedLoading) {
@@ -278,6 +278,11 @@ void Scene::animate(float dt) {
 			obj->animate(dt);
 		}
 	}
+}
+
+void Scene::onContextResize(unsigned int windowWidth, unsigned int windowHeight)
+{
+	//TODO
 }
 
 void Scene::draw(GPUProgram& gpuProgram) {
