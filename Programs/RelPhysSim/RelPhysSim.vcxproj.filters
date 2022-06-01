@@ -186,6 +186,9 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IControlEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IControlEvent.h">
@@ -334,9 +337,6 @@
     </ClInclude>
     <ClInclude Include="Initialiser.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalInclude.h">
-      <Filter>Header Files\Controller</Filter>
     </ClInclude>
     <ClInclude Include="Callbacks.h">
       <Filter>Header Files\Controller</Filter>

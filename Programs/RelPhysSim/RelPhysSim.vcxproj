@@ -91,13 +91,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\glew-1.13.0\include\;$(SolutionDir)..\Libs\freeglut\include\;D:\VisualCpp\ModellingOfRelativisticPhysics\Libs\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\VisualCpp\ModellingOfRelativisticPhysics\Libs\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\Libs\freeglut\lib;$(SolutionDir)..\Libs\glew-1.13.0\lib\Release\Win32\;$(SolutionDir)..\Libs\devil-1.7.8\lib\;D:\VisualCpp\ModellingOfRelativisticPhysics\Libs\glm;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\VisualCpp\ModellingOfRelativisticPhysics\Libs\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,6 +154,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="GlobalVariables.cpp" />
     <ClCompile Include="GPUProgram.cpp" />
+    <ClCompile Include="IControlEvent.cpp" />
     <ClCompile Include="ImGUIObserver.cpp" />
     <ClCompile Include="Initialiser.cpp" />
     <ClCompile Include="PersistenceHelper.cpp" />
@@ -199,7 +200,6 @@
     <ClInclude Include="..\..\Libs\include\imgui\imstb_truetype.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="ControlEventManager.h" />
-    <ClInclude Include="GlobalInclude.h" />
     <ClInclude Include="GlobalVariables.h" />
     <ClInclude Include="GPUProgram.h" />
     <ClInclude Include="ImGUIObserver.h" />

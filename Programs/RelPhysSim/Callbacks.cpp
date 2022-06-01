@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "ControlEventManager.h"
 #include "SingletonManager.h"
-#include "GlobalInclude.h"
+#include "GlobalVariables.h"
 #include "ImGUIAdapter.h"
 #include "Shaders.h"
 
@@ -87,7 +87,12 @@ void Callbacks::onKey(GLFWwindow* window, int key, int scancode, int action, int
 		scene->type(key);
 	}
 	else if (scene->getCreationSequence() != CreationSequence::costumize) {
-		ControlEventManager::getInstance().handlePressedEvents(*scene, key);
+		if (GLFW_PRESS == action) {
+			ControlEventManager::getInstance().onPress(*Scene::getInstance(), key);
+		}
+		else if (GLFW_RELEASE == action) {
+			ControlEventManager::getInstance().onRelease(*Scene::getInstance(), key);
+		}
 	}
 }
 
@@ -196,7 +201,7 @@ void Callbacks::toggleFullScreen()
 		glfwSetWindowMonitor(GlobalVariables::window, monitor, 0, 0, mode->width, mode->height, 60);
 	}
 	else {
-		glfwSetWindowMonitor(GlobalVariables::window, nullptr, 50, 50, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 60);
+		glfwSetWindowMonitor(GlobalVariables::window, nullptr, 50, 50, GlobalVariables::windowWidth, GlobalVariables::windowHeight, 60);
 	}
 	glfwGetWindowSize(GlobalVariables::window, &GlobalVariables::windowWidth, &GlobalVariables::windowHeight);
 	glViewport(0, 0, GlobalVariables::windowWidth, GlobalVariables::windowHeight);

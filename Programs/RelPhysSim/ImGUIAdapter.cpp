@@ -3,7 +3,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
-#include "GlobalInclude.h"
+#include "GlobalVariables.h"
 
 const char* ImGUIAdapter::Variables::intersectionModeNames[2] = { "Hypercone", "Hyperplane" };
 const char* ImGUIAdapter::Variables::dopplerModeNames[3] = { "Full", "Mild", "Off"};

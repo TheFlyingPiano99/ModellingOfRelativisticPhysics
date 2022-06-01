@@ -1,18 +1,24 @@
 #pragma once
 
 class IControlEvent {
+
 protected:
+	bool wasPressed = false;
 	char keyShortcut;
+	enum TriggerType {
+		triggerContinous,
+		triggerOnPress,
+		triggerOnRelease
+	};
+	TriggerType triggerType = TriggerType::triggerOnPress;
 
 public:
 
-	char getKeyShortcut() {
-		return keyShortcut;
-	}
+	char getKeyShortcut() const;
 
-	bool isPressed(const char key) {
-		return key == keyShortcut;
-	}
+	bool onPress();
+	bool onRelease();
 
 	virtual void performAction (const float dt) = 0;
+
 };

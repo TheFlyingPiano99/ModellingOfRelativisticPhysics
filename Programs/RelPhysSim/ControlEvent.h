@@ -10,11 +10,7 @@ class ControlEvent : public IControlEvent
 {
 
 public:
-	virtual void performAction(const float dt) = 0;
-
-	char getKeyShortcut() {
-		return keyShortcut;
-	}
+	virtual void performAction( const float dt) = 0;
 };
 
 
@@ -26,7 +22,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 
 };
 
@@ -38,7 +34,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction(const float dt) override;
 };
 
 class ToggleViewModeEvent : public ControlEvent {
@@ -49,7 +45,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleIntersectionModeEvent : public ControlEvent {
@@ -60,18 +56,18 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	virtual void performAction( const float dt)  override;
 };
 
 class ToggleSelectionEvent : public ControlEvent {
 public:
 	ToggleSelectionEvent()
 	{
-		keyShortcut = '\t';
+		keyShortcut = '\x2';
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleDopplerEffectEvent : public ControlEvent {
@@ -81,7 +77,7 @@ public:
 		keyShortcut = 'd';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleShadingEvent : public ControlEvent {
@@ -90,7 +86,7 @@ public:
 		keyShortcut = 's';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class MoveCameraForwardEvent : public ControlEvent {
@@ -101,7 +97,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class MoveCameraBackwardEvent : public ControlEvent {
@@ -110,7 +106,7 @@ public:
 		keyShortcut = '\'';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 
@@ -121,7 +117,7 @@ public:
 		keyShortcut = '/';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class MoveCameraDownEvent : public ControlEvent {
@@ -131,7 +127,7 @@ public:
 		keyShortcut = '.';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 
@@ -142,7 +138,7 @@ public:
 		keyShortcut = ';';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class MoveCameraRightEvent : public ControlEvent {
@@ -153,7 +149,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	virtual void performAction( const float dt)  override;
 };
 
 class ZoomInEvent : public ControlEvent {
@@ -162,7 +158,7 @@ public:
 		keyShortcut = '=';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ZoomOutEvent : public ControlEvent {
@@ -172,7 +168,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class WindTimeEvent : public ControlEvent {
@@ -182,7 +178,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class RewindTimeEvent : public ControlEvent {
@@ -191,7 +187,7 @@ public:
 		keyShortcut = 'r';
 	}
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleLorentzEvent : public ControlEvent {
@@ -201,7 +197,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleTransformToProperFrameEvent : public ControlEvent {
@@ -212,7 +208,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SaveEvent : public ControlEvent {
@@ -223,7 +219,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class LoadEvent : public ControlEvent {
@@ -234,7 +230,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleEditorEvent : public ControlEvent {
@@ -245,7 +241,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ClearSceneEvent : public ControlEvent {
@@ -256,7 +252,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class DeleteSelectedEvent: public ControlEvent {
@@ -267,7 +263,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleSimultaneBoostEvent : public ControlEvent {
@@ -278,7 +274,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleHUDEvent : public ControlEvent {
@@ -289,7 +285,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleDisplayIntersectableEvent : public ControlEvent {
@@ -300,7 +296,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleImGUIEvent : public ControlEvent {
@@ -311,7 +307,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectXCameraDirectionEvent : public ControlEvent {
@@ -322,7 +318,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectYCameraDirectionEvent : public ControlEvent {
@@ -333,7 +329,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectZCameraDirectionEvent : public ControlEvent {
@@ -344,7 +340,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectFreeCameraDirectionEvent : public ControlEvent {
@@ -355,7 +351,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectMinusXCameraDirectionEvent : public ControlEvent {
@@ -366,7 +362,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectMinusYCameraDirectionEvent : public ControlEvent {
@@ -377,7 +373,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class SelectMinusZCameraDirectionEvent : public ControlEvent {
@@ -388,7 +384,7 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };
 
 class ToggleDrawPathEvent : public ControlEvent {
@@ -399,5 +395,5 @@ public:
 	}
 
 	// Inherited via ControlEvent
-	virtual void performAction(const float dt) override;
+	void performAction( const float dt)  override;
 };

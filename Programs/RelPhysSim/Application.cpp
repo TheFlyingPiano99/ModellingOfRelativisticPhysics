@@ -2,9 +2,7 @@
 
 #include "Callbacks.h"
 #include "Scene.h"
-#include "GlobalInclude.h"
-
-#define PROJECT_NAME "Voxel renderer"
+#include "GlobalVariables.h"
 
 void setFullScreenMode(GLFWwindow*& window, bool isFullScreenMode) {
 	if (isFullScreenMode) {
@@ -13,7 +11,7 @@ void setFullScreenMode(GLFWwindow*& window, bool isFullScreenMode) {
 		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 60);
 	}
 	else {
-		glfwSetWindowMonitor(window, nullptr, 50, 50, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 60);
+		glfwSetWindowMonitor(window, nullptr, 50, 50, GlobalVariables::windowWidth, GlobalVariables::windowHeight, 60);
 	}
 	glfwGetWindowSize(window, &GlobalVariables::windowWidth, &GlobalVariables::windowHeight);
 }
@@ -31,9 +29,9 @@ int initWindow(GLFWwindow*& window) {
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, PROJECT_NAME, NULL, NULL);
+	window = glfwCreateWindow(GlobalVariables::windowWidth, GlobalVariables::windowHeight, WINDOW_TITLE, nullptr, nullptr);
 	// Error check if the window fails to create
-	if (window == NULL)
+	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window!" << std::endl;
 		glfwTerminate();
@@ -86,7 +84,7 @@ int main()
 			// Creates new title
 			std::string FPS = std::to_string((1.0 / timeDiff) * frameCounter);
 			std::string ms = std::to_string((timeDiff / frameCounter) * 1000.0);
-			std::string newTitle = std::string(PROJECT_NAME) + " (" + FPS + " FPS / " + ms + " ms)";
+			std::string newTitle = std::string(WINDOW_TITLE) + " (" + FPS + " FPS / " + ms + " ms)";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			// Resets times and counter

@@ -19,60 +19,71 @@ void ControlEventManager::destroyInstance() {
 
 void ControlEventManager::addControlEvent(IControlEvent* controlEvent)
 {
-	controlEvents.push_back(controlEvent);
+	controlEvents.emplace(controlEvent->getKeyShortcut(), controlEvent);
 }
 
-std::vector<IControlEvent*>& ControlEventManager::getControlEvents()
+std::map<char, IControlEvent*>& ControlEventManager::getControlEvents()
 {
 	return controlEvents;
 }
 
-void ControlEventManager::handlePressedEvents(Scene& scene, unsigned char key)
+void ControlEventManager::onPress(Scene& scene, char key)
 {
-	for (IControlEvent* event : controlEvents) {
-		if (event->isPressed(key)) {
-			scene.pushBackControlEvent(event);
+	auto event = controlEvents.find(key);
+	if (event != controlEvents.end()) {
+		if (event->second->onPress()) {
+			scene.pushBackControlEvent(event->second);
+		}
+	}
+}
+
+void ControlEventManager::onRelease(Scene& scene, char key)
+{
+	auto event = controlEvents.find(key);
+	if (event != controlEvents.end()) {
+		if (event->second->onRelease()) {
+			scene.pushBackControlEvent(event->second);
 		}
 	}
 }
 
 void ControlEventManager::buildDefaultControlScheme()
 {
-	controlEvents.push_back(new ToggleObserverEvent());
-	controlEvents.push_back(new TogglePauseEvent());
-	controlEvents.push_back(new ZoomInEvent());
-	controlEvents.push_back(new ZoomOutEvent());
-	controlEvents.push_back(new ToggleDopplerEffectEvent());
-	controlEvents.push_back(new RewindTimeEvent());
-	controlEvents.push_back(new WindTimeEvent());
-	controlEvents.push_back(new ToggleIntersectionModeEvent());
-	controlEvents.push_back(new ToggleTransformToProperFrameEvent());
-	controlEvents.push_back(new ToggleLorentzEvent());
-	controlEvents.push_back(new ToggleViewModeEvent());
-	controlEvents.push_back(new ToggleShadingEvent());
-	controlEvents.push_back(new ToggleSelectionEvent());
-	controlEvents.push_back(new MoveCameraForwardEvent());
-	controlEvents.push_back(new MoveCameraBackwardEvent());
-	controlEvents.push_back(new MoveCameraLeftEvent());
-	controlEvents.push_back(new MoveCameraRightEvent());
-	controlEvents.push_back(new MoveCameraUpEvent());
-	controlEvents.push_back(new MoveCameraDownEvent());
-	controlEvents.push_back(new SaveEvent());
-	controlEvents.push_back(new LoadEvent());
-	controlEvents.push_back(new ToggleEditorEvent());
-	controlEvents.push_back(new ClearSceneEvent());
-	controlEvents.push_back(new DeleteSelectedEvent());
-	controlEvents.push_back(new ToggleSimultaneBoostEvent());
-	controlEvents.push_back(new ToggleHUDEvent());
-	controlEvents.push_back(new ToggleDisplayIntersectableEvent());
-	controlEvents.push_back(new ToggleDrawPathEvent());
+	addControlEvent(new ToggleObserverEvent());
+	addControlEvent(new TogglePauseEvent());
+	addControlEvent(new ZoomInEvent());
+	addControlEvent(new ZoomOutEvent());
+	addControlEvent(new ToggleDopplerEffectEvent());
+	addControlEvent(new RewindTimeEvent());
+	addControlEvent(new WindTimeEvent());
+	addControlEvent(new ToggleIntersectionModeEvent());
+	addControlEvent(new ToggleTransformToProperFrameEvent());
+	addControlEvent(new ToggleLorentzEvent());
+	addControlEvent(new ToggleViewModeEvent());
+	addControlEvent(new ToggleShadingEvent());
+	addControlEvent(new ToggleSelectionEvent());
+	addControlEvent(new MoveCameraForwardEvent());
+	addControlEvent(new MoveCameraBackwardEvent());
+	addControlEvent(new MoveCameraLeftEvent());
+	addControlEvent(new MoveCameraRightEvent());
+	addControlEvent(new MoveCameraUpEvent());
+	addControlEvent(new MoveCameraDownEvent());
+	addControlEvent(new SaveEvent());
+	addControlEvent(new LoadEvent());
+	addControlEvent(new ToggleEditorEvent());
+	addControlEvent(new ClearSceneEvent());
+	addControlEvent(new DeleteSelectedEvent());
+	addControlEvent(new ToggleSimultaneBoostEvent());
+	addControlEvent(new ToggleHUDEvent());
+	addControlEvent(new ToggleDisplayIntersectableEvent());
+	addControlEvent(new ToggleDrawPathEvent());
 	/*
-	controlEvents.push_back(new SelectFreeCameraDirectionEvent());
-	controlEvents.push_back(new SelectXCameraDirectionEvent());
-	controlEvents.push_back(new SelectYCameraDirectionEvent());
-	controlEvents.push_back(new SelectZCameraDirectionEvent());
-	controlEvents.push_back(new SelectMinusXCameraDirectionEvent());
-	controlEvents.push_back(new SelectMinusYCameraDirectionEvent());
-	controlEvents.push_back(new SelectMinusZCameraDirectionEvent());
+	addControlEvent(new SelectFreeCameraDirectionEvent());
+	addControlEvent(new SelectXCameraDirectionEvent());
+	addControlEvent(new SelectYCameraDirectionEvent());
+	addControlEvent(new SelectZCameraDirectionEvent());
+	addControlEvent(new SelectMinusXCameraDirectionEvent());
+	addControlEvent(new SelectMinusYCameraDirectionEvent());
+	addControlEvent(new SelectMinusZCameraDirectionEvent());
 	*/
 }
