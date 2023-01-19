@@ -107,11 +107,11 @@ void Scene::loadDefault()
 
 	//Observers:-------------------------------------------------
 	//1.
-	wrdln = new GeodeticLine(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
+	wrdln = new GeodeticLine(vec3(-10.0f, -10.0f, 50.0f), vec3(0.0f, 0.0f, 0.0f), "Obs1's world line");
 	observer = new Observer(wrdln, "Obs1", "An observer");
 	observers.push_back(observer);
 
-	wrdln = new GeodeticLine(vec3(-5.0f, 20.0f, 0.0f), vec3(0.0f, -0.8f, 0.0f), "Obs2's world line");
+	wrdln = new GeodeticLine(vec3(0.0f, 20.0f, 0.0f), vec3(0.0f, -0.9f, 0.0f), "Obs2's world line");
 	observer = new Observer(wrdln, "Obs2", "An observer");
 	observers.push_back(observer);
 
@@ -138,15 +138,16 @@ void Scene::loadDefault()
 		objects.push_back(Object::createEarth(wrdln));
 	}
 	*/
-	
 
 	
 	//Dice:
+	/*
 	wrdln = new GeodeticLine(vec3(10.0f, -6.0f, 0.0f), vec3(0.0f, 0.9f, 0.0f), "Speeding dice world line v = 0.75c");
 	Object* dice = Object::createDice(wrdln);
 	dice->setName("Fast dice");
 	dice->setDescription("v = 0.9c");
 	objects.push_back(dice);
+	*/
 	
 	/*
 	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, 3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 1");
@@ -156,30 +157,32 @@ void Scene::loadDefault()
 	objects.push_back(dice);
 	*/
 	
+	/*
 	wrdln = new GeodeticLine(vec3(10.0f, 0.0f, -3.0f), vec3(0.0f, 0.0f, 0.0f), "Standing dice world line no 2");
 	dice = Object::createDice(wrdln);
 	dice->setName("Standing dice");
 	dice->setDescription("");
 	objects.push_back(dice);
+	*/
 	
 	
 
 	/*
-	for (int j = 0; j < 10; j++) {
+	for (int j = 0; j < 30; j++) {
 		for (int i = 0; i < 1; i++) {
-			//wrdln = new GeodeticLine(vec3(10.0f + j * 3, -15.0f + (i) * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
-			wrdln = new SpiralLine(vec3(20.0f + 10.0f + j * 3, -15.0f + (i) * 3, 0.0f),
-				vec3(10.0f + j * 3, -15.0f + (i) * 3, 0.0f),
-				vec3(0.0f, 0.5f, 0.0f), "");
+			wrdln = new GeodeticLine(vec3((j - 15) * 3, -15.0f + (i) * 3, -6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			//wrdln = new SpiralLine(vec3(20.0f + 10.0f + j * 3, -15.0f + (i) * 3, 0.0f),
+				//vec3(10.0f + j * 3, -15.0f + (i) * 3, 0.0f),
+				//vec3(0.0f, 0.5f, 0.0f), "");
 			objects.push_back(Object::createDice(wrdln));
-			//wrdln = new GeodeticLine(vec3(10.f + j * 3, -15.0f + (i) * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
-			//objects.push_back(Object::createDice(wrdln));
+			wrdln = new GeodeticLine(vec3((j - 15) * 3, -15.0f + (i) * 3, 6.0f), vec3(0.0f, 0.0f, 0.0f), "");
+			objects.push_back(Object::createDice(wrdln));
 		}
 	}
 	*/
 
 	
-	/*
+	
 	objects.push_back(Object::createSpike(
 		new CompositeLine(vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -188,9 +191,8 @@ void Scene::loadDefault()
 	objects.push_back(Object::createSpike(
 		new SpiralLine(vec3(20.0f, 0.0f, 0.0f),
 			vec3(0.0f, 0.0f, 0.0f),
-			vec3(0.0f, 0.6f, 0.0f),
+			vec3(0.0f, 0.7f, 0.0f),
 			"Spiral worldline")));
-	*/
 	
 	
 
