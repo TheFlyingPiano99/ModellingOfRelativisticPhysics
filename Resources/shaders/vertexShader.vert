@@ -1,5 +1,5 @@
-	#version 330				// Shader 3.3
-	precision highp float;		// normal floats, makes no difference on desktop computers
+	#version 330 core				// Shader 3.3
+	//precision highp float;		// normal floats, makes no difference on desktop computers
 
 	layout(location = 0) in vec4 vp;
 	layout(location = 1) in vec3 vn;

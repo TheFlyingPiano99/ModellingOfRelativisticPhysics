@@ -5,7 +5,7 @@ HUD* HUD::instance = NULL;
 
 void HUD::animate(float dt)
 {
-	for each (std::shared_ptr<Caption*> cap in captions)
+	for (std::shared_ptr<Caption*> cap : captions)
 	{
 		(*cap)->animate();
 	}
@@ -17,7 +17,7 @@ void HUD::draw(GPUProgram& gpuProgram, const Camera& camera)
 	if (!visible) {
 		return;
 	}
-	for each (std::shared_ptr<Caption*> cap in captions)				// Captions
+	for (std::shared_ptr<Caption*> cap : captions)				// Captions
 	{
 		(*cap)->draw(gpuProgram, camera);
 	}

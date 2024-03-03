@@ -1,4 +1,5 @@
 #pragma once
+#include "Geometry.h"
 
 /*
 * Allows variable, to control interpolated states.

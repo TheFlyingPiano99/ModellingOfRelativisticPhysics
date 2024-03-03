@@ -1,6 +1,8 @@
 
 #include "GL\glew.h"
+//#include "glad.h"
 #include "Texture.h"
+#include <cstdio>
 
 std::vector<vec4> Texture::load(std::string pathname, bool transparent, int& width, int& height) {
 	FILE* file = fopen(pathname.c_str(), "r");

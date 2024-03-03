@@ -4,7 +4,7 @@
 #define MyAppName "ModellingOfRelativisticPhysics"
 #define MyAppVersion "0.1"
 #define MyAppPublisher "Zoltán Simon"
-#define MyAppExeName "ModellingOfRelativisticPhysics.exe"
+#define MyAppExeName "RelPhysSim.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -19,11 +19,12 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Installer
+OutputDir=./
 OutputBaseFilename=relPhysSetup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+DisableDirPage=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -32,13 +33,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\bin\ModellingOfRelativisticPhysics.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\bin\freeglut.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\bin\glew32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Programs\Skeleton\bin\ModellingOfRelativisticPhysics.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Resources\Geometry\*"; DestDir: "{app}\Resources\Geometry\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Resources\Texture\*"; DestDir: "{app}\Resources\Texture\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\VisualCpp\RelativisztikusModellező\ModellingOfRelativisticPhysics\Saves\*"; DestDir: "{app}\Saves"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\Programs\RelPhysSim\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\bin\*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Resources\Geometry\*"; DestDir: "{app}\Resources\Geometry\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\Resources\Texture\*"; DestDir: "{app}\Resources\Texture\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\Saves\*"; DestDir: "{app}\Saves"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

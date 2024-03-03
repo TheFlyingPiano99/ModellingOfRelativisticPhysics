@@ -1,4 +1,4 @@
-	#version 330			// Shader 3.3
+	#version 330 core			// Shader 3.3
 	precision highp float;	// normal floats, makes no difference on desktop computers
 
 	uniform bool textMode;
@@ -7,6 +7,7 @@
 	uniform int viewMode;	// 0 = realTime3D, 1 = diagram
 	uniform int dopplerMode;	// 0 = full, 1 = mild, 2 = off
 	uniform bool doShading;
+
 //Object:
 	in vec3 wPos;
 	in vec3 norm;

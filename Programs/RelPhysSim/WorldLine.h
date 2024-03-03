@@ -117,7 +117,7 @@ public:
 	/*
 	* Used to select line when hovered over by mouse.
 	*/
-	float distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings, vec4& closestLocation = vec4());
+	float distanceBetweenRayAndDiagram(const Ray& ray, const RelTypes::ObserverProperties& observerProperties, const RelTypes::Settings& settings, vec4& closestLocation);
 
 	/*
 	* Intersects intersectable and returns time measered by absolute observer at intersection.

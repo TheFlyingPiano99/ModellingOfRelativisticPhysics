@@ -245,7 +245,7 @@ void Scene::animate(float dt) {
 			activeObserver->syncCamera(realTime3DCamera, settings);
 		}
 		
-		for each (Object * obj in objects)
+		for (Object * obj : objects)
 		{
 			obj->animate(dt);
 		}
@@ -711,11 +711,11 @@ void Scene::save(const char* destinationFile)
 			file << wl->genSaveString() << std::endl;
 		}
 */
-		for each (Observer * obs in observers)
+		for (Observer * obs : observers)
 		{
 			file << obs->genSaveString() << std::endl;
 		}
-		for each (Object * obj in objects)
+		for (Object * obj : objects)
 		{
 			file << obj->genSaveString() << std::endl;
 		}

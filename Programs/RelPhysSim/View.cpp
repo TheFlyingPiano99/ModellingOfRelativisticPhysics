@@ -10,7 +10,7 @@ void RealTime3DView::draw(GPUProgram& gpuProgram) {
 	LightCone* lightCone = scene->getActiveObserver()->getLightCone(scene->getSettings());
 	Hyperplane* hyperplane = scene->getActiveObserver()->getHyperplane(scene->getSettings());
 
-	for each (LightSource * lt in *(scene->getLights()))
+	for (LightSource * lt : *(scene->getLights()))
 	{
 		lt->loadOnGPU(gpuProgram);								// Load lights
 	}
@@ -21,12 +21,12 @@ void RealTime3DView::draw(GPUProgram& gpuProgram) {
 	gpuProgram.setUniform(scene->getSettings().doLorentz.get(), "doLorentz");
 	gpuProgram.setUniform(scene->getSettings().intersectionMode.get(), "intersectionMode");
 
-	for each (Object * obj in *(scene->getObjects()))
+	for (Object * obj : *(scene->getObjects()))
 	{
 		RelTypes::Settings settings = scene->getSettings();
 		obj->draw(gpuProgram, *(scene->getActiveCamera()), *lightCone, *hyperplane, scene->getActiveObserver()->getProperties(settings), settings);	// Objects
 	}
-	for each (Observer * obs in *(scene->getObservers()))
+	for (Observer * obs : *(scene->getObservers()))
 	{
 		obs->draw(gpuProgram, *activeCamera);			// Observers
 	}
@@ -48,7 +48,7 @@ void RealTime3DView::transitionTo()
 
 void DiagramView::draw(GPUProgram& gpuProgram) {
 	Scene* scene = reinterpret_cast<Scene*>(owner);
-	for each (LightSource * lt in *(scene->getDiagramLights()))
+	for (LightSource * lt : *(scene->getDiagramLights()))
 	{
 		lt->loadOnGPU(gpuProgram);									// Load lights
 	}
@@ -58,13 +58,13 @@ void DiagramView::draw(GPUProgram& gpuProgram) {
 	LightCone* lightCone = scene->getActiveObserver()->getLightCone(scene->getSettings());
 	Hyperplane* hyperplane = scene->getActiveObserver()->getHyperplane(scene->getSettings());
 	scene->getBackground()->drawDiagram(gpuProgram, *(scene->getActiveCamera()));		// Background
-	for each (Object * obj in *(scene->getObjects()))
+	for (Object * obj : *(scene->getObjects()))
 	{
 		obj->drawDiagram(gpuProgram, *activeCamera, *lightCone, *hyperplane,
 			scene->getActiveObserver()->getProperties(scene->getSettings()),
 			scene->getSettings());			// Objects
 	}
-	for each (Observer * obs in *(scene->getObservers()))
+	for (Observer * obs : *(scene->getObservers()))
 	{
 		obs->drawDiagram(gpuProgram, *activeCamera);			// Observers
 	}

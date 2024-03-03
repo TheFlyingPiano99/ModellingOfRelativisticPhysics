@@ -6,7 +6,7 @@
 std::vector<std::string> split(std::string str, const char separator) {
 	std::vector<std::string> words;
 	bool prevWasSeparator = true;
-	for each (char c in str)
+	for (char c : str)
 	{
 		if (c == separator) {
 			prevWasSeparator = true;

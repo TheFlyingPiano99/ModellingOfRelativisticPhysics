@@ -70,24 +70,24 @@ public:
 
 	~Scene() {
 		delete view;
-		for each (Observer* obs in observers)
+		for (Observer* obs : observers)
 		{
 			delete obs;
 		}
-		for each (Object * obj in objects)
+		for (Object * obj : objects)
 		{
 			delete obj;
 		}
-		for each (LightSource * lt in lights)
+		for (LightSource * lt : lights)
 		{
 			delete lt;
 		}
-		for each (LightSource * lt in diagramLights)
+		for (LightSource * lt : diagramLights)
 		{
 			delete lt;
 		}
 
-		for each (WorldLine* line in linesToDisplay)
+		for (WorldLine* line : linesToDisplay)
 		{
 			delete line;
 		}

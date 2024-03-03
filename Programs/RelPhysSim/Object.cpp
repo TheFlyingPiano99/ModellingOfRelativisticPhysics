@@ -344,7 +344,8 @@ void Object::setWorldLine(std::map<int, WorldLine*>& worldLines) {
 */
 
 float Object::rayDistanceToDiagram(const Ray& ray, RelTypes::ObserverProperties observerProperties, const RelTypes::Settings& settings) {
-	return worldLine->distanceBetweenRayAndDiagram(ray, observerProperties, settings);
+	vec4 placeholder;
+	return worldLine->distanceBetweenRayAndDiagram(ray, observerProperties, settings, placeholder);
 }
 
 float Object::rayDistanceToObject(const Ray& ray, 

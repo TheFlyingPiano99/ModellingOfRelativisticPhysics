@@ -12,7 +12,7 @@ void MessageQueue::pop()
 }
 
 MessageQueue::~MessageQueue() {
-	for each (std::shared_ptr<Caption*> cap in queue) {
+	for (std::shared_ptr<Caption*> cap : queue) {
 		(*cap)->erease();
 	}
 }

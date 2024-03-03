@@ -22,7 +22,8 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <windows.h>
 #endif
-#include <GL/glew.h>		// must be downloaded
+#include <GL/glew.h>
+//#include "glad.h"
 #include <GL/freeglut.h>	// must be downloaded unless you have an Apple
 #endif
 
